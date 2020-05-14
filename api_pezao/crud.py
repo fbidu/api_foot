@@ -8,6 +8,9 @@ from . import models, schema
 
 
 def create_user(db: Session, user: schema.UserCreate):
+    """
+    Creates a new user from the data in the schema inside the provided DB
+    """
     db_user = models.User(**user.dict())
 
     db.add(db_user)
@@ -18,4 +21,7 @@ def create_user(db: Session, user: schema.UserCreate):
 
 
 def list_users(db: Session):
+    """
+    Lists all the registered users
+    """
     return db.query(models.User).all()
