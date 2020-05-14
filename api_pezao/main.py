@@ -3,11 +3,12 @@ Here be awesome code!
 """
 from typing import List
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, File, UploadFile
 from sqlalchemy.orm import Session
 
 
 from . import crud, models, schema
+from .csv_input import import_csv
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -49,3 +50,13 @@ def read_users(db: Session = Depends(get_db)):
     Lists all users
     """
     return crud.list_users(db)
+
+
+@app.post("/csv/")
+async def read_csv(file: UploadFile = File(...)):
+    """
+    Receives a CSV input file
+    """
+    content = open(file.file, "rb")
+    lines = import_csv(content)
+    return {"lines": lines}
