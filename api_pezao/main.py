@@ -53,10 +53,14 @@ def read_users(db: Session = Depends(get_db)):
 
 
 @app.post("/csv/")
-async def read_csv(file: UploadFile = File(...)):
+def read_csv(csv_file: UploadFile = File(...)):
     """
     Receives a CSV input file
     """
-    content = open(file.file, "rb")
-    lines = import_csv(content)
+    with csv_file.file as file:
+        content = file.read()
+        content = content.decode("utf-8")
+        content = content.split("\n")
+        lines = import_csv(content)
+
     return {"lines": lines}
