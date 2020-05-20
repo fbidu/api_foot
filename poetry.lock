@@ -607,7 +607,6 @@ version = ">=0.12"
 [[package]]
 category = "main"
 description = "A streaming multipart parser for Python"
-marker = "extra == \"all\""
 name = "python-multipart"
 optional = false
 python-versions = "*"
@@ -798,7 +797,7 @@ python-versions = ">=3.6"
 version = "3.1.0"
 
 [metadata]
-content-hash = "27db3d8a0152398f4c42a415782013d6151c6ac395aa2fc8e702b1d685c6b061"
+content-hash = "6bd4791cd51bf820f7299d0b24209e5e589fcb87a6b3196aa9df3c2fcd2f5f7d"
 python-versions = "^3.7"
 
 [metadata.hashes]
