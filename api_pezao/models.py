@@ -27,7 +27,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-class Roles_Users(Base):
+class RolesUsers(Base):
     """
     Defines the SQLAlchemy model for 'roles_users' table
     """
