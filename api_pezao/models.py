@@ -101,7 +101,7 @@ class TemplatesSMS(Base):
     id = Column(Integer, primary_key=True, index=True)
     msg = Column(String)
 
-class Attempt_Log(Base):
+class AttemptLog(Base):
     """
     Defines the SQLAlchemy model for 'attempt_log' table
     """
