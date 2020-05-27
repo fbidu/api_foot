@@ -132,7 +132,7 @@ class Result(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     IDExport = Column(Integer, unique=True, index=True)
-    Barcode = Column(Integer) #type?
+    Barcode = Column(String)
     NumLote = Column(Integer)
     DataNasc = Column(String) #date?
     HoraNasc = Column(String) #date?
