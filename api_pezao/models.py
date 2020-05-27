@@ -91,7 +91,7 @@ class Templates_Result(Base):
     result_id = Column(Integer, unique=True, index=True)
     template_id = Column(Integer, unique=True, index=True)
 
-class Templates_SMS(Base):
+class TemplatesSMS(Base):
     """
     Defines the SQLAlchemy model for 'templates_sms' table
     """
