@@ -81,7 +81,7 @@ class Log(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-class Templates_Result(Base):
+class TemplatesResult(Base):
     """
     Defines the SQLAlchemy model for 'templates_result' table
     """
