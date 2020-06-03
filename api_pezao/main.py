@@ -64,3 +64,12 @@ def read_csv(csv_file: UploadFile = File(...)):
         lines = import_csv(content)
 
     return {"lines": lines}
+
+
+@app.post("/pdf/")
+def read_pdf(pdf_file: UploadFile = File(...)):
+    """
+    Receives and stores a PDF file
+    """
+    content = pdf_file.file.read()
+    return len(content)
