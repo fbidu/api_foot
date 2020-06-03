@@ -25,3 +25,10 @@ estático de código e do [`black`](https://github.com/psf/black) como formatado
 
 Esses dois projetos podem ser executados manualmente mas, adicionalmente, você
 pode instalar o `[pre-commit]'(https://pre-commit.com/) também.
+
+## Rodando
+
+### Configurações
+
+* `pdf_storage_path`: Caminho completo para onde os PDFs dos laudos devem ser
+  salvos e buscados
