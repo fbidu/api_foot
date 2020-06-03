@@ -47,7 +47,7 @@ class Roles(Base):
     role_id = Column(Integer, primary_key=True, index=True)
     role_name = Column(String, unique=True, index=True)
 
-class Hospital_Cs(Base):
+class HospitalCS(Base):
     """
     Defines the SQLAlchemy model for 'hospital_cs' table
     """
