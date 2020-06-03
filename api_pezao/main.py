@@ -7,9 +7,10 @@ from fastapi import Depends, FastAPI, File, UploadFile
 from sqlalchemy.orm import Session
 
 
-from . import crud, models, schema
+from . import crud, models, schema, settings
 from .csv_input import import_csv
 from .database import SessionLocal, engine
+
 
 models.Base.metadata.create_all(bind=engine)
 
