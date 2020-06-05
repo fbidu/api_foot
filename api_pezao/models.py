@@ -156,7 +156,7 @@ class Result(Base):
     LocalNasc = Column(String)
     PDF_Filename = Column(String)
     Tipo_SMS = Column(String) #type?
-    RECODRD_CREATION_DATE = Column(DateTime, default=datetime.datetime.utcnow) #date?
+    RECORD_CREATION_DATE = Column(DateTime, default=datetime.datetime.utcnow) #date?
     FILE_EXPORT_DATE = Column(DateTime, default=datetime.datetime.utcnow) #date?
     FILE_EXPORT_NAME = Column(String)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
