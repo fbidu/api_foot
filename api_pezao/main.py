@@ -1,13 +1,14 @@
 """
 Here be awesome code!
 """
+from functools import lru_cache
 from typing import List
 
 from fastapi import Depends, FastAPI, File, UploadFile
 from sqlalchemy.orm import Session
 
 
-from . import crud, models, schema
+from . import config, crud, models, schema
 from .csv_input import import_csv
 from .pdf_input import save_pdf
 from .database import SessionLocal, engine
@@ -16,6 +17,15 @@ from .database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True)
+
+
+@lru_cache()
+def get_settings():
+    """
+    Returns a new instance of settings
+    """
+    return config.Settings()
+
 
 # Dependency
 def get_db():

@@ -14,6 +14,3 @@ class Settings(BaseSettings):
     """
 
     pdf_storage_path: str = "/tmp"
-
-
-settings = Settings()
