@@ -3,7 +3,10 @@ Testes funcionais - determinam se o comportamento dos endpoints é o esperado
 """
 from pathlib import Path
 from fastapi.testclient import TestClient
+
 from api_pezao.main import app
+
+from .utils import check_files_equal
 
 client = TestClient(app)
 
@@ -47,3 +50,4 @@ def test_post_pdf():
 
     assert content == 10453
     assert Path("/tmp/demo.pdf").exists()
+    assert check_files_equal(sample_file, "/tmp/demo.pdf")
