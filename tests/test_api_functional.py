@@ -46,3 +46,4 @@ def test_post_pdf():
     content = response.json()
 
     assert content == 10453
+    assert Path("/tmp/demo.pdf").exists()

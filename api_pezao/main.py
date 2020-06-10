@@ -7,8 +7,9 @@ from fastapi import Depends, FastAPI, File, UploadFile
 from sqlalchemy.orm import Session
 
 
-from . import crud, models, schema, settings
+from . import crud, models, schema
 from .csv_input import import_csv
+from .pdf_input import save_pdf
 from .database import SessionLocal, engine
 
 
@@ -72,5 +73,7 @@ def read_pdf(pdf_file: UploadFile = File(...)):
     """
     Receives and stores a PDF file
     """
-    content = pdf_file.file.read()
+    file = pdf_file.file
+    content = file.read()
+    save_pdf(content, f"/tmp/{pdf_file.filename}")
     return len(content)
