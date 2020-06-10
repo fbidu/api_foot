@@ -15,7 +15,7 @@ Clone esse repositório e execute dentro da pasta
 
 Após o processo, você deverá ser capaz de rodar o projeto com
 
-`poetry run uvicorn api-pezao.main:app --reload --debug`
+`poetry run uvicorn api_pezao.main:app --reload --debug`
 
 
 ### Adicionais
