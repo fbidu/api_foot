@@ -2,6 +2,7 @@
 Here be awesome code!
 """
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from fastapi import Depends, FastAPI, File, UploadFile
@@ -79,11 +80,15 @@ def read_csv(csv_file: UploadFile = File(...)):
 
 
 @app.post("/pdf/")
-def read_pdf(pdf_file: UploadFile = File(...)):
+def read_pdf(
+    pdf_file: UploadFile = File(...), settings: config.Settings = Depends(get_settings)
+):
     """
     Receives and stores a PDF file
     """
     file = pdf_file.file
     content = file.read()
-    save_pdf(content, f"/tmp/{pdf_file.filename}")
+    target_path = Path(settings.pdf_storage_path)
+    filename = target_path.joinpath(pdf_file.filename)
+    save_pdf(content, filename)
     return len(content)
