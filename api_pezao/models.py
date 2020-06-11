@@ -10,8 +10,9 @@ from .database import Base
 
 # pylint: disable=too-few-public-methods
 class HospitalType(enum.Enum):
-    H = 'H'
-    C = 'C'
+    H = "H"
+    C = "C"
+
 
 class User(Base):
     """
@@ -28,6 +29,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
+
 class RolesUsers(Base):
     """
     Defines the SQLAlchemy model for 'roles_users' table
@@ -38,6 +40,7 @@ class RolesUsers(Base):
     user_id = Column(Integer, unique=True, index=True)
     role_id = Column(Integer, unique=True, index=True)
 
+
 class Roles(Base):
     """
     Defines the SQLAlchemy model for 'roles' table
@@ -47,6 +50,7 @@ class Roles(Base):
 
     role_id = Column(Integer, primary_key=True, index=True)
     role_name = Column(String, unique=True, index=True)
+
 
 class HospitalCS(Base):
     """
@@ -82,6 +86,7 @@ class Log(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
+
 class TemplatesResult(Base):
     """
     Defines the SQLAlchemy model for 'templates_result' table
@@ -92,6 +97,7 @@ class TemplatesResult(Base):
     result_id = Column(Integer, unique=True, index=True)
     template_id = Column(Integer, unique=True, index=True)
 
+
 class TemplatesSMS(Base):
     """
     Defines the SQLAlchemy model for 'templates_sms' table
@@ -101,6 +107,7 @@ class TemplatesSMS(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     msg = Column(String)
+
 
 class AttemptLog(Base):
     """
@@ -122,12 +129,13 @@ class AttemptLog(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
+
 class Result(Base):
     """
     Defines the SQLAlchemy model for 'result' table
     """
 
-    #some stuff here im unsure about, waiting for answers from the client, ana will ask her
+    # some stuff here im unsure about, waiting for answers from the client, ana will ask her
 
     __tablename__ = "result"
 
@@ -135,31 +143,30 @@ class Result(Base):
     IDExport = Column(Integer, unique=True, index=True)
     Barcode = Column(String)
     NumLote = Column(Integer)
-    DataNasc = Column(String) #date?
-    HoraNasc = Column(String) #date?
-    DataColeta = Column(String) #date?
-    HoraColeta = Column(String) #date?
+    DataNasc = Column(String)  # date?
+    HoraNasc = Column(String)  # date?
+    DataColeta = Column(String)  # date?
+    HoraColeta = Column(String)  # date?
     prMotherFirstname = Column(String)
     prMotherSurname = Column(String)
     CPF = Column(String)
     ptnFirstname = Column(String)
     ptnSurname = Column(String)
     DNV = Column(String)
-    CNS = Column(String) #type?
+    CNS = Column(String)  # type?
     ptnEmail = Column(String)
     ptnPhone1 = Column(String)
     ptnPhone2 = Column(String)
-    CodLocColeta = Column(String) #type?
+    CodLocColeta = Column(String)  # type?
     LocalColeta = Column(String)
-    COD_LocColeta = Column(String) #type? repeat?
-    COD_HospNasc = Column(String) #type? repeat?
+    COD_LocColeta = Column(String)  # type? repeat?
+    COD_HospNasc = Column(String)  # type? repeat?
     HospNasc = Column(String)
     LocalNasc = Column(String)
     PDF_Filename = Column(String)
-    Tipo_SMS = Column(String) #type?
-    RECORD_CREATION_DATE = Column(DateTime, default=datetime.datetime.utcnow) #date?
-    FILE_EXPORT_DATE = Column(DateTime, default=datetime.datetime.utcnow) #date?
+    Tipo_SMS = Column(String)  # type?
+    RECORD_CREATION_DATE = Column(DateTime, default=datetime.datetime.utcnow)  # date?
+    FILE_EXPORT_DATE = Column(DateTime, default=datetime.datetime.utcnow)  # date?
     FILE_EXPORT_NAME = Column(String)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
-
