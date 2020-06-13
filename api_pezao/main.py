@@ -84,11 +84,15 @@ def read_pdf(
     pdf_file: UploadFile = File(...), settings: config.Settings = Depends(get_settings)
 ):
     """
-    Receives and stores a PDF file
+    Receives and stores a PDF file. The location of the file will be determined
+    by the `pdf_storage_path` config.
     """
     file = pdf_file.file
     content = file.read()
+
+    # Builds the path
     target_path = Path(settings.pdf_storage_path)
     filename = target_path.joinpath(pdf_file.filename)
+
     save_pdf(content, filename)
     return len(content)

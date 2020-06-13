@@ -1,17 +1,15 @@
 """
-Testes funcionais - determinam se o comportamento dos endpoints é o esperado
+Testes funcionais para POST de PDF
 """
 from datetime import datetime
-from os import mkdir, rmdir, remove
+from os import mkdir, remove, rmdir
 from pathlib import Path
-from fastapi.testclient import TestClient
 from pytest import fixture
 
 from api_pezao import config, main
 
-from .utils import check_files_equal, post_pdf
+from ..utils import post_pdf, check_files_equal
 
-client = TestClient(main.app)
 
 # pylint: disable=redefined-outer-name
 @fixture
@@ -22,31 +20,7 @@ def sample_pdf():
     return Path("tests/demo.pdf").absolute()
 
 
-def test_root():
-    """
-    Testa se um GET em / funciona
-    """
-    response = client.get("/")
-    assert response.status_code == 200
-
-
-def test_post_csv():
-    """
-    Testa se o envio de um arquivo para /csv retorna o número de linhas nele
-    """
-    sample_file = Path("tests/demo.csv").absolute()
-    files = {"csv_file": open(sample_file, "r")}
-    response = client.post("/csv/", files=files)
-
-    assert response.status_code == 200
-    assert response.json()
-
-    content = response.json()
-
-    assert content["lines"] == 4
-
-
-def test_post_pdf(sample_pdf):
+def test_post_pdf(client, sample_pdf):
     """
     Testa se o envio de um arquivo para /pdf retorna o tamanho dele e salva
     """
@@ -62,7 +36,7 @@ def test_post_pdf(sample_pdf):
     assert check_files_equal(sample_pdf, "/tmp/demo.pdf")
 
 
-def test_post_pdf_obeys_env(sample_pdf):
+def test_post_pdf_obeys_env(client, sample_pdf):
     """
     Testa se ao enviar um arquivo para /pdf, ele é
     salvo em um lugar especificado
