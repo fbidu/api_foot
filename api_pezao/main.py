@@ -11,8 +11,10 @@ from sqlalchemy.orm import Session
 
 from . import config, crud, models, schema
 from .csv_input import import_csv
-from .pdf_input import save_pdf
 from .database import SessionLocal, engine
+from .pdf_input import save_pdf
+from .schemas.pdf_processed import PDFProcessed
+from .utils import sha256
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -79,7 +81,7 @@ def read_csv(csv_file: UploadFile = File(...)):
     return {"lines": lines}
 
 
-@app.post("/pdf/")
+@app.post("/pdf/", response_model=PDFProcessed)
 def read_pdf(
     pdf_file: UploadFile = File(...), settings: config.Settings = Depends(get_settings)
 ):
@@ -95,4 +97,6 @@ def read_pdf(
     filename = target_path.joinpath(pdf_file.filename)
 
     save_pdf(content, filename)
-    return len(content)
+    return PDFProcessed(
+        length=len(content), filename=pdf_file.filename, sha256=sha256(filename)
+    )
