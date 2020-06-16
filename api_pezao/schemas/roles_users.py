@@ -6,8 +6,8 @@ from pydantic import BaseModel
 
 class RolesUsersBase(BaseModel):
     """
-    Roles_UsersBase defines the fields available for an role_user in any
-    point of its lifecycle.
+    RolesUsersBase define a base para relação user-role.
+    Essa relação sempre possuirá user_id e role_id
     """
 
     # descriptions are a bit wonky, im a little lost
@@ -29,8 +29,6 @@ class RolesUsers(RolesUsersBase):
     """
     Defines a Pydantic model for an user
     """
-
-    id: int
 
     class Config:
         """

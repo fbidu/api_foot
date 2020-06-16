@@ -5,50 +5,6 @@ Define Pydantic models for the data structures.
 import datetime
 from pydantic import BaseModel
 
-from .models import HospitalType
-
-
-class HospitalCsBase(BaseModel):
-    """
-    UserBase defines the fields available for an user in any
-    point of its lifecycle.
-    """
-
-    id: int
-    code: str
-    name: str
-    type: HospitalType
-    email1: str
-    email2: str
-    email3: str
-    user_id: int
-
-
-class HospitalCsCreate(HospitalCsBase):
-    """
-    UserCreate defines additional fields that should be used
-    while creating an user that weren't defined on `UserBase`
-    """
-
-    pass
-
-
-class HospitalCs(HospitalCsBase):
-    """
-    Defines a Pydantic model for an user
-    """
-
-    id: int
-    created_at: datetime.datetime  # datetime?
-    updated_at: datetime.datetime  # datetime?
-
-    class Config:
-        """
-        Metadata to define the orm_mode of sqlalchemy
-        """
-
-        orm_mode = True
-
 
 # -------------------------------------------------
 class LogBase(BaseModel):
