@@ -6,41 +6,6 @@ import datetime
 from pydantic import BaseModel
 
 # -------------------------------------------------
-class TemplatesSMSBase(BaseModel):
-    """
-    UserBase defines the fields available for an user in any
-    point of its lifecycle.
-    """
-
-    id: int
-    msg: str
-
-
-class TemplatesSMSCreate(TemplatesSMSBase):
-    """
-    UserCreate defines additional fields that should be used
-    while creating an user that weren't defined on `UserBase`
-    """
-
-    pass
-
-
-class TemplatesSMS(TemplatesSMSBase):
-    """
-    Defines a Pydantic model for an user
-    """
-
-    id: int
-
-    class Config:
-        """
-        Metadata to define the orm_mode of sqlalchemy
-        """
-
-        orm_mode = True
-
-
-# -------------------------------------------------
 class AttemptLogBase(BaseModel):
     """
     UserBase defines the fields available for an user in any

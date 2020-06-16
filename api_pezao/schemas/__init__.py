@@ -6,4 +6,5 @@ from .hospital_cs import *
 from .log import *
 from .role import *
 from .roles_users import *
+from .template_result import *
 from .user import *
