@@ -9,15 +9,15 @@ from fastapi import Depends, FastAPI, File, UploadFile
 from sqlalchemy.orm import Session
 
 
-from . import config, crud, models, schemas
+from . import config, crud, schemas
 from .csv_input import import_csv
-from .database import SessionLocal, engine
+from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
 from .schemas.pdf_processed import PDFProcessed
 from .utils import sha256
 
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True)
 

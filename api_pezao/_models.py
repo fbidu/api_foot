@@ -1,48 +1,11 @@
 """
 Armazenar os modelos de dados para o banco
 """
-import enum
+
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Enum, PrimaryKeyConstraint
+from sqlalchemy import Column, Integer, String, DateTime, PrimaryKeyConstraint
 
 from .database import Base
-
-
-# pylint: disable=too-few-public-methods
-class HospitalType(enum.Enum):
-    """
-    Enum for the different Hospital Types
-    """
-
-    H = "H"
-    C = "C"
-
-
-class User(Base):
-    """
-    Defines the SQLAlchemy model for 'user' table
-    """
-
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, index=True)
-    cpf = Column(String, unique=True, index=True)
-    name = Column(String)
-    email = Column(String, unique=True, index=True)
-    password = Column(String)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
-
-
-class RolesUsers(Base):
-    """
-    Defines the SQLAlchemy model for 'roles_users' table
-    """
-
-    __tablename__ = "roles_users"
-    __table_args__ = (PrimaryKeyConstraint("user_id", "role_id"),)
-    user_id = Column(Integer, index=True)
-    role_id = Column(Integer, index=True)
 
 
 class Roles(Base):
@@ -54,25 +17,6 @@ class Roles(Base):
 
     role_id = Column(Integer, primary_key=True, index=True)
     role_name = Column(String, unique=True, index=True)
-
-
-class HospitalCS(Base):
-    """
-    Defines the SQLAlchemy model for 'hospital_cs' table
-    """
-
-    __tablename__ = "hospital_cs"
-
-    id = Column(Integer, primary_key=True, index=True)
-    code = Column(String, unique=True, index=True)
-    name = Column(String)
-    type = Column(Enum(HospitalType))
-    email1 = Column(String)
-    email2 = Column(String)
-    email3 = Column(String)
-    user_id = Column(Integer)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 
 class Log(Base):
