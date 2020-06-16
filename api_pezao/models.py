@@ -3,13 +3,17 @@ Armazenar os modelos de dados para o banco
 """
 import enum
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, PrimaryKeyConstraint
 
 from .database import Base
 
 
 # pylint: disable=too-few-public-methods
 class HospitalType(enum.Enum):
+    """
+    Enum for the different Hospital Types
+    """
+
     H = "H"
     C = "C"
 
@@ -36,9 +40,9 @@ class RolesUsers(Base):
     """
 
     __tablename__ = "roles_users"
-
-    user_id = Column(Integer, unique=True, index=True)
-    role_id = Column(Integer, unique=True, index=True)
+    __table_args__ = (PrimaryKeyConstraint("user_id", "role_id"),)
+    user_id = Column(Integer, index=True)
+    role_id = Column(Integer, index=True)
 
 
 class Roles(Base):
