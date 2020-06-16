@@ -6,51 +6,6 @@ import datetime
 from pydantic import BaseModel
 
 # -------------------------------------------------
-class AttemptLogBase(BaseModel):
-    """
-    UserBase defines the fields available for an user in any
-    point of its lifecycle.
-    """
-
-    id: int
-    login: str
-    password: str
-    correct_code: str
-    code: str
-    cpf: str
-    dnv: str
-    dtnasc: str
-    client_ip: str
-
-
-class AttemptLogCreate(AttemptLogBase):
-    """
-    UserCreate defines additional fields that should be used
-    while creating an user that weren't defined on `UserBase`
-    """
-
-    pass
-
-
-class AttemptLog(AttemptLogBase):
-    """
-    Defines a Pydantic model for an user
-    """
-
-    id: int
-    client_date_time: datetime.datetime
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-
-    class Config:
-        """
-        Metadata to define the orm_mode of sqlalchemy
-        """
-
-        orm_mode = True
-
-
-# -------------------------------------------------
 class ResultBase(BaseModel):
     """
     UserBase defines the fields available for an user in any
