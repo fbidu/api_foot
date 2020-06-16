@@ -1,15 +1,13 @@
 """
-Define Pydantic models for the data structures.
+Define modelo de dados para resultados
 """
-
-import datetime
+from datetime import datetime
 from pydantic import BaseModel
 
-# -------------------------------------------------
+
 class ResultBase(BaseModel):
     """
-    UserBase defines the fields available for an user in any
-    point of its lifecycle.
+    ResultBase lista os campos que estão sempre disponíveis
     """
 
     id: int
@@ -38,15 +36,15 @@ class ResultBase(BaseModel):
     LocalNasc: str
     PDF_Filename: str
     Tipo_SMS: str  # type?
-    RECODRD_CREATION_DATE: datetime.datetime  # date?
-    FILE_EXPORT_DATE: datetime.datetime  # date?
+    RECODRD_CREATION_DATE: datetime  # date?
+    FILE_EXPORT_DATE: datetime  # date?
     FILE_EXPORT_NAME: str
 
 
 class ResultCreate(ResultBase):
     """
-    UserCreate defines additional fields that should be used
-    while creating an user that weren't defined on `UserBase`
+    Os campos necessários para criar um novo resultado.
+    São os mesmos da base.
     """
 
     pass
@@ -54,12 +52,12 @@ class ResultCreate(ResultBase):
 
 class Result(ResultBase):
     """
-    Defines a Pydantic model for an user
+    Define um modelo de dados para os resultados
     """
 
     id: int
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         """
