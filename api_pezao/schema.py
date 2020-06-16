@@ -8,41 +8,6 @@ from pydantic import BaseModel
 from .models import HospitalType
 
 
-class RolesBase(BaseModel):
-    """
-    UserBase defines the fields available for an user in any
-    point of its lifecycle.
-    """
-
-    role_id: int
-    role_name: str
-
-
-class RolesCreate(RolesBase):
-    """
-    UserCreate defines additional fields that should be used
-    while creating an user that weren't defined on `UserBase`
-    """
-
-    pass
-
-
-class Roles(RolesBase):
-    """
-    Defines a Pydantic model for an user
-    """
-
-    id: int
-
-    class Config:
-        """
-        Metadata to define the orm_mode of sqlalchemy
-        """
-
-        orm_mode = True
-
-
-# -------------------------------------------------
 class HospitalCsBase(BaseModel):
     """
     UserBase defines the fields available for an user in any
