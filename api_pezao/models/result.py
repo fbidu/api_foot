@@ -1,32 +1,10 @@
 """
-Armazenar os modelos de dados para o banco
+Define modelo SQL para resultados
 """
+from datetime import datetime
+from sqlalchemy import Column, DateTime, Integer, String
 
-import datetime
-from sqlalchemy import Column, Integer, String, DateTime
-
-from .database import Base
-
-
-class AttemptLog(Base):
-    """
-    Defines the SQLAlchemy model for 'attempt_log' table
-    """
-
-    __tablename__ = "attempt_log"
-
-    id = Column(Integer, primary_key=True, index=True)
-    login = Column(String)
-    password = Column(String)
-    correct_code = Column(String)
-    code = Column(String)
-    cpf = Column(String)
-    dnv = Column(String)
-    dtnasc = Column(String)
-    client_ip = Column(String)
-    client_date_time = Column(DateTime, default=datetime.datetime.utcnow)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+from ..database import Base
 
 
 class Result(Base):
@@ -64,8 +42,8 @@ class Result(Base):
     LocalNasc = Column(String)
     PDF_Filename = Column(String)
     Tipo_SMS = Column(String)  # type?
-    RECORD_CREATION_DATE = Column(DateTime, default=datetime.datetime.utcnow)  # date?
-    FILE_EXPORT_DATE = Column(DateTime, default=datetime.datetime.utcnow)  # date?
+    RECORD_CREATION_DATE = Column(DateTime, default=datetime.utcnow)  # date?
+    FILE_EXPORT_DATE = Column(DateTime, default=datetime.utcnow)  # date?
     FILE_EXPORT_NAME = Column(String)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
