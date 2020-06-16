@@ -9,15 +9,15 @@ from fastapi import Depends, FastAPI, File, UploadFile
 from sqlalchemy.orm import Session
 
 
-from . import config, crud, models, schema
+from . import config, crud, schemas
 from .csv_input import import_csv
-from .database import SessionLocal, engine
+from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
 from .schemas.pdf_processed import PDFProcessed
 from .utils import sha256
 
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True)
 
@@ -50,8 +50,8 @@ def home():
     return "Hello, world!"
 
 
-@app.post("/users/", response_model=schema.User)
-def create_user(user: schema.UserCreate, db: Session = Depends(get_db)):
+@app.post("/users/", response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     Receives a new user record in `user` and creates
     a new user in the current database
@@ -59,7 +59,7 @@ def create_user(user: schema.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.get("/users/", response_model=List[schema.User])
+@app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db)):
     """
     Lists all users
