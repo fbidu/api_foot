@@ -3,7 +3,7 @@ Armazenar os modelos de dados para o banco
 """
 import enum
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime, PrimaryKeyConstraint
+from sqlalchemy import Column, Integer, String, DateTime, Enum, PrimaryKeyConstraint
 
 from .database import Base
 
@@ -66,7 +66,7 @@ class HospitalCS(Base):
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, unique=True, index=True)
     name = Column(String)
-    type = Column(enum.Enum(HospitalType))
+    type = Column(Enum(HospitalType))
     email1 = Column(String)
     email2 = Column(String)
     email3 = Column(String)
