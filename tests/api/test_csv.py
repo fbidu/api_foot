@@ -1,22 +1,10 @@
 """
-Testes funcionais - determinam se o comportamento dos endpoints é o esperado
+Testes funcionais para envio de PDF
 """
 from pathlib import Path
-from fastapi.testclient import TestClient
-from api_pezao.main import app
-
-client = TestClient(app)
 
 
-def test_root():
-    """
-    Testa se um GET em / funciona
-    """
-    response = client.get("/")
-    assert response.status_code == 200
-
-
-def test_post_csv():
+def test_post_csv(client):
     """
     Testa se o envio de um arquivo para /csv retorna o número de linhas nele
     """

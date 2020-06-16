@@ -141,7 +141,8 @@ disable=print-statement,
         comprehension-escape,
         logging-format-interpolation,
         pointless-string-statement,
-        unnecessary-pass
+        unnecessary-pass,
+        bad-continuation
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -289,7 +290,8 @@ good-names=i,
            Run,
            _,
            db,
-           e
+           e,
+           f
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
