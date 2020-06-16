@@ -18,8 +18,6 @@ class UserBase(BaseModel):
     cpf: str
     email: str
     password: str
-    created_at: datetime = None  # datetime?
-    updated_at: datetime = None  # datetime?
 
 
 class UserCreate(UserBase):
@@ -37,6 +35,8 @@ class User(UserBase):  # i dont understand this bit :(
     """
 
     id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     class Config:
         """
@@ -49,7 +49,7 @@ class User(UserBase):  # i dont understand this bit :(
 # -----------------------------------------------
 
 
-class Roles_UsersBase(BaseModel):
+class RolesUsersBase(BaseModel):
     """
     Roles_UsersBase defines the fields available for an role_user in any
     point of its lifecycle.
@@ -61,7 +61,7 @@ class Roles_UsersBase(BaseModel):
     role_id: int
 
 
-class Roles_UsersCreate(Roles_UsersBase):
+class RolesUsersCreate(RolesUsersBase):
     """
     UserCreate defines additional fields that should be used
     while creating an user that weren't defined on `UserBase`
@@ -70,7 +70,7 @@ class Roles_UsersCreate(Roles_UsersBase):
     pass
 
 
-class Roles_Users(Roles_UsersBase):
+class RolesUsers(RolesUsersBase):
     """
     Defines a Pydantic model for an user
     """
@@ -121,7 +121,7 @@ class Roles(RolesBase):
 
 
 # -------------------------------------------------
-class Hospital_CsBase(BaseModel):
+class HospitalCsBase(BaseModel):
     """
     UserBase defines the fields available for an user in any
     point of its lifecycle.
@@ -139,7 +139,7 @@ class Hospital_CsBase(BaseModel):
     updated_at: datetime  # datetime?
 
 
-class Hospital_CsCreate(Hospital_CsBase):
+class HospitalCsCreate(HospitalCsBase):
     """
     UserCreate defines additional fields that should be used
     while creating an user that weren't defined on `UserBase`
@@ -148,7 +148,7 @@ class Hospital_CsCreate(Hospital_CsBase):
     pass
 
 
-class Hospital_Cs(Hospital_CsBase):
+class HospitalCs(HospitalCsBase):
     """
     Defines a Pydantic model for an user
     """
@@ -204,7 +204,7 @@ class Log(LogBase):
 
 
 # -------------------------------------------------
-class Templates_ResultBase(BaseModel):
+class TemplatesResultBase(BaseModel):
     """
     UserBase defines the fields available for an user in any
     point of its lifecycle.
@@ -214,7 +214,7 @@ class Templates_ResultBase(BaseModel):
     template_id: int
 
 
-class Templates_ResultCreate(Templates_ResultBase):
+class TemplatesResultCreate(TemplatesResultBase):
     """
     UserCreate defines additional fields that should be used
     while creating an user that weren't defined on `UserBase`
@@ -223,7 +223,7 @@ class Templates_ResultCreate(Templates_ResultBase):
     pass
 
 
-class Templates_Result(Templates_ResultBase):
+class TemplatesResult(TemplatesResultBase):
     """
     Defines a Pydantic model for an user
     """
@@ -239,7 +239,7 @@ class Templates_Result(Templates_ResultBase):
 
 
 # -------------------------------------------------
-class Templates_SMSBase(BaseModel):
+class TemplatesSMSBase(BaseModel):
     """
     UserBase defines the fields available for an user in any
     point of its lifecycle.
@@ -249,7 +249,7 @@ class Templates_SMSBase(BaseModel):
     msg: str
 
 
-class Templates_SMSCreate(Templates_SMSBase):
+class TemplatesSMSCreate(TemplatesSMSBase):
     """
     UserCreate defines additional fields that should be used
     while creating an user that weren't defined on `UserBase`
@@ -258,7 +258,7 @@ class Templates_SMSCreate(Templates_SMSBase):
     pass
 
 
-class Templates_SMS(Templates_SMSBase):
+class TemplatesSMS(TemplatesSMSBase):
     """
     Defines a Pydantic model for an user
     """
@@ -274,7 +274,7 @@ class Templates_SMS(Templates_SMSBase):
 
 
 # -------------------------------------------------
-class Attempt_LogBase(BaseModel):
+class AttemptLogBase(BaseModel):
     """
     UserBase defines the fields available for an user in any
     point of its lifecycle.
@@ -294,7 +294,7 @@ class Attempt_LogBase(BaseModel):
     updated_at: datetime  # datetime?
 
 
-class Attempt_LogCreate(Attempt_LogBase):
+class AttemptLogCreate(AttemptLogBase):
     """
     UserCreate defines additional fields that should be used
     while creating an user that weren't defined on `UserBase`
@@ -303,7 +303,7 @@ class Attempt_LogCreate(Attempt_LogBase):
     pass
 
 
-class Attempt_Log(Attempt_LogBase):
+class AttemptLog(AttemptLogBase):
     """
     Defines a Pydantic model for an user
     """
