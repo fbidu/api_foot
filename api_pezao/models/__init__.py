@@ -1,6 +1,7 @@
 """
 Define modelos SQL Alchemy
 """
+from .attempt_log import AttemptLog
 from .hospital_cs import HospitalCS, HospitalType
 from .log import Log
 from .roles import Roles
