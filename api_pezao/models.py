@@ -97,9 +97,9 @@ class TemplatesResult(Base):
     """
 
     __tablename__ = "templates_result"
-
-    result_id = Column(Integer, unique=True, index=True)
-    template_id = Column(Integer, unique=True, index=True)
+    __table_args__ = (PrimaryKeyConstraint("result_id", "template_id"),)
+    result_id = Column(Integer, index=True)
+    template_id = Column(Integer, index=True)
 
 
 class TemplatesSMS(Base):
