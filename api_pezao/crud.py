@@ -4,10 +4,10 @@ CRUD = Create Read Update Delete
 
 from sqlalchemy.orm import Session
 
-from . import models, schema
+from . import models, schemas
 
 
-def create_user(db: Session, user: schema.UserCreate):
+def create_user(db: Session, user: schemas.UserCreate):
     """
     Creates a new user from the data in the schema inside the provided DB
     """
