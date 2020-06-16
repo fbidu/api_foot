@@ -5,6 +5,8 @@ Define Pydantic models for the data structures.
 import datetime
 from pydantic import BaseModel
 
+from .models import HospitalType
+
 # pylint: disable=too-few-public-methods
 
 # a little confused on this whole part, did i do the bases right?
@@ -130,13 +132,11 @@ class HospitalCsBase(BaseModel):
     id: int
     code: str
     name: str
-    type: enumerate
+    type: HospitalType
     email1: str
     email2: str
     email3: str
     user_id: int
-    created_at: datetime  # datetime?
-    updated_at: datetime  # datetime?
 
 
 class HospitalCsCreate(HospitalCsBase):
@@ -154,6 +154,8 @@ class HospitalCs(HospitalCsBase):
     """
 
     id: int
+    created_at: datetime.datetime  # datetime?
+    updated_at: datetime.datetime  # datetime?
 
     class Config:
         """
@@ -174,9 +176,6 @@ class LogBase(BaseModel):
     results_id: int
     user_id: int
     client_ip: str
-    client_date_time: datetime  # datetime?
-    created_at: datetime  # datetime?
-    updated_at: datetime  # datetime?
 
 
 class LogCreate(LogBase):
@@ -194,6 +193,9 @@ class Log(LogBase):
     """
 
     id: int
+    client_date_time: datetime.datetime
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     class Config:
         """
@@ -289,9 +291,6 @@ class AttemptLogBase(BaseModel):
     dnv: str
     dtnasc: str
     client_ip: str
-    client_date_time: datetime  # datetime?
-    created_at: datetime  # datetime?
-    updated_at: datetime  # datetime?
 
 
 class AttemptLogCreate(AttemptLogBase):
@@ -309,6 +308,9 @@ class AttemptLog(AttemptLogBase):
     """
 
     id: int
+    client_date_time: datetime.datetime
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     class Config:
         """
@@ -351,11 +353,9 @@ class ResultBase(BaseModel):
     LocalNasc: str
     PDF_Filename: str
     Tipo_SMS: str  # type?
-    RECODRD_CREATION_DATE: datetime  # date?
-    FILE_EXPORT_DATE: datetime  # date?
+    RECODRD_CREATION_DATE: datetime.datetime  # date?
+    FILE_EXPORT_DATE: datetime.datetime  # date?
     FILE_EXPORT_NAME: str
-    created_at: datetime  # datetime?
-    updated_at: datetime  # datetime?
 
 
 class ResultCreate(ResultBase):
@@ -373,6 +373,8 @@ class Result(ResultBase):
     """
 
     id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     class Config:
         """
