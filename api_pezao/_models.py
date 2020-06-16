@@ -8,33 +8,6 @@ from sqlalchemy import Column, Integer, String, DateTime, PrimaryKeyConstraint
 from .database import Base
 
 
-class Roles(Base):
-    """
-    Defines the SQLAlchemy model for 'roles' table
-    """
-
-    __tablename__ = "roles"
-
-    role_id = Column(Integer, primary_key=True, index=True)
-    role_name = Column(String, unique=True, index=True)
-
-
-class Log(Base):
-    """
-    Defines the SQLAlchemy model for 'log' table
-    """
-
-    __tablename__ = "log"
-
-    id = Column(Integer, primary_key=True, index=True)
-    results_id = Column(Integer, unique=True, index=True)
-    user_id = Column(Integer, unique=True, index=True)
-    client_ip = Column(String)
-    client_date_time = Column(DateTime, default=datetime.datetime.utcnow)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
-
-
 class TemplatesResult(Base):
     """
     Defines the SQLAlchemy model for 'templates_result' table
