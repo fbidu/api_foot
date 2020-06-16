@@ -8,17 +8,6 @@ from sqlalchemy import Column, Integer, String, DateTime
 from .database import Base
 
 
-class TemplatesSMS(Base):
-    """
-    Defines the SQLAlchemy model for 'templates_sms' table
-    """
-
-    __tablename__ = "templates_sms"
-
-    id = Column(Integer, primary_key=True, index=True)
-    msg = Column(String)
-
-
 class AttemptLog(Base):
     """
     Defines the SQLAlchemy model for 'attempt_log' table
