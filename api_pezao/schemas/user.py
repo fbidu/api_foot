@@ -11,8 +11,8 @@ class UserBase(BaseModel):
     point of its lifecycle.
     """
 
-    id: int
     cpf: str
+    name: str
     email: str
     password: str
 
