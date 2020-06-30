@@ -50,7 +50,7 @@ def home():
     return "Hello, world!"
 
 
-@app.post("/users/", response_model=schemas.User)
+@app.post("/users/", response_model=schemas.User, status_code=201)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     Receives a new user record in `user` and creates
