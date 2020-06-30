@@ -2,7 +2,8 @@
 Define modelo SQL para logs
 """
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -15,9 +16,12 @@ class Log(Base):
     __tablename__ = "log"
 
     id = Column(Integer, primary_key=True, index=True)
-    results_id = Column(Integer, unique=True, index=True)
-    user_id = Column(Integer, unique=True, index=True)
+    results_id = Column(Integer, ForeignKey('result.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
     client_ip = Column(String)
     client_date_time = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
+
+    result = relationship("Result", back_populates="log")
+    user = relationship("User", back_populates="log")
