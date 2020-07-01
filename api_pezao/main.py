@@ -5,14 +5,18 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List
 
-from fastapi import Depends, FastAPI, File, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from sqlalchemy.util.langhelpers import dependencies
 
 
 from . import config, crud, schemas
+from .auth import get_current_user, oauth2_scheme
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
+from .schemas import User
 from .schemas.pdf_processed import PDFProcessed
 from .utils import sha256
 
@@ -48,6 +52,31 @@ def home():
     The root of the API
     """
     return "Hello, world!"
+
+
+@app.post("/token")
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
+    user = crud.find_user(db=db, email=form_data.username)
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    if not user.password == form_data.password:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    return {"access_token": user.email, "token_type": "bearer"}
+
+
+@app.get("/users/token")
+def read_token(token: str = Depends(oauth2_scheme)):
+    return {"token": token}
+
+
+@app.get("/users/me")
+def read_current_user(current_user: User = Depends(get_current_user)):
+    return current_user
 
 
 @app.post("/users/", response_model=schemas.User, status_code=201)
