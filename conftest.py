@@ -20,7 +20,8 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 Base.metadata.create_all(bind=engine)
 
 
-def override_get_db():
+@fixture
+def db():
     """
     Overrides the default db for testing
     """
@@ -36,10 +37,16 @@ def override_get_db():
         connection.close()
 
 
+# pylint: disable=redefined-outer-name
 @fixture
-def client():
+def client(db):
     """
     Offers a test client for the main API
     """
-    main.app.dependency_overrides[main.get_db] = override_get_db
+
+    def __get_db_fixture():
+        return db
+
+    main.app.dependency_overrides[main.get_db] = __get_db_fixture
+
     return TestClient(main.app)
