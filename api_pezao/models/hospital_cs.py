@@ -32,7 +32,7 @@ class HospitalCS(Base):
     email1 = Column(String)
     email2 = Column(String)
     email3 = Column(String)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
