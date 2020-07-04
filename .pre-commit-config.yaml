@@ -29,7 +29,7 @@ repos:
 
           - id: system
             name: PyTest
-            entry: poetry run pytest -v
+            entry: poetry run pytest --doctest-modules -v
             language: system
             pass_filenames: false
             stages: [push]
