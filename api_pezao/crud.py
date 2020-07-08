@@ -9,6 +9,7 @@ from api_pezao.models.user import User
 
 
 from . import models, schemas
+from .auth import get_password_hash
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> User:
@@ -16,6 +17,7 @@ def create_user(db: Session, user: schemas.UserCreate) -> User:
     Creates a new user from the data in the schema inside the provided DB
     """
     db_user = models.User(**user.dict())
+    db_user.password = get_password_hash(db_user.password)
 
     db.add(db_user)
     db.commit()
