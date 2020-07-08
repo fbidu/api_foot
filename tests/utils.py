@@ -1,6 +1,7 @@
 """
 Utilitary function to aid testing
 """
+from requests import Response
 from api_pezao.utils import sha256
 
 
@@ -12,7 +13,7 @@ def check_files_equal(path_a, path_b):
     return sha256(path_a) == sha256(path_b)
 
 
-def post_pdf(sample_pdf, client):
+def post_pdf(sample_pdf, client) -> Response:
     """
     Posts a file to the main PDF endpoint
     """
@@ -22,7 +23,7 @@ def post_pdf(sample_pdf, client):
 
 def create_demo_user(
     client, cpf="00000000000", email="teste@teste.com", password="secret"
-):
+) -> Response:
     """
     Creates a user for testing purposes
     """
@@ -32,9 +33,9 @@ def create_demo_user(
     return response
 
 
-def log_user_in(username, password, client):
+def log_user_in(username, password, client) -> Response:
     """
     Authenticates an user and returns a token
     """
     payload = {"username": username, "password": password}
-    client.post("/login", data=payload)
+    return client.post("/token", data=payload)

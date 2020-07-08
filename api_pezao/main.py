@@ -32,7 +32,6 @@ def get_settings():
     return config.Settings()
 
 
-# Dependency
 def get_db():
     """
     Returns a new DB instance
