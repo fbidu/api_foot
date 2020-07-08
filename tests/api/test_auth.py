@@ -66,12 +66,12 @@ class TestAuth:
         assert response.status_code == 401
 
 
-def test_invalid_password_fails(client: TestClient, test_user: User):
-    """
-    Checa se um usuário com email válido mas senha inválida falha
-    """
-    payload = {"username": test_user.email, "password": "invalid!!"}
+    def test_invalid_password_fails(self):
+        """
+        Checa se um usuário com email válido mas senha inválida falha
+        """
+        payload = {"username": self.test_user.email, "password": "invalid!!"}
 
-    response = log_user_in(client=client, **payload)
+        response = log_user_in(client=self.client, **payload)
 
-    assert response.status_code == 401
+        assert response.status_code == 401
