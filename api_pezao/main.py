@@ -8,11 +8,9 @@ from typing import List
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from sqlalchemy.util.langhelpers import dependencies
-
 
 from . import config, crud, schemas
-from .auth import get_current_user, oauth2_scheme
+from .auth import get_current_user, oauth2_scheme, verify_password
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
@@ -58,12 +56,17 @@ def home():
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
+    """
+    Realiza o login de um usuário aceitando como input um formulário com
+    `username` e `password`. O `username` pode ser o e-mail ou CPF de
+    um usuário.
+    """
     user = crud.find_user(db=db, email=form_data.username)
 
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    if not user.password == form_data.password:
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     return {"access_token": user.email, "token_type": "bearer"}
@@ -71,11 +74,17 @@ def login(
 
 @app.get("/users/token")
 def read_token(token: str = Depends(oauth2_scheme)):
+    """
+    Dado um `token` retorna informações sobre ele.
+    """
     return {"token": token}
 
 
 @app.get("/users/me")
 def read_current_user(current_user: User = Depends(get_current_user)):
+    """
+    Retorna informações do usuário logado atualmente.
+    """
     return current_user
 
 
