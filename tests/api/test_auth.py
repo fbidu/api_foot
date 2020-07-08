@@ -1,6 +1,7 @@
 """
 Testes funcionais para autenticação
 """
+from enum import auto
 from fastapi.testclient import TestClient
 from pytest import fixture
 
@@ -18,34 +19,51 @@ def test_user(db):
     return create_test_user(db, password="secret")
 
 
-# pylint: disable=redefined-outer-name
-def test_login_accepts_email(client: TestClient, test_user: User):
+class TestAuth:
     """
-    Testa se o endpoint de login funciona com o e-mail do usuário
+    Class que testa vários pontos do mecanismo de autenticação
     """
-    payload = {"username": test_user.email, "password": "secret"}
 
-    response = log_user_in(client=client, **payload)
+    @fixture(autouse=True)
+    def __test_user(self, db):
+        """
+        Oferece um usuário de teste
+        """
+        self.test_user = create_test_user(db, password="secret")
 
-    assert response.status_code == 200
+    @fixture(autouse=True)
+    def _test_client(self, client):
+        """
+        Oferece um cliente de teste da API
+        """
+        self.client = client
 
-    data = response.json()
+    def test_login_accepts_email(self):
+        """
+        Testa se o endpoint de login funciona com o e-mail do usuário
+        """
+        payload = {"username": self.test_user.email, "password": "secret"}
 
-    assert "access_token" in data
-    assert "token_type" in data
-    assert data["token_type"] == "bearer"
+        response = log_user_in(client=self.client, **payload)
 
+        assert response.status_code == 200
 
-# pylint: disable=unused-argument
-def test_invalid_email_fails(client: TestClient, test_user: User):
-    """
-    Checa se um usuário com senha válida mas email errado falha
-    """
-    payload = {"username": "invalid!!", "password": "secret"}
+        data = response.json()
 
-    response = log_user_in(client=client, **payload)
+        assert "access_token" in data
+        assert "token_type" in data
+        assert data["token_type"] == "bearer"
 
-    assert response.status_code == 401
+    # pylint: disable=unused-argument
+    def test_invalid_email_fails(self):
+        """
+        Checa se um usuário com senha válida mas email errado falha
+        """
+        payload = {"username": "invalid!!", "password": "secret"}
+
+        response = log_user_in(client=self.client, **payload)
+
+        assert response.status_code == 401
 
 
 def test_invalid_password_fails(client: TestClient, test_user: User):
