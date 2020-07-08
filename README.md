@@ -6,7 +6,7 @@ A API principal do projeto
 
 Para rodar a API em desenvolvimento você precisará de:
 
-* Python >= 3.7
+* Python >= 3.8
 * [Poetry](https://python-poetry.org/docs/#installation)
 
 Clone esse repositório e execute dentro da pasta
