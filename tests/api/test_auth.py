@@ -1,9 +1,9 @@
 """
 Testes funcionais para autenticação
 """
-from enum import auto
 from fastapi.testclient import TestClient
 from pytest import fixture
+from sqlalchemy.orm.session import Session
 
 from api_pezao.models import User
 
@@ -11,28 +11,23 @@ from ..db_utils import create_test_user
 from ..utils import log_user_in
 
 
-@fixture
-def test_user(db):
-    """
-    Oferece um usuário de teste
-    """
-    return create_test_user(db, password="secret")
-
-
 class TestAuth:
     """
     Class que testa vários pontos do mecanismo de autenticação
     """
 
+    test_user: User
+    client: TestClient
+
     @fixture(autouse=True)
-    def __test_user(self, db):
+    def __test_user(self, db: Session):
         """
         Oferece um usuário de teste
         """
         self.test_user = create_test_user(db, password="secret")
 
     @fixture(autouse=True)
-    def _test_client(self, client):
+    def _test_client(self, client: TestClient):
         """
         Oferece um cliente de teste da API
         """
@@ -64,7 +59,6 @@ class TestAuth:
         response = log_user_in(client=self.client, **payload)
 
         assert response.status_code == 401
-
 
     def test_invalid_password_fails(self):
         """
