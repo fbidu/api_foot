@@ -3,7 +3,6 @@ Módulo que provê funções de autenticação
 """
 
 
-from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
@@ -39,10 +38,3 @@ def get_password_hash(password):
 
     """
     return pwd_context.hash(password)
-
-
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    """
-    Retorna informações do usuário logado
-    """
-    return token * 2

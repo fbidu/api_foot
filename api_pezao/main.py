@@ -10,11 +10,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import config, crud, schemas
-from .auth import get_current_user, oauth2_scheme, verify_password
+from .auth import oauth2_scheme, verify_password
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
-from .schemas import User
 from .schemas.pdf_processed import PDFProcessed
 from .utils import sha256, is_valid_cpf, is_valid_email
 
@@ -84,12 +83,14 @@ def read_token(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 
 
-@app.get("/users/me")
-def read_current_user(current_user: User = Depends(get_current_user)):
+@app.get("/users/me", response_model=schemas.User)
+def read_current_user(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     """
     Retorna informações do usuário logado atualmente.
     """
-    return current_user
+    return crud.get_current_user(db, token)
 
 
 @app.post("/users/", response_model=schemas.User, status_code=201)

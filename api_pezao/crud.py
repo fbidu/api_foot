@@ -60,3 +60,11 @@ def find_user(db: Session, email: str = None, cpf: str = None) -> User:
         query = query.filter(models.User.cpf == cpf)
 
     return query.first()
+
+
+def get_current_user(db: Session, token: str):
+    """
+    Retorna informações do usuário logado
+    """
+    user = find_user(db, email=token)
+    return user

@@ -33,9 +33,17 @@ def create_demo_user(
     return response
 
 
-def log_user_in(username, password, client) -> Response:
+def log_user_in(client, username, password) -> Response:
     """
     Authenticates an user and returns a token
     """
     payload = {"username": username, "password": password}
     return client.post("/token", data=payload)
+
+
+def auth_header(client, username="test@test.com", password="test") -> Response:
+    """
+    Returns a dict containing the authorization header for a given user
+    """
+    token = log_user_in(client, username, password).json()["access_token"]
+    return {"authorization": f"Bearer {token}"}
