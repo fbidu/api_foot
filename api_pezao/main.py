@@ -58,7 +58,6 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     return crud.create_user(db=db, user=user)
 
-
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db)):
     """
@@ -100,3 +99,39 @@ def read_pdf(
     return PDFProcessed(
         length=len(content), filename=pdf_file.filename, sha256=sha256(filename)
     )
+
+@app.post("/result_creation_just_for_test/", response_model=schemas.Result, status_code=201)
+def create_result_just_for_test(result: schemas.ResultCreate, db: Session = Depends(get_db)):
+    """
+    Receives a new result record in `result` and creates
+    a new result in the current database
+    """
+    return crud.create_result(db=db, result=result)
+
+@app.get("/results/", response_model=List[schemas.Result])
+def read_results(db: Session = Depends(get_db)):
+    """
+    Lists all results
+    """
+    return crud.list_results(db)
+
+@app.get("/results_by_dnv/", response_model=List[schemas.Result])
+def get_results_by_dnv(dnv: str, db: Session = Depends(get_db)):
+    """
+    Listar todos os resultados que tenham aquele DNV
+    """
+    return crud.get_results_by_dnv(db, dnv)
+
+@app.get("/results_by_cns/", response_model=List[schemas.Result])
+def get_results_by_cns(cns: str, db: Session = Depends(get_db)):
+    """
+    Listar todos os resultados que tenham aquele CNS
+    """
+    return crud.get_results_by_cns(db, cns)
+
+@app.get("/results_by_cpf/", response_model=List[schemas.Result])
+def get_results_by_cpf(cpf: str, db: Session = Depends(get_db)):
+    """
+    Listar todos os resultados que tenham aquele CPF
+    """
+    return crud.get_results_by_cpf(db, cpf)

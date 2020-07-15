@@ -18,8 +18,8 @@ class ResultBase(BaseModel):
     HoraNasc: str  # date?
     DataColeta: str  # date?
     HoraColeta: str  # date?
-    ptnMotherFirstname: str  # fieldname?
-    ptnMotherSurname: str  # fieldname?
+    prMotherFirstname: str  # fieldname?
+    prMotherSurname: str  # fieldname?
     CPF: str
     ptnFirstname: str
     ptnSurname: str
@@ -36,7 +36,7 @@ class ResultBase(BaseModel):
     LocalNasc: str
     PDF_Filename: str
     Tipo_SMS: str  # type?
-    RECODRD_CREATION_DATE: datetime  # date?
+    RECORD_CREATION_DATE: datetime  # date?
     FILE_EXPORT_DATE: datetime  # date?
     FILE_EXPORT_NAME: str
 
