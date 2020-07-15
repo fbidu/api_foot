@@ -29,7 +29,14 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     """
-    Dada uma senha, retorna sua versão hasheada.
+    Dada uma senha, retorna sua versão hasheada. A senha hasheada
+    pode ser verificada com `verify_password`
+
+    >>> pwd = "test"
+    >>> hashed = get_password_hash(pwd)
+    >>> verify_password(pwd, hashed)
+    True
+
     """
     return pwd_context.hash(password)
 

@@ -2,7 +2,7 @@
 Testes funcionais para autenticação
 """
 from fastapi.testclient import TestClient
-from pytest import fixture
+from pytest import fixture, mark
 from sqlalchemy.orm.session import Session
 
 from api_pezao.models import User
@@ -85,3 +85,18 @@ class TestAuth:
         assert "access_token" in data
         assert "token_type" in data
         assert data["token_type"] == "bearer"
+
+    @mark.xfail
+    def test_me(self):
+        """
+        There should be a /me endpoint that
+        returns info on the logged in user
+        """
+        response = self.client.get("/me/")
+        assert response.status_code == 200
+
+        user_data = response.json()
+
+        assert "id" in user_data
+        assert "password" not in user_data
+        assert "email" in user_data
