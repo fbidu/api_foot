@@ -41,16 +41,21 @@ def find_user(db: Session, email: str = None, cpf: str = None) -> User:
     essa função vai buscar por usuário que tenha tanto o
     e-mail quanto o CPF igual ao da função.
 
+    Se nenhum dos campos for fornecido, a função retorna None
+
     Args:
         db (sqlalchemy.orm.Session): Sessão do SQLAlchemy para buscar o usuário
         email (str, opcional): e-mail para ser buscado
         cpf (str, opcional): CPF para ser buscado
     """
+
+    if not (email or cpf):
+        return None
+
     query = db.query(models.User)
 
     if email:
         query = query.filter(models.User.email == email)
-
     if cpf:
         query = query.filter(models.User.cpf == cpf)
 

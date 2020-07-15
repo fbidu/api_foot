@@ -55,3 +55,13 @@ def test_find_user_by_both_cpf_and_email(db: Session, test_user: User):
 
     found_user = crud.find_user(db, cpf="123456", email="test@test.com")
     assert not found_user
+
+
+def test_find_user_without_args_returns_none(db: Session):
+    """
+    Testa se conseguimos encontrar um usuário por email
+    """
+    found_user = crud.find_user(db)
+
+    assert not found_user
+    assert found_user is None
