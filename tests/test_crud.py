@@ -24,7 +24,7 @@ def test_find_user_by_email(db: Session, test_user: User):
     """
     Testa se conseguimos encontrar um usuário por email
     """
-    found_user = crud.find_user(db, email="test@test")
+    found_user = crud.find_user(db, email="test@test.com")
 
     assert found_user
     assert test_user == found_user
@@ -45,7 +45,7 @@ def test_find_user_by_both_cpf_and_email(db: Session, test_user: User):
     Testa se conseguimos encontrar um usuário por cpf
     """
 
-    found_user = crud.find_user(db, cpf="00000000000", email="test@test")
+    found_user = crud.find_user(db, cpf="00000000000", email="test@test.com")
 
     assert found_user
     assert test_user == found_user
@@ -53,5 +53,5 @@ def test_find_user_by_both_cpf_and_email(db: Session, test_user: User):
     found_user = crud.find_user(db, cpf="00000000000", email="email-errado")
     assert not found_user
 
-    found_user = crud.find_user(db, cpf="123456", email="test@test")
+    found_user = crud.find_user(db, cpf="123456", email="test@test.com")
     assert not found_user

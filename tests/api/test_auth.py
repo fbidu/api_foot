@@ -13,7 +13,7 @@ from ..utils import log_user_in
 
 class TestAuth:
     """
-    Class que testa vários pontos do mecanismo de autenticação
+    Classe que testa vários pontos do mecanismo de autenticação
     """
 
     test_user: User
@@ -69,3 +69,19 @@ class TestAuth:
         response = log_user_in(client=self.client, **payload)
 
         assert response.status_code == 401
+
+    def test_login_accepts_cpf(self):
+        """
+        Testa se o endpoint de login funciona com o cpf do usuário
+        """
+        payload = {"username": self.test_user.cpf, "password": "secret"}
+
+        response = log_user_in(client=self.client, **payload)
+
+        assert response.status_code == 200
+
+        data = response.json()
+
+        assert "access_token" in data
+        assert "token_type" in data
+        assert data["token_type"] == "bearer"

@@ -16,7 +16,7 @@ from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
 from .schemas import User
 from .schemas.pdf_processed import PDFProcessed
-from .utils import sha256
+from .utils import sha256, is_valid_cpf, is_valid_email
 
 
 Base.metadata.create_all(bind=engine)
@@ -60,7 +60,12 @@ def login(
     `username` e `password`. O `username` pode ser o e-mail ou CPF de
     um usuário.
     """
-    user = crud.find_user(db=db, email=form_data.username)
+    user = None
+
+    if is_valid_email(form_data.username):
+        user = crud.find_user(db=db, email=form_data.username)
+    elif is_valid_cpf(form_data.username):
+        user = crud.find_user(db=db, cpf=form_data.username)
 
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")

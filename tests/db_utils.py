@@ -9,7 +9,11 @@ from api_pezao.schemas import UserCreate
 
 
 def create_test_user(
-    db: Session, email="test@test", cpf="00000000000", password="secret", name="test"
+    db: Session,
+    email="test@test.com",
+    cpf="00000000000",
+    password="secret",
+    name="test",
 ) -> User:
     """
     Cria um usuário de testes dentro do banco de dados
