@@ -38,39 +38,37 @@ def create_result(db: Session, result: schemas.ResultCreate):
 
     return db_result
 
-def list_results(db: Session):
+def read_results(
+db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", DataColeta: str = "", LocalColeta: str = "", prMotherFirstname: str = "", prMotherSurname: str = ""
+):
     """
-    Lists all the registered results
+    Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
+    Se deixar o filtro vazio, ele não será considerado. Por exemplo, deixar todos os filtros vazios faz com que sejam listados todos os resultados existentes no banco.
+    Filtros de nome da mãe e de local de coleta funcionam com operador LIKE.
+    Colocar Ana fará com que apenas mães com nome = Ana apareçam.
+    Colocar Ana% fará com que mães com nome que começa com Ana apareçam.
+    Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
+    O mesmo vale pros locais de coleta.
     """
-    return db.query(models.Result).all()
+    results = db.query(models.Result)
 
-def get_results_by_dnv(db: Session, dnv: str):
-    """
-    Lista todos os resultados cujo DNV é o DNV dado.
-    """
-    return db.query(models.Result).filter(models.Result.DNV == dnv).all()
+    if not DNV == "":
+        results = results.filter(models.Result.DNV == DNV)
+    if not CNS == "":
+        results = results.filter(models.Result.CNS == CNS)
+    if not CPF == "":
+        results = results.filter(models.Result.CPF == CPF)
+    if not DataNasc == "":
+        results = results.filter(models.Result.DataNasc == DataNasc)
+    if not DataColeta == "":
+        results = results.filter(models.Result.DataColeta == DataColeta)
+    if not LocalColeta == "":
+        results = results.filter(models.Result.LocalColeta.like(LocalColeta))
+    if not prMotherFirstname == "":
+        results = results.filter(models.Result.prMotherFirstname.like(prMotherFirstname))
+    if not prMotherSurname == "":
+        results = results.filter(models.Result.prMotherSurname.like(prMotherSurname))
 
-def get_results_by_cns(db: Session, cns: str):
-    """
-    Lista todos os resultados cujo CNS é o CNS dado.
-    """
-    return db.query(models.Result).filter(models.Result.CNS == cns).all()
+    results = results.order_by(models.Result.FILE_EXPORT_DATE.desc())
 
-
-def get_results_by_cpf(db: Session, cpf: str):
-    """
-    Lista todos os resultados cujo CPF é o CPF dado.
-    """
-    return db.query(models.Result).filter(models.Result.CPF == cpf).all()
-
-def get_results_by_datanasc(db: Session, datanasc: str):
-    """
-    Lista todos os resultados cuja data de nascimento é a data dada.
-    """
-    return db.query(models.Result).filter(models.Result.DataNasc == datanasc).all()
-
-def get_results_by_datacoleta(db: Session, datacoleta: str):
-    """
-    Lista todos os resultados cuja data de nascimento é a data dada.
-    """
-    return db.query(models.Result).filter(models.Result.DataColeta == datacoleta).all()
+    return results.all()

@@ -109,29 +109,17 @@ def create_result_just_for_test(result: schemas.ResultCreate, db: Session = Depe
     return crud.create_result(db=db, result=result)
 
 @app.get("/results/", response_model=List[schemas.Result])
-def read_results(db: Session = Depends(get_db)):
+def read_results(
+    db: Session = Depends(get_db),
+    DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", DataColeta: str = "", LocalColeta: str = "", prMotherFirstname: str = "", prMotherSurname: str = ""
+):
     """
-    Lists all results
+    Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
+    Se deixar o filtro vazio, ele não será considerado. Por exemplo, deixar todos os filtros vazios faz com que sejam listados todos os resultados existentes no banco.
+    Filtros de nome da mãe e de local de coleta funcionam com operador LIKE.
+    Colocar Ana fará com que apenas mães com nome = Ana apareçam.
+    Colocar Ana% fará com que mães com nome que começa com Ana apareçam.
+    Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
+    O mesmo vale pros locais de coleta.
     """
-    return crud.list_results(db)
-
-@app.get("/results_by_dnv/", response_model=List[schemas.Result])
-def get_results_by_dnv(dnv: str, db: Session = Depends(get_db)):
-    """
-    Listar todos os resultados que tenham aquele DNV
-    """
-    return crud.get_results_by_dnv(db, dnv)
-
-@app.get("/results_by_cns/", response_model=List[schemas.Result])
-def get_results_by_cns(cns: str, db: Session = Depends(get_db)):
-    """
-    Listar todos os resultados que tenham aquele CNS
-    """
-    return crud.get_results_by_cns(db, cns)
-
-@app.get("/results_by_cpf/", response_model=List[schemas.Result])
-def get_results_by_cpf(cpf: str, db: Session = Depends(get_db)):
-    """
-    Listar todos os resultados que tenham aquele CPF
-    """
-    return crud.get_results_by_cpf(db, cpf)
+    return crud.read_results(db, DNV, CNS, CPF, DataNasc, DataColeta, LocalColeta, prMotherFirstname, prMotherSurname)
