@@ -10,6 +10,8 @@ python = "^3.7"
 fastapi = {version = "^0.54.1", extras = ["all"]}
 sqlalchemy = "^1.3"
 python-multipart = "^0.0.5"
+pyjwt = "^1.7.1"
+passlib = {version = "^1.7.2", extras = ["bcrypt"]}
 
 [tool.poetry.dev-dependencies]
 pytest = {version = "^5.3"}
@@ -17,6 +19,7 @@ pre-commit = {version = "^2.0"}
 black = {version = "^18.3-alpha.0", allow-prereleases = true}
 pylint = "^2.4"
 ipython = "^7.13"
+pytest-cov = "^2.10.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

@@ -5,16 +5,17 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List
 
-from fastapi import Depends, FastAPI, File, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-
 from . import config, crud, schemas
+from .auth import oauth2_scheme, verify_password
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
 from .schemas.pdf_processed import PDFProcessed
-from .utils import sha256
+from .utils import sha256, is_valid_cpf, is_valid_email
 
 
 Base.metadata.create_all(bind=engine)
@@ -30,7 +31,6 @@ def get_settings():
     return config.Settings()
 
 
-# Dependency
 def get_db():
     """
     Returns a new DB instance
@@ -48,6 +48,49 @@ def home():
     The root of the API
     """
     return "Hello, world!"
+
+
+@app.post("/token")
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
+    """
+    Realiza o login de um usuário aceitando como input um formulário com
+    `username` e `password`. O `username` pode ser o e-mail ou CPF de
+    um usuário.
+    """
+    user = None
+
+    if is_valid_email(form_data.username):
+        user = crud.find_user(db=db, email=form_data.username)
+    elif is_valid_cpf(form_data.username):
+        user = crud.find_user(db=db, cpf=form_data.username)
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    if not verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    return {"access_token": user.email, "token_type": "bearer"}
+
+
+@app.get("/users/token")
+def read_token(token: str = Depends(oauth2_scheme)):
+    """
+    Dado um `token` retorna informações sobre ele.
+    """
+    return {"token": token}
+
+
+@app.get("/users/me", response_model=schemas.User)
+def read_current_user(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
+    """
+    Retorna informações do usuário logado atualmente.
+    """
+    return crud.get_current_user(db, token)
 
 
 @app.post("/users/", response_model=schemas.User, status_code=201)

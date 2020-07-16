@@ -14,8 +14,8 @@ class RolesUsers(Base):
 
     __tablename__ = "roles_users"
     __table_args__ = (PrimaryKeyConstraint("user_id", "role_id"),)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    role_id = Column(Integer, ForeignKey('role.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
+    role_id = Column(Integer, ForeignKey("role.id"))
 
     user = relationship("User", back_populates="roles_users")
     role = relationship("Role", back_populates="roles_users")
