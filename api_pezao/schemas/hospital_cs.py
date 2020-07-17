@@ -15,7 +15,8 @@ class HospitalCSBase(BaseModel):
 
     code: str
     name: str
-    type: HospitalType
+    #type: HospitalType
+    type: str
     email1: str
     email2: str
     email3: str

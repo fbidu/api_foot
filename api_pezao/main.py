@@ -4,6 +4,8 @@ Here be awesome code!
 from functools import lru_cache
 from pathlib import Path
 from typing import List
+from typing import Tuple
+from typing import Dict
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
@@ -181,15 +183,17 @@ def read_hospitals(
 
 # Criar um novo hospital, e o usuário/senha associado a ele
 
-@app.post("/hospitals/", response_model=schemas.HospitalCS, status_code=201)
-def create_hospital(hospital: schemas.HospitalCSCreate, db: Session = Depends(get_db)):
-    """
-    Cria um hospital e, também, um usuário para ele. O login do usuário é o email1 do hospital, e a senha é aleatória.
-    """
-    return crud.create_hospital(db, hospital)
+@app.post("/hospitals/", response_model=schemas.HospitalCS)
+def create_hospital(hospital: schemas.HospitalCSCreate, password: str, db: Session = Depends(get_db)):
+    return crud.create_hospital(db, hospital, password)
 
-# Alterar um hospital já existente (qualquer campo)
+# Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
+@app.put("/hospitals/", response_model=schemas.HospitalCS)
+def update_hospital(hospital: schemas.HospitalCS, password: str = None, db: Session = Depends(get_db)):
+    return crud.update_hospital(db, hospital, password)
 
-
-# Deletar um hospital já existente
+# Deletar um hospital existente
+@app.delete("/hospitals/", response_model=bool)
+def delete_hospital(hospital_id: int, db: Session = Depends(get_db)):
+    return crud.delete_hospital(db, hospital_id)

@@ -11,9 +11,10 @@ class UserBase(BaseModel):
     point of its lifecycle.
     """
 
-    cpf: str
+    cpf: str = None
     name: str
-    email: str
+    email: str = None
+    login: str
 
 
 class UserCreate(UserBase):

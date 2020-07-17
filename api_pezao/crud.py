@@ -2,6 +2,7 @@
 CRUD = Create Read Update Delete
 """
 from typing import List
+from typing import Tuple
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -12,6 +13,7 @@ from api_pezao.models.user import User
 from . import models, schemas
 from .auth import get_password_hash
 
+from datetime import datetime
 
 def create_user(db: Session, user: schemas.UserCreate) -> User:
     """
@@ -135,18 +137,60 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
     return hospitals.all()
 
 def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: str):
-    """
-    Creates a new hospital from the data in the schema inside the provided DB
-    """
     db_hospital = models.HospitalCS(**hospital.dict())
 
-    hospital_user = schemas.UserCreate(cpf="", email=db_hospital.email1, password=password)
-    created_user = create_user(db, hospital_user)
+    user = schemas.UserCreate(cpf=None, email=hospital.email1, name=hospital.name,
+                            login=hospital.code+"-"+hospital.type, password=password)
 
-    db_hospital.user_id = created_user.id
+    db_user = create_user(db, user)
+
+    db_hospital.user_id = db_user.id
 
     db.add(db_hospital)
     db.commit()
     db.refresh(db_hospital)
 
     return db_hospital
+
+def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = None):
+    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
+
+    if not db_hospital == None:
+        db_hospital.code = hospital.code
+        db_hospital.name = hospital.name
+        db_hospital.type = hospital.type
+        db_hospital.email1 = hospital.email1
+        db_hospital.email2 = hospital.email2
+        db_hospital.email3 = hospital.email3
+        db_hospital.updated_at = datetime.now()
+
+        db_user = db.query(models.User).filter(models.User.id == hospital.user_id).first()
+
+        if not db_user == None:
+            db_user.name = hospital.name
+            db_user.login = hospital.code+"-"+hospital.type
+            db_user.updated_at = datetime.now()
+
+            if not password == None:
+                db_user.password = get_password_hash(password)
+
+        db.commit()
+        db.refresh(db_user)
+        db.refresh(db_hospital)
+
+        return db_hospital
+
+def delete_hospital(db: Session, hospital_id: int):
+    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+
+    if db_hospital == None:
+        return False
+
+    db_user = db.query(models.User).filter(models.User.id == db_hospital.user_id).first()
+
+    db.delete(db_hospital)
+    db.delete(db_user)
+
+    db.commit()
+
+    return True
