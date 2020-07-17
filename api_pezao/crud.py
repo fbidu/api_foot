@@ -4,6 +4,7 @@ CRUD = Create Read Update Delete
 from typing import List
 
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from api_pezao.models.user import User
 
@@ -114,3 +115,38 @@ db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", Da
     results = results.order_by(models.Result.FILE_EXPORT_DATE.desc())
 
     return results.all()
+
+def read_hospitals(db: Session, code: str = "", name: str = "", email: str = ""):
+    hospitals = db.query(models.HospitalCS)
+
+    if not code == '':
+        hospitals = hospitals.filter(models.HospitalCS.code == code)
+    if not name == '':
+        hospitals = hospitals.filter(models.HospitalCS.name.like(name))
+    if not email == '':
+        hospitals = hospitals.filter(
+            or_(
+                models.HospitalCS.email1.like(email),
+                models.HospitalCS.email2.like(email),
+                models.HospitalCS.email3.like(email),
+            )
+        )
+
+    return hospitals.all()
+
+def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: str):
+    """
+    Creates a new hospital from the data in the schema inside the provided DB
+    """
+    db_hospital = models.HospitalCS(**hospital.dict())
+
+    hospital_user = schemas.UserCreate(cpf="", email=db_hospital.email1, password=password)
+    created_user = create_user(db, hospital_user)
+
+    db_hospital.user_id = created_user.id
+
+    db.add(db_hospital)
+    db.commit()
+    db.refresh(db_hospital)
+
+    return db_hospital

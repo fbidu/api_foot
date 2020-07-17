@@ -166,3 +166,30 @@ def read_results(
     O mesmo vale pros locais de coleta.
     """
     return crud.read_results(db, DNV, CNS, CPF, DataNasc, DataColeta, LocalColeta, prMotherFirstname, prMotherSurname)
+
+# Listar hospitais para o admin, com filtros se ele desejar
+@app.get("/hospitals/", response_model=List[schemas.HospitalCS])
+def read_hospitals(
+    db: Session = Depends(get_db),
+    code: str = "", name: str = "", email: str = ""
+):
+    """
+    Lista hospitais conforme os filtros. Se o filtro estiver vazio, não é considerado.
+    É possível usar operador LIKE no nome do hospital e no e-mail (%).
+    """
+    return crud.read_hospitals(db, code, name, email)
+
+# Criar um novo hospital, e o usuário/senha associado a ele
+
+@app.post("/hospitals/", response_model=schemas.HospitalCS, status_code=201)
+def create_hospital(hospital: schemas.HospitalCSCreate, db: Session = Depends(get_db)):
+    """
+    Cria um hospital e, também, um usuário para ele. O login do usuário é o email1 do hospital, e a senha é aleatória.
+    """
+    return crud.create_hospital(db, hospital)
+
+# Alterar um hospital já existente (qualquer campo)
+
+
+
+# Deletar um hospital já existente
