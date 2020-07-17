@@ -2,7 +2,7 @@
 Oferece modelos de validação para Usuários
 """
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class UserBase(BaseModel):
@@ -12,8 +12,8 @@ class UserBase(BaseModel):
     """
 
     cpf: str
+    name: str
     email: str
-    password: str
 
 
 class UserCreate(UserBase):
@@ -22,7 +22,7 @@ class UserCreate(UserBase):
     while creating an user that weren't defined on `UserBase`
     """
 
-    pass
+    password: str
 
 
 class User(UserBase):

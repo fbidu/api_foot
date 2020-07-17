@@ -13,7 +13,7 @@ class RoleBase(BaseModel):
     role_name: str
 
 
-class RolesCreate(RoleBase):
+class RoleCreate(RoleBase):
     """
     Ao criar um role precisamos apenas do Nome, que já
     está definido como necessário na clase RoleBase
@@ -32,7 +32,7 @@ class Role(RoleBase):
         * role_name (str): o nome do role
     """
 
-    role_id: int
+    id: int
 
     class Config:
         """
