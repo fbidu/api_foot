@@ -1,12 +1,14 @@
 """
 CRUD = Create Read Update Delete
 """
+
 from typing import List
 from typing import Tuple
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
+from api_pezao.models.log import Log
 from api_pezao.models.user import User
 
 
@@ -194,3 +196,9 @@ def delete_hospital(db: Session, hospital_id: int):
     db.commit()
 
     return True
+
+def list_logs(db: Session) -> List[Log]:
+    """
+    Lists all the registered users
+    """
+    return db.query(models.Log).all()
