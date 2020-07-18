@@ -16,10 +16,10 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
-    cpf = Column(String)
+    cpf = Column(String, unique=True, nullable=True)
     name = Column(String)
-    email = Column(String)
-    login = Column(String, unique=True)
+    email = Column(String, unique=True, nullable=True)
+    login = Column(String, unique=True, nullable=True)
     password = Column(String)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
