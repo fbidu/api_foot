@@ -1,10 +1,12 @@
 """
 CRUD = Create Read Update Delete
 """
+
 from typing import List
 
 from sqlalchemy.orm import Session
 
+from api_pezao.models.log import Log
 from api_pezao.models.user import User
 
 
@@ -68,3 +70,10 @@ def get_current_user(db: Session, token: str):
     """
     user = find_user(db, email=token)
     return user
+
+
+def list_logs(db: Session) -> List[Log]:
+    """
+    Lists all the registered users
+    """
+    return db.query(models.Log).all()

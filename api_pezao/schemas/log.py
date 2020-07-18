@@ -12,9 +12,10 @@ class LogBase(BaseModel):
     """
 
     client_date_time: datetime
-    results_id: int
-    user_id: int
-    client_ip: str
+    results_id: int = ""
+    user_id: int = ""
+    client_ip: str = ""
+    message: str
 
 
 class LogCreate(LogBase):
