@@ -11,7 +11,7 @@ from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from . import config, crud, schemas
+from . import config, crud, schemas, log
 from .auth import oauth2_scheme, verify_password
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
@@ -101,14 +101,22 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     Receives a new user record in `user` and creates
     a new user in the current database
     """
-    return crud.create_user(db=db, user=user)
+    created_user = crud.create_user(db=db, user=user)
+
+    log("Foi criado um usuário com os seguintes dados: cpf = %s, email = %s, login = %s" % (created_user.cpf, created_user.email, created_user.login), db)
+
+    return created_user
 
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db)):
     """
     Lists all users
     """
-    return crud.list_users(db)
+    user_list = crud.list_users(db)
+
+    log("Usuários foram listados.", db)
+
+    return user_list
 
 
 @app.post("/csv/")
@@ -121,6 +129,8 @@ def read_csv(csv_file: UploadFile = File(...)):
         content = content.decode("utf-8")
         content = content.split("\n")
         lines = import_csv(content)
+
+    log("CSV foi importado.")
 
     return {"lines": lines}
 
@@ -141,6 +151,9 @@ def read_pdf(
     filename = target_path.joinpath(pdf_file.filename)
 
     save_pdf(content, filename)
+
+    log("PDF foi importado.")
+
     return PDFProcessed(
         length=len(content), filename=pdf_file.filename, sha256=sha256(filename)
     )
@@ -151,7 +164,11 @@ def create_result_just_for_test(result: schemas.ResultCreate, db: Session = Depe
     Receives a new result record in `result` and creates
     a new result in the current database
     """
-    return crud.create_result(db=db, result=result)
+    created_result = crud.create_result(db=db, result=result)
+
+    log("Foi criado um resultado para fins de teste. ID do resultado: %s" % (created_result.id), db)
+
+    return created_result
 
 @app.get("/results/", response_model=List[schemas.Result])
 def read_results(
@@ -167,7 +184,12 @@ def read_results(
     Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
     O mesmo vale pros locais de coleta.
     """
-    return crud.read_results(db, DNV, CNS, CPF, DataNasc, DataColeta, LocalColeta, prMotherFirstname, prMotherSurname)
+
+    result_list = crud.read_results(db, DNV, CNS, CPF, DataNasc, DataColeta, LocalColeta, prMotherFirstname, prMotherSurname)
+
+    log("Resultados foram buscados com os seguintes filtros: DNV = %s, CNS = %s, CPF = %s, DataNasc = %s, DataColeta = %s, LocalColeta = %s, prMotherFirstname = %s, prMotherSurname = %s" % (DNV, CNS, CPF, DataNasc, DataColeta, LocalColeta, prMotherFirstname, prMotherSurname), db)
+
+    return result_list
 
 # Listar hospitais para o admin, com filtros se ele desejar
 @app.get("/hospitals/", response_model=List[schemas.HospitalCS])
@@ -179,21 +201,41 @@ def read_hospitals(
     Lista hospitais conforme os filtros. Se o filtro estiver vazio, não é considerado.
     É possível usar operador LIKE no nome do hospital e no e-mail (%).
     """
-    return crud.read_hospitals(db, code, name, email)
+    hospital_list = crud.read_hospitals(db, code, name, email)
+
+    log("Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s" % (code, name, email), db)
+
+    return hospital_list
 
 # Criar um novo hospital, e o usuário/senha associado a ele
 
 @app.post("/hospitals/", response_model=schemas.HospitalCS)
 def create_hospital(hospital: schemas.HospitalCSCreate, password: str, db: Session = Depends(get_db)):
-    return crud.create_hospital(db, hospital, password)
+    created_hospital = crud.create_hospital(db, hospital, password)
+
+    log("Novo hospital foi criado com code = %s, type = %s, name = %s." % (created_hospital.code, created_hospital.type, created_hospital.name), db)
+
+    return created_hospital
 
 # Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
 @app.put("/hospitals/", response_model=schemas.HospitalCS)
 def update_hospital(hospital: schemas.HospitalCS, password: str = None, db: Session = Depends(get_db)):
-    return crud.update_hospital(db, hospital, password)
+    updated_hospital = crud.update_hospital(db, hospital, password)
+
+    log("Um hospital teve dados atualizados: code = %s, type = %s, name = %s." % (updated_hospital.code, updated_hospital.type, updated_hospital.name), db)
+
+    return updated_hospital
 
 # Deletar um hospital existente
 @app.delete("/hospitals/", response_model=bool)
 def delete_hospital(hospital_id: int, db: Session = Depends(get_db)):
-    return crud.delete_hospital(db, hospital_id)
+    deleted = crud.delete_hospital(db, hospital_id)
+
+    log("Tentativa de deletar hospital de ID %s: %s" % (hospital_id, deleted), db)
+
+    return deleted
+
+@app.get("/logs/", response_model=List[schemas.Log])
+def read_logs(db: Session = Depends(get_db)):
+    return crud.list_logs(db)

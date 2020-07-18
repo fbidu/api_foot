@@ -141,7 +141,7 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
 def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: str):
     db_hospital = models.HospitalCS(**hospital.dict())
 
-    user = schemas.UserCreate(cpf=None, email=hospital.email1, name=hospital.name,
+    user = schemas.UserCreate(cpf=None, email=None, name=hospital.name,
                             login=hospital.code+"-"+hospital.type, password=password)
 
     db_user = create_user(db, user)
@@ -176,8 +176,10 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
             if not password == None:
                 db_user.password = get_password_hash(password)
 
+            db.commit()
+            db.refresh(db_user)
+
         db.commit()
-        db.refresh(db_user)
         db.refresh(db_hospital)
 
         return db_hospital
