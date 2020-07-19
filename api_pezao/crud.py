@@ -37,7 +37,7 @@ def list_users(db: Session) -> List[User]:
     """
     return db.query(models.User).all()
 
-def find_user(db: Session, email: str = None, cpf: str = None) -> User:
+def find_user(db: Session, login_possibility: str = None) -> User:
     """
     Procura por um usuário por email ou cpf.
 
@@ -53,24 +53,26 @@ def find_user(db: Session, email: str = None, cpf: str = None) -> User:
         cpf (str, opcional): CPF para ser buscado
     """
 
-    if not (email or cpf):
+    if not login_possibility:
         return None
 
     query = db.query(models.User)
+    user = query.filter(models.User.cpf == login_possibility).first()
 
-    if email:
-        query = query.filter(models.User.email == email)
-    if cpf:
-        query = query.filter(models.User.cpf == cpf)
+    if user is None:
+        user = query.filter(models.User.email == login_possibility).first()
 
-    return query.first()
+    if user is None:
+        user = query.filter(models.User.login == login_possibility).first()
+
+    return user
 
 
 def get_current_user(db: Session, token: str):
     """
     Retorna informações do usuário logado
     """
-    user = find_user(db, email=token)
+    user = find_user(db, login_possibility=token)
     return user
 
 def create_result(db: Session, result: schemas.ResultCreate):

@@ -63,10 +63,17 @@ def login(
     """
     user = None
 
+    token = ""
+
     if is_valid_email(form_data.username):
-        user = crud.find_user(db=db, email=form_data.username)
+        user = crud.find_user(db=db, login_possibility=form_data.username)
+        token = user.email
     elif is_valid_cpf(form_data.username):
-        user = crud.find_user(db=db, cpf=form_data.username)
+        user = crud.find_user(db=db, login_possibility=form_data.username)
+        token = user.cpf
+    else:
+        user = crud.find_user(db=db, login_possibility=form_data.username)
+        token = user.login
 
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
@@ -74,7 +81,7 @@ def login(
     if not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    return {"access_token": user.email, "token_type": "bearer"}
+    return {"access_token": token, "token_type": "bearer"}
 
 
 @app.get("/users/token")
@@ -93,7 +100,6 @@ def read_current_user(
     Retorna informações do usuário logado atualmente.
     """
     return crud.get_current_user(db, token)
-
 
 @app.post("/users/", response_model=schemas.User, status_code=201)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -173,7 +179,7 @@ def create_result_just_for_test(result: schemas.ResultCreate, db: Session = Depe
 @app.get("/results/", response_model=List[schemas.Result])
 def read_results(
     db: Session = Depends(get_db),
-    DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", DataColeta: str = "", LocalColeta: str = "", prMotherFirstname: str = "", prMotherSurname: str = ""
+    DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", DataColeta: str = "", LocalColeta: str = "", prMotherFirstname: str = "", prMotherSurname: str = "", token: str = Depends(oauth2_scheme)
 ):
     """
     Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
@@ -184,6 +190,8 @@ def read_results(
     Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
     O mesmo vale pros locais de coleta.
     """
+
+    logged_user = crud.get_current_user(db, token)
 
     result_list = crud.read_results(db, DNV, CNS, CPF, DataNasc, DataColeta, LocalColeta, prMotherFirstname, prMotherSurname)
 
