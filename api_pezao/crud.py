@@ -168,7 +168,7 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
         db_hospital.email3 = hospital.email3
         db_hospital.updated_at = datetime.now()
 
-        db_user = db.query(models.User).filter(models.User.id == hospital.user_id).first()
+        db_user = db_hospital.user
 
         if not db_user == None:
             db_user.name = hospital.name
@@ -192,14 +192,20 @@ def delete_hospital(db: Session, hospital_id: int):
     if db_hospital == None:
         return False
 
-    db_user = db.query(models.User).filter(models.User.id == db_hospital.user_id).first()
+    db_user = db_hospital.user
 
     db.delete(db_hospital)
-    db.delete(db_user)
+
+    if db_user is not None:
+        db.delete(db_user)
 
     db.commit()
 
     return True
+
+def test_get_hospital_user(db: Session, hospital_id: int):
+    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    return db_hospital.user
 
 def list_logs(db: Session) -> List[Log]:
     """

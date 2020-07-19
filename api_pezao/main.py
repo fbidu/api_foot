@@ -247,3 +247,7 @@ def delete_hospital(hospital_id: int, db: Session = Depends(get_db)):
 @app.get("/logs/", response_model=List[schemas.Log])
 def read_logs(db: Session = Depends(get_db)):
     return crud.list_logs(db)
+
+@app.get("/test_get_hospital_user/", response_model=schemas.User)
+def test_get_hospital_user(id: int, db: Session = Depends(get_db)):
+    return crud.test_get_hospital_user(db, id)
