@@ -12,8 +12,8 @@ from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from . import config, crud, schemas, log
-from .auth import oauth2_scheme, verify_password, create_access_token
+from . import config, crud, schemas, log, sendsms
+from .auth import oauth2_scheme, verify_password
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
@@ -351,9 +351,6 @@ def read_hospitals(
     )
 
 
-# Criar um novo hospital, e o usuário/senha associado a ele
-
-
 @app.post("/hospitals/", response_model=schemas.HospitalCS)
 def create_hospital(
     hospital: schemas.HospitalCSCreate,
@@ -379,9 +376,6 @@ def create_hospital(
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou criar hospital"
     )
-
-
-# Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
 
 @app.put("/hospitals/{hospital_id}/", response_model=schemas.HospitalCS)
@@ -464,3 +458,52 @@ def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
     Teste do user de hospital
     """
     return crud.test_get_hospital_user(db, id_)
+
+
+@app.put("/sms_activate")
+def activate_scheduled_sms_sweep(settings: config.Settings = Depends(get_settings)):
+    settings.daily_sms_sweep_active = True
+    return
+
+
+@app.put("/sms_deactivate")
+def deactivate_scheduled_sms_sweep(settings: config.Settings = Depends(get_settings)):
+    settings.daily_sms_sweep_active = False
+    return
+
+
+@app.put("/sms_change_time")
+def set_scheduled_sms_sweep_time(
+    new_hour: int, new_minutes: int, settings: config.Settings = Depends(get_settings)
+):
+    new_time = str(new_minutes) + " " + str(new_hour) + " * * *"
+    settings.sms_sweep_time = new_time
+    return
+
+
+@app.post("/sms_sweep")
+def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db())):
+    sms_list = crud.sms_sweep(db, hospitals)
+
+    for sms in sms_list:
+        if sendsms.send_sms(sms[:2]):
+            log(
+                "SMS do resultado de id %s enviado para número %s com sucesso."
+                % (str(sms[2]), sms[0]),
+                db,
+            )
+            if not crud.confirm_sms(db, sms[2]):
+                print("erro confirmando envio de sms \n")
+                log(
+                    "ERRO: Ocorreu um erro confirmando o envio do SMS do resultado de id %s"
+                    % (str(sms[2])),
+                    db,
+                )
+
+        else:
+            log(
+                "ERRO: Não foi possível enviar o SMS do resultado de id %s para o número %s."
+                % (str(sms[2]), sms[0]),
+                db,
+            )
+    return

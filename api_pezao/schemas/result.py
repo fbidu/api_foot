@@ -39,6 +39,7 @@ class ResultBase(BaseModel):
     RECORD_CREATION_DATE: datetime  # date?
     FILE_EXPORT_DATE: datetime  # date?
     FILE_EXPORT_NAME: str
+    sms_sent: bool = False
 
 
 class ResultCreate(ResultBase):
