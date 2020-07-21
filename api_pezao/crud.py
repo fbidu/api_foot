@@ -12,7 +12,7 @@ from api_pezao.models.log import Log
 from api_pezao.models.user import User
 
 
-from . import models, schemas
+from . import models, schemas,sms_utils
 from .auth import get_password_hash
 
 from datetime import datetime
@@ -227,7 +227,7 @@ def list_logs(db: Session) -> List[Log]:
 def sms_sweep(db: Session, hospital_list: List[str] = None):
     """
     Returns a (phone, message, result id) for every SMS that needs to be sent
-    If a list of hospitals is provided, returns SMSs to be sent from exams made in those hospitsls only
+    If a list of hospitals is provided, returns SMSs to be sent from exams made in those hospitals only
     """
 
     if not hospital_list:
@@ -245,21 +245,43 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
     # for each result that needs SMS to be sent:
     for r in result_list:
 
-        # sms = template_sms that has the same id as a template_result's template_id
-        # template_result which has the same result_id as the result's id
-        sms = db.query(models.TemplateSMS).filter(
-            models.TemplateSMS.id == db.query(models.TemplatesResult).filter(
-                models.TemplatesResult.result_id == r.id
-            ).first().template_id
-        ).first()
+        valid_phones = []
+        error_codes = []
 
-        # adds sms message with each of the phone numbers in the result to the to-send sms list
-        if r.ptnPhone1:
-            sms_list.append((r.ptnPhone1, sms.msg, r.id))
-        if r.ptnPhone2:
-            sms_list.append((r.ptnPhone2, sms.msg, r.id))
+        # checks if there are valid mobile phone numbers for sending SMS on that result.
+        # valid numbers are saved to the valid_phones list
+        # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd) are saved on error_codes list
+        for phone in [r.ptnPhone1, r.ptnPhone2]:
+            if phone:
+                v = sms_utils.verify_phone(v)
+                if isinstance(v, int):
+                    error_codes.append(v)
+                else:
+                    valid_phones.append(v)
 
-    # returns sms list
+        # if there are no valid numbers, report back the gravest error found (smaller number)
+        if not valid_phones:
+            error_codes.sort()
+            sms_list.append((str(error_codes[0]), None, r.id))
+
+        else:
+            # if there are valid phones...
+
+            # find the sms message to be sent:
+            # look in the template_results table for the entry with same result_id as the result's id
+            # then, look in the template_sms table for the entry with same id as the discovered
+            # template_results' template_id
+            sms = db.query(models.TemplateSMS).filter(
+                models.TemplateSMS.id == db.query(models.TemplatesResult).filter(
+                    models.TemplatesResult.result_id == r.id
+                ).first().template_id
+            ).first()
+
+            # prepares to send the correct message for every valid phone number found
+            for p in valid_phones:
+                sms_list.append((p, sms.msg, r.id))
+
+    # returns list of sms messages to be sent
     return sms_list
 
 

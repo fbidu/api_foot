@@ -12,7 +12,7 @@ from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from . import config, crud, schemas, log, sendsms
+from . import config, crud, schemas, log, sms_utils
 from .auth import oauth2_scheme, verify_password
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
@@ -486,24 +486,42 @@ def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db())):
     sms_list = crud.sms_sweep(db, hospitals)
 
     for sms in sms_list:
-        if sendsms.send_sms(sms[:2]):
+        if sms[0] == "0":
             log(
-                "SMS do resultado de id %s enviado para número %s com sucesso."
-                % (str(sms[2]), sms[0]),
+                "ERRO: resultado de id %s não possui número de telefone." % str(sms[2]),
                 db,
             )
-            if not crud.confirm_sms(db, sms[2]):
-                print("erro confirmando envio de sms \n")
-                log(
-                    "ERRO: Ocorreu um erro confirmando o envio do SMS do resultado de id %s"
-                    % (str(sms[2])),
-                    db,
-                )
+        elif sms[0] == "1":
+            log(
+                "ERRO: resultado de id %s não possui um número de telefone celular."
+                % str(sms[2]),
+                db,
+            )
+        elif sms[0] == "2":
+            log(
+                "ERRO: DDD inválido no número de celular do resultado de id %s."
+                % str(sms[2]),
+                db,
+            )
 
         else:
-            log(
-                "ERRO: Não foi possível enviar o SMS do resultado de id %s para o número %s."
-                % (str(sms[2]), sms[0]),
-                db,
-            )
+            if sms_utils.send_sms(sms[:2]):
+                log(
+                    "SMS do resultado de id %s enviado para número %s com sucesso."
+                    % (str(sms[2]), sms[0]),
+                    db,
+                )
+                if not crud.confirm_sms(db, sms[2]):
+                    log(
+                        "ERRO: Ocorreu um erro confirmando o envio do SMS do resultado de id %s"
+                        % (str(sms[2])),
+                        db,
+                    )
+
+            else:
+                log(
+                    "ERRO: Não foi possível enviar o SMS do resultado de id %s para o número %s."
+                    % (str(sms[2]), sms[0]),
+                    db,
+                )
     return
