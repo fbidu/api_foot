@@ -4,6 +4,7 @@ Here be awesome code!
 from functools import lru_cache
 from pathlib import Path
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
@@ -21,7 +22,20 @@ from .utils import sha256, is_valid_cpf, is_valid_email
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True)
+origins = [
+    "http://localhost.tiangolo.com",
+    "http://localhost:3000",
+    "http://localhost",
+    "http://localhost:8000",
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @lru_cache()
 def get_settings():
