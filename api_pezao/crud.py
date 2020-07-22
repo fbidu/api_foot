@@ -12,7 +12,7 @@ from api_pezao.models.log import Log
 from api_pezao.models.user import User
 
 
-from . import models, schemas,sms_utils
+from . import models, schemas, sms_utils
 from .auth import get_password_hash
 
 from datetime import datetime
@@ -92,7 +92,15 @@ def create_result(db: Session, result: schemas.ResultCreate):
 
 
 def read_results(
-db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", DataColeta: str = "", LocalColeta: str = "", prMotherFirstname: str = "", prMotherSurname: str = ""
+    db: Session,
+    DNV: str = "",
+    CNS: str = "",
+    CPF: str = "",
+    DataNasc: str = "",
+    DataColeta: str = "",
+    LocalColeta: str = "",
+    prMotherFirstname: str = "",
+    prMotherSurname: str = "",
 ):
     """
     Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
@@ -118,7 +126,9 @@ db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", Da
     if not LocalColeta == "":
         results = results.filter(models.Result.LocalColeta.like(LocalColeta))
     if not prMotherFirstname == "":
-        results = results.filter(models.Result.prMotherFirstname.like(prMotherFirstname))
+        results = results.filter(
+            models.Result.prMotherFirstname.like(prMotherFirstname)
+        )
     if not prMotherSurname == "":
         results = results.filter(models.Result.prMotherSurname.like(prMotherSurname))
 
@@ -130,11 +140,11 @@ db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", Da
 def read_hospitals(db: Session, code: str = "", name: str = "", email: str = ""):
     hospitals = db.query(models.HospitalCS)
 
-    if not code == '':
+    if not code == "":
         hospitals = hospitals.filter(models.HospitalCS.code == code)
-    if not name == '':
+    if not name == "":
         hospitals = hospitals.filter(models.HospitalCS.name.like(name))
-    if not email == '':
+    if not email == "":
         hospitals = hospitals.filter(
             or_(
                 models.HospitalCS.email1.like(email),
@@ -149,8 +159,13 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
 def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: str):
     db_hospital = models.HospitalCS(**hospital.dict())
 
-    user = schemas.UserCreate(cpf=None, email=None, name=hospital.name,
-                            login=hospital.code+"-"+hospital.type, password=password)
+    user = schemas.UserCreate(
+        cpf=None,
+        email=None,
+        name=hospital.name,
+        login=hospital.code + "-" + hospital.type,
+        password=password,
+    )
 
     db_user = create_user(db, user)
 
@@ -164,7 +179,9 @@ def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: s
 
 
 def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = None):
-    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
+    )
 
     if not db_hospital == None:
         db_hospital.code = hospital.code
@@ -179,7 +196,7 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
 
         if not db_user == None:
             db_user.name = hospital.name
-            db_user.login = hospital.code+"-"+hospital.type
+            db_user.login = hospital.code + "-" + hospital.type
             db_user.updated_at = datetime.now()
 
             if not password == None:
@@ -195,7 +212,9 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
 
 
 def delete_hospital(db: Session, hospital_id: int):
-    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    )
 
     if db_hospital == None:
         return False
@@ -213,7 +232,9 @@ def delete_hospital(db: Session, hospital_id: int):
 
 
 def test_get_hospital_user(db: Session, hospital_id: int):
-    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    )
     return db_hospital.user
 
 
@@ -232,11 +253,16 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
 
     if not hospital_list:
         # no defined hospitals -> return every result which SMS hadn't been sent yet
-        result_list = db.query(models.Result).filter(not models.Result.sms_sent).all()
+        result_list = db.query(models.Result).filter(~models.Result.sms_sent).all()
     else:
         # defined hospitals -> return not sent results whose hospital code is in hospitals list
-        result_list = db.query(models.Result).filter(not models.Result.sms_sent,
-                                                     models.Result.COD_LocColeta.in_(hospital_list)).all()
+        result_list = (
+            db.query(models.Result)
+            .filter(
+                ~models.Result.sms_sent, models.Result.COD_LocColeta.in_(hospital_list)
+            )
+            .all()
+        )
 
     # creates a list of SMS to be returned
     # every entry in the list is a tuple (phone, message)
@@ -273,7 +299,7 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
             # template_results' template_id
             for message in r.templates_result:
                 for p in valid_phones:
-                    sms_list. append((p, message.templates_sms.msg, r.id))
+                    sms_list.append((p, message.templates_sms.msg, r.id))
 
     # returns list of sms messages to be sent
     return sms_list
