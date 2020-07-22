@@ -23,35 +23,35 @@ def verify_phone(number: str, settings: config.Settings = None):
     Error Code 1 - not a mobile number (maybe a land line)
     Error Code 2 - mobile number with invalid ddd
 
-    >>>verify_phone("sem fone")
+    >>> verify_phone("sem fone")
     0
 
-    >>>verify_phone("")
+    >>> verify_phone("")
     0
 
-    >>>verify_phone("000000000000000")
+    >>> verify_phone("000000000000000")
     1
 
-    >>>verify_phone("11 39289524")
+    >>> verify_phone("11 39289524")
     1
 
-    >>>verify_phone("1139289524")
+    >>> verify_phone("1139289524")
     1
 
-    >>>verify_phone("23 995322524")
+    >>> verify_phone("23 995322524")
     2
 
-    >>>verify_phone("23 995322524")
+    >>> verify_phone("23 995322524")
     2
 
-    >>>verify_phone("19 995322524")
-    "19995322524"
+    >>> verify_phone("19 995322524")
+    '19995322524'
 
-    >>>verify_phone("19 99532-2524")
-    "19995322524"
+    >>> verify_phone("19 99532-2524")
+    '19995322524'
 
-    >>>verify_phone("19995322524")
-    "19995322524"
+    >>> verify_phone("19995322524")
+    '19995322524'
 
     """
 
@@ -59,7 +59,7 @@ def verify_phone(number: str, settings: config.Settings = None):
         settings = config.Settings()
 
     # removes all non-digits from phone number string
-    number = re.sub('[^0-9]', '', number)
+    number = re.sub("[^0-9]", "", number)
 
     # if there are no numbers on the phone string, it isn't a phone (error code 0)
     if not number:
