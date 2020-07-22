@@ -128,11 +128,6 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     created_user = crud.create_user(db=db, user=user)
 
-    # ANA: ISSO ESTÁ AQUI SÓ PARA EU FAZER TESTE, TEMOS QUE TIRAR DEPOIS
-    if created_user.login == "CIPOI_ADMIN":
-        created_user.is_superuser = True
-    ###############################################################
-
     log(
         "Foi criado um usuário com os seguintes dados: cpf = %s, email = %s, login = %s"
         % (created_user.cpf, created_user.email, created_user.login),
@@ -482,7 +477,7 @@ def set_scheduled_sms_sweep_time(
 
 
 @app.post("/sms_sweep")
-def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db())):
+def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db)):
     sms_list = crud.sms_sweep(db, hospitals)
 
     for sms in sms_list:

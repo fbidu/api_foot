@@ -279,7 +279,7 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
         # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd) are saved on error_codes list
         for phone in [r.ptnPhone1, r.ptnPhone2]:
             if phone:
-                v = sms_utils.verify_phone(v)
+                v = sms_utils.verify_phone(phone)
                 if isinstance(v, int):
                     error_codes.append(v)
                 else:
@@ -299,7 +299,7 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
             # template_results' template_id
             for message in r.templates_result:
                 for p in valid_phones:
-                    sms_list.append((p, message.templates_sms.msg, r.id))
+                    sms_list.append((p, message.template_sms.msg, r.id))
 
     # returns list of sms messages to be sent
     return sms_list
