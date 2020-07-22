@@ -155,7 +155,7 @@ def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: s
 def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = None):
     db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
 
-    if not db_hospital == None:
+    if db_hospital:
         db_hospital.code = hospital.code
         db_hospital.name = hospital.name
         db_hospital.type = hospital.type
@@ -166,12 +166,12 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
 
         db_user = db_hospital.user
 
-        if not db_user == None:
+        if db_user:
             db_user.name = hospital.name
             db_user.login = hospital.code+"-"+hospital.type
             db_user.updated_at = datetime.now()
 
-            if not password == None:
+            if password:
                 db_user.password = get_password_hash(password)
 
             db.commit()
