@@ -17,6 +17,7 @@ from .auth import get_password_hash
 
 from datetime import datetime
 
+
 def create_user(db: Session, user: schemas.UserCreate) -> User:
     """
     Creates a new user from the data in the schema inside the provided DB
@@ -36,6 +37,7 @@ def list_users(db: Session) -> List[User]:
     Lists all the registered users
     """
     return db.query(models.User).all()
+
 
 def find_user(db: Session, username: str) -> User:
     """
@@ -68,8 +70,9 @@ def get_current_user(db: Session, token: str):
     """
     Retorna informações do usuário logado
     """
-    user = find_user(db, login_possibility=token)
+    user = find_user(db, username=token)
     return user
+
 
 def create_result(db: Session, result: schemas.ResultCreate):
     """
@@ -83,8 +86,17 @@ def create_result(db: Session, result: schemas.ResultCreate):
 
     return db_result
 
+
 def read_results(
-db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", DataColeta: str = "", LocalColeta: str = "", prMotherFirstname: str = "", prMotherSurname: str = ""
+    db: Session,
+    DNV: str = "",
+    CNS: str = "",
+    CPF: str = "",
+    DataNasc: str = "",
+    DataColeta: str = "",
+    LocalColeta: str = "",
+    prMotherFirstname: str = "",
+    prMotherSurname: str = "",
 ):
     """
     Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
@@ -110,7 +122,9 @@ db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", Da
     if not LocalColeta == "":
         results = results.filter(models.Result.LocalColeta.like(LocalColeta))
     if not prMotherFirstname == "":
-        results = results.filter(models.Result.prMotherFirstname.like(prMotherFirstname))
+        results = results.filter(
+            models.Result.prMotherFirstname.like(prMotherFirstname)
+        )
     if not prMotherSurname == "":
         results = results.filter(models.Result.prMotherSurname.like(prMotherSurname))
 
@@ -118,14 +132,15 @@ db: Session, DNV: str = "", CNS: str = "", CPF: str = "", DataNasc: str = "", Da
 
     return results.all()
 
+
 def read_hospitals(db: Session, code: str = "", name: str = "", email: str = ""):
     hospitals = db.query(models.HospitalCS)
 
-    if not code == '':
+    if not code == "":
         hospitals = hospitals.filter(models.HospitalCS.code == code)
-    if not name == '':
+    if not name == "":
         hospitals = hospitals.filter(models.HospitalCS.name.like(name))
-    if not email == '':
+    if not email == "":
         hospitals = hospitals.filter(
             or_(
                 models.HospitalCS.email1.like(email),
@@ -136,11 +151,17 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
 
     return hospitals.all()
 
+
 def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: str):
     db_hospital = models.HospitalCS(**hospital.dict())
 
-    user = schemas.UserCreate(cpf=None, email=None, name=hospital.name,
-                            login=hospital.code+"-"+hospital.type, password=password)
+    user = schemas.UserCreate(
+        cpf=None,
+        email=None,
+        name=hospital.name,
+        login=hospital.code + "-" + hospital.type,
+        password=password,
+    )
 
     db_user = create_user(db, user)
 
@@ -152,8 +173,11 @@ def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: s
 
     return db_hospital
 
+
 def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = None):
-    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
+    )
 
     if db_hospital:
         db_hospital.code = hospital.code
@@ -168,7 +192,7 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
 
         if db_user:
             db_user.name = hospital.name
-            db_user.login = hospital.code+"-"+hospital.type
+            db_user.login = hospital.code + "-" + hospital.type
             db_user.updated_at = datetime.now()
 
             if password:
@@ -182,8 +206,11 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
 
         return db_hospital
 
+
 def delete_hospital(db: Session, hospital_id: int):
-    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    )
 
     if db_hospital == None:
         return False
@@ -199,9 +226,13 @@ def delete_hospital(db: Session, hospital_id: int):
 
     return True
 
+
 def test_get_hospital_user(db: Session, hospital_id: int):
-    db_hospital = db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    )
     return db_hospital.user
+
 
 def list_logs(db: Session) -> List[Log]:
     """
