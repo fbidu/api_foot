@@ -37,7 +37,7 @@ def list_users(db: Session) -> List[User]:
     """
     return db.query(models.User).all()
 
-def find_user(db: Session, login_possibility: str = None) -> User:
+def find_user(db: Session, username: str) -> User:
     """
     Procura por um usuário por email ou cpf.
 
@@ -53,17 +53,13 @@ def find_user(db: Session, login_possibility: str = None) -> User:
         cpf (str, opcional): CPF para ser buscado
     """
 
-    if not login_possibility:
-        return None
-
     query = db.query(models.User)
-    user = query.filter(models.User.cpf == login_possibility).first()
+    user = query.filter(models.User.cpf == username).first()
 
     if user is None:
-        user = query.filter(models.User.email == login_possibility).first()
-
-    if user is None:
-        user = query.filter(models.User.login == login_possibility).first()
+        user = query.filter(models.User.email == username).first()
+    elif user is None:
+        user = query.filter(models.User.login == username).first()
 
     return user
 
