@@ -271,15 +271,9 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
             # look in the template_results table for the entry with same result_id as the result's id
             # then, look in the template_sms table for the entry with same id as the discovered
             # template_results' template_id
-            sms = db.query(models.TemplateSMS).filter(
-                models.TemplateSMS.id == db.query(models.TemplatesResult).filter(
-                    models.TemplatesResult.result_id == r.id
-                ).first().template_id
-            ).first()
-
-            # prepares to send the correct message for every valid phone number found
-            for p in valid_phones:
-                sms_list.append((p, sms.msg, r.id))
+            for message in r.templates_result:
+                for p in valid_phones:
+                    sms_list. append((p, message.templates_sms.msg, r.id))
 
     # returns list of sms messages to be sent
     return sms_list
