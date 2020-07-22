@@ -269,7 +269,7 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
     sms_list = []
 
     # for each result that needs SMS to be sent:
-    for r in result_list:
+    for result in result_list:
 
         valid_phones = []
         error_codes = []
@@ -277,18 +277,24 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
         # checks if there are valid mobile phone numbers for sending SMS on that result.
         # valid numbers are saved to the valid_phones list
         # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd) are saved on error_codes list
-        for phone in [r.ptnPhone1, r.ptnPhone2]:
-            if phone:
-                v = sms_utils.verify_phone(phone)
-                if isinstance(v, int):
-                    error_codes.append(v)
-                else:
-                    valid_phones.append(v)
+
+        result_phones = [result.ptnPhone1, result.ptnPhone2]
+        if result_phones:
+            for phone in [result.ptnPhone1, result.ptnPhone2]:
+                if phone:
+                    v = sms_utils.verify_phone(phone)
+                    if isinstance(v, int):
+                        error_codes.append(v)
+                    else:
+                        valid_phones.append(v)
 
         # if there are no valid numbers, report back the gravest error found (smaller number)
         if not valid_phones:
-            error_codes.sort()
-            sms_list.append((str(error_codes[0]), None, r.id))
+            if error_codes:
+                error_codes.sort()
+                sms_list.append((str(error_codes[0]), None, result.id))
+            else:
+                sms_list.append(("0", None, result.id))
 
         else:
             # if there are valid phones...
@@ -297,9 +303,9 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
             # look in the template_results table for the entry with same result_id as the result's id
             # then, look in the template_sms table for the entry with same id as the discovered
             # template_results' template_id
-            for message in r.templates_result:
-                for p in valid_phones:
-                    sms_list.append((p, message.template_sms.msg, r.id))
+            for message in result.templates_result:
+                for phone in valid_phones:
+                    sms_list.append((phone, message.template_sms.msg, result.id))
 
     # returns list of sms messages to be sent
     return sms_list
