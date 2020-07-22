@@ -15,11 +15,11 @@ class HospitalCSBase(BaseModel):
 
     code: str
     name: str
-    type: HospitalType
+    #type: HospitalType
+    type: str
     email1: str
     email2: str
     email3: str
-    user_id: int
 
 
 class HospitalCSCreate(HospitalCSBase):
@@ -38,6 +38,7 @@ class HospitalCS(HospitalCSBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    user_id: int
 
     class Config:
         """
