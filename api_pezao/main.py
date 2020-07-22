@@ -136,7 +136,7 @@ def read_csv(csv_file: UploadFile = File(...)):
         content = content.split("\n")
         lines = import_csv(content)
 
-    log("CSV foi importado.")
+    log("CSV foi importado.", db)
 
     return {"lines": lines}
 
@@ -158,7 +158,7 @@ def read_pdf(
 
     save_pdf(content, filename)
 
-    log("PDF foi importado.")
+    log("PDF foi importado.", db)
 
     return PDFProcessed(
         length=len(content), filename=pdf_file.filename, sha256=sha256(filename)
