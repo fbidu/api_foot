@@ -124,6 +124,11 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     created_user = crud.create_user(db=db, user=user)
 
+    # ANA: ISSO ESTÁ AQUI SÓ PARA EU FAZER TESTE, TEMOS QUE TIRAR DEPOIS
+    if created_user.login == 'CIPOI_ADMIN':
+        created_user.is_superuser = True
+    ###############################################################
+
     log(
         "Foi criado um usuário com os seguintes dados: cpf = %s, email = %s, login = %s"
         % (created_user.cpf, created_user.email, created_user.login),
@@ -132,17 +137,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     return created_user
 
-
 @app.get("/users/", response_model=List[schemas.User])
-def read_users(db: Session = Depends(get_db)):
+def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Lists all users
     """
-    user_list = crud.list_users(db)
-
-    log("Usuários foram listados.", db)
-
-    return user_list
+    logged_user = crud.get_current_user(db, token)
+    if logged_user.is_superuser:
+        user_list = crud.list_users(db)
+        log(f"Usuários foram listados pelo superuser {logged_user.name}.", db)
+        return user_list
+    else:
+        log(f"Usuário {logged_user.name}, que não é superuser, tentou listar usuários!", db)
+        return []
 
 
 @app.post("/csv/")
@@ -232,6 +239,8 @@ def read_results(
     """
 
     logged_user = crud.get_current_user(db, token)
+    if not (logged_user.is_superuser or logged_user.is_staff):
+        CPF = logged_user.cpf
 
     result_list = crud.read_results(
         db,
@@ -266,21 +275,27 @@ def read_results(
 # Listar hospitais para o admin, com filtros se ele desejar
 @app.get("/hospitals/", response_model=List[schemas.HospitalCS])
 def read_hospitals(
-    db: Session = Depends(get_db), code: str = "", name: str = "", email: str = ""
+    db: Session = Depends(get_db), code: str = "", name: str = "", email: str = "",
+    token: str = Depends(oauth2_scheme)
 ):
     """
     Lista hospitais conforme os filtros. Se o filtro estiver vazio, não é considerado.
     É possível usar operador LIKE no nome do hospital e no e-mail (%).
     """
-    hospital_list = crud.read_hospitals(db, code, name, email)
+    logged_user = crud.get_current_user(db, token)
+    if logged_user.is_superuser:
+        hospital_list = crud.read_hospitals(db, code, name, email)
 
-    log(
-        "Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s"
-        % (code, name, email),
-        db,
-    )
+        log(
+            "Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s"
+            % (code, name, email),
+            db,
+        )
 
-    return hospital_list
+        return hospital_list
+    else:
+        log(f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db)
+        return []
 
 
 # Criar um novo hospital, e o usuário/senha associado a ele
@@ -288,50 +303,70 @@ def read_hospitals(
 
 @app.post("/hospitals/", response_model=schemas.HospitalCS)
 def create_hospital(
-    hospital: schemas.HospitalCSCreate, password: str, db: Session = Depends(get_db)
+    hospital: schemas.HospitalCSCreate, password: str, db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme)
 ):
-    created_hospital = crud.create_hospital(db, hospital, password)
+    logged_user = crud.get_current_user(db, token)
+    if logged_user.is_superuser:
+        created_hospital = crud.create_hospital(db, hospital, password)
 
-    log(
-        "Novo hospital foi criado com code = %s, type = %s, name = %s."
-        % (created_hospital.code, created_hospital.type, created_hospital.name),
-        db,
-    )
+        log(
+            "Novo hospital foi criado com code = %s, type = %s, name = %s."
+            % (created_hospital.code, created_hospital.type, created_hospital.name),
+            db,
+        )
 
-    return created_hospital
+        return created_hospital
+    else:
+        log("Usuário que não é superuser tentou criar hospital", db)
+        return None
 
 
 # Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
-
 @app.put("/hospitals/", response_model=schemas.HospitalCS)
 def update_hospital(
-    hospital: schemas.HospitalCS, password: str = None, db: Session = Depends(get_db)
+    hospital: schemas.HospitalCS, password: str = None, db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme)
 ):
-    updated_hospital = crud.update_hospital(db, hospital, password)
+    logged_user = crud.get_current_user(db, token)
+    if logged_user.is_superuser:
+        updated_hospital = crud.update_hospital(db, hospital, password)
 
-    log(
-        "Um hospital teve dados atualizados: code = %s, type = %s, name = %s."
-        % (updated_hospital.code, updated_hospital.type, updated_hospital.name),
-        db,
-    )
+        log(
+            "Um hospital teve dados atualizados: code = %s, type = %s, name = %s."
+            % (updated_hospital.code, updated_hospital.type, updated_hospital.name),
+            db,
+        )
 
-    return updated_hospital
+        return updated_hospital
+    else:
+        log("Usuário que não é superuser tentou atualizar hospital", db)
+        return None
 
 
 # Deletar um hospital existente
 @app.delete("/hospitals/", response_model=bool)
-def delete_hospital(hospital_id: int, db: Session = Depends(get_db)):
-    deleted = crud.delete_hospital(db, hospital_id)
+def delete_hospital(hospital_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    logged_user = crud.get_current_user(db, token)
+    if logged_user.is_superuser:
+        deleted = crud.delete_hospital(db, hospital_id)
 
-    log("Tentativa de deletar hospital de ID %s: %s" % (hospital_id, deleted), db)
+        log("Tentativa de deletar hospital de ID %s: %s" % (hospital_id, deleted), db)
 
-    return deleted
+        return deleted
+    else:
+        log("Usuário que não é superuser tentou deletar hospital", db)
+        return None
 
 
 @app.get("/logs/", response_model=List[schemas.Log])
-def read_logs(db: Session = Depends(get_db)):
-    return crud.list_logs(db)
+def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    logged_user = crud.get_current_user(db, token)
+    if logged_user.is_superuser:
+        return crud.list_logs(db)
+    else:
+        return []
 
 
 @app.get("/test_get_hospital_user/", response_model=schemas.User)

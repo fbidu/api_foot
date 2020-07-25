@@ -43,6 +43,8 @@ class User(UserBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    is_superuser: bool
+    is_staff: bool
 
     class Config:
         """

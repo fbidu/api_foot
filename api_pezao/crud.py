@@ -164,6 +164,7 @@ def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: s
     )
 
     db_user = create_user(db, user)
+    db_user.is_staff = True
 
     db_hospital.user_id = db_user.id
 
