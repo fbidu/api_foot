@@ -137,6 +137,24 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     return created_user
 
+@app.post("/roles/", response_model=schemas.User)
+def change_role(user: schemas.User, is_staff: bool = False, is_superuser: bool = False, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    logged_user = crud.get_current_user(db, token)
+    updated_user = user
+
+    if logged_user.is_staff:
+        updated_user = crud.set_staff_role(user, is_staff, db)
+        log("Um usuário staff atualizou a flag staff de outro", db)
+        return updated_user
+    if logged_user.is_superuser:
+        updated_user = crud.set_staff_role(user, is_staff, db)
+        updated_user = crud.set_superuser_role(user, is_superuser, db)
+        log("Um usuário superuser atualizou as flags staff e superuser de outro", db)
+        return updated_user
+
+    log("Um usuário sem privilégio tentou alterar flag de outro", db)
+    return None
+
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """

@@ -31,6 +31,23 @@ def create_user(db: Session, user: schemas.UserCreate) -> User:
 
     return db_user
 
+def set_staff_role(user: schemas.User, staff: bool, db: Session) -> User:
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+    if db_user:
+        db_user.is_staff = staff
+        db.commit()
+        db.refresh(db_user)
+
+    return db_user
+
+def set_superuser_role(user: schemas.User, superuser: bool, db: Session) -> User:
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+    if db_user:
+        db_user.is_superuser = superuser
+        db.commit()
+        db.refresh(db_user)
+
+    return db_user
 
 def list_users(db: Session) -> List[User]:
     """
