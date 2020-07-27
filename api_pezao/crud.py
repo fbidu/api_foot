@@ -60,7 +60,7 @@ def find_user(db: Session, username: str) -> User:
 
     if user is None:
         user = query.filter(models.User.email == username).first()
-    elif user is None:
+    if user is None:
         user = query.filter(models.User.login == username).first()
 
     return user
