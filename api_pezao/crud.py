@@ -169,15 +169,15 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
     return hospitals.all()
 
 
-def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: str):
-    db_hospital = models.HospitalCS(**hospital.dict())
+def create_hospital(db: Session, hospital: schemas.HospitalCSCreate):
+    db_hospital = models.HospitalCS(**hospital.dict(exclude={'password'}))
 
     user = schemas.UserCreate(
         cpf=None,
         email=None,
         name=hospital.name,
         login=hospital.code + "-" + hospital.type,
-        password=password,
+        password=hospital.password,
     )
 
     db_user = create_user(db, user)
@@ -192,7 +192,7 @@ def create_hospital(db: Session, hospital: schemas.HospitalCSCreate, password: s
     return db_hospital
 
 
-def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = None):
+def update_hospital(db: Session, hospital: schemas.HospitalCSUpdate):
     db_hospital = (
         db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
     )
@@ -213,8 +213,8 @@ def update_hospital(db: Session, hospital: schemas.HospitalCS, password: str = N
             db_user.login = hospital.code + "-" + hospital.type
             db_user.updated_at = datetime.now()
 
-            if password:
-                db_user.password = get_password_hash(password)
+            if hospital.password:
+                db_user.password = get_password_hash(hospital.password)
 
             db.commit()
             db.refresh(db_user)
@@ -237,7 +237,7 @@ def delete_hospital(db: Session, hospital_id: int):
 
     db.delete(db_hospital)
 
-    if db_user is not None:
+    if db_user:
         db.delete(db_user)
 
     db.commit()

@@ -26,9 +26,7 @@ class HospitalCSCreate(HospitalCSBase):
     """
     Define o comportamento de criação de uma instância de HospitalCS
     """
-
-    pass
-
+    password: str
 
 class HospitalCS(HospitalCSBase):
     """
@@ -46,3 +44,6 @@ class HospitalCS(HospitalCSBase):
         """
 
         orm_mode = True
+
+class HospitalCSUpdate(HospitalCS):
+    password: str = None

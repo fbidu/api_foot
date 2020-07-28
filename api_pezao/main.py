@@ -321,12 +321,12 @@ def read_hospitals(
 
 @app.post("/hospitals/", response_model=schemas.HospitalCS)
 def create_hospital(
-    hospital: schemas.HospitalCSCreate, password: str, db: Session = Depends(get_db),
+    hospital: schemas.HospitalCSCreate, db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ):
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
-        created_hospital = crud.create_hospital(db, hospital, password)
+        created_hospital = crud.create_hospital(db, hospital)
 
         log(
             "Novo hospital foi criado com code = %s, type = %s, name = %s."
@@ -344,12 +344,12 @@ def create_hospital(
 
 @app.put("/hospitals/", response_model=schemas.HospitalCS)
 def update_hospital(
-    hospital: schemas.HospitalCS, password: str = None, db: Session = Depends(get_db),
+    hospital: schemas.HospitalCSUpdate, db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
 ):
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
-        updated_hospital = crud.update_hospital(db, hospital, password)
+        updated_hospital = crud.update_hospital(db, hospital)
 
         log(
             "Um hospital teve dados atualizados: code = %s, type = %s, name = %s."
