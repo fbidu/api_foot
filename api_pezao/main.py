@@ -165,9 +165,9 @@ def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme
         user_list = crud.list_users(db)
         log(f"Usuários foram listados pelo superuser {logged_user.name}.", db)
         return user_list
-    else:
-        log(f"Usuário {logged_user.name}, que não é superuser, tentou listar usuários!", db)
-        return []
+
+    log(f"Usuário {logged_user.name}, que não é superuser, tentou listar usuários!", db)
+    return []
 
 
 @app.post("/csv/")
@@ -311,9 +311,9 @@ def read_hospitals(
         )
 
         return hospital_list
-    else:
-        log(f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db)
-        return []
+
+    log(f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db)
+    return []
 
 
 # Criar um novo hospital, e o usuário/senha associado a ele
@@ -335,9 +335,9 @@ def create_hospital(
         )
 
         return created_hospital
-    else:
-        log("Usuário que não é superuser tentou criar hospital", db)
-        return None
+
+    log("Usuário que não é superuser tentou criar hospital", db)
+    return None
 
 
 # Alterar um hospital já existente (qualquer campo exceto id, user_id)
@@ -358,9 +358,9 @@ def update_hospital(
         )
 
         return updated_hospital
-    else:
-        log("Usuário que não é superuser tentou atualizar hospital", db)
-        return None
+
+    log("Usuário que não é superuser tentou atualizar hospital", db)
+    return None
 
 
 # Deletar um hospital existente
@@ -373,9 +373,9 @@ def delete_hospital(hospital_id: int, db: Session = Depends(get_db), token: str 
         log("Tentativa de deletar hospital de ID %s: %s" % (hospital_id, deleted), db)
 
         return deleted
-    else:
-        log("Usuário que não é superuser tentou deletar hospital", db)
-        return None
+
+    log("Usuário que não é superuser tentou deletar hospital", db)
+    return None
 
 
 @app.get("/logs/", response_model=List[schemas.Log])
@@ -383,8 +383,8 @@ def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         return crud.list_logs(db)
-    else:
-        return []
+
+    return []
 
 
 @app.get("/test_get_hospital_user/", response_model=schemas.User)
