@@ -153,7 +153,7 @@ def change_role(user: schemas.User, is_staff: bool = False, is_superuser: bool =
         return updated_user
 
     log("Um usuário sem privilégio tentou alterar flag de outro", db)
-    return None
+    raise HTTPException(status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro")
 
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
@@ -167,7 +167,7 @@ def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme
         return user_list
 
     log(f"Usuário {logged_user.name}, que não é superuser, tentou listar usuários!", db)
-    return []
+    raise HTTPException(status_code=403, detail="Usuário sem permissão tentou listar usuários")
 
 
 @app.post("/csv/")
@@ -313,7 +313,7 @@ def read_hospitals(
         return hospital_list
 
     log(f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db)
-    return []
+    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou listar hospitais")
 
 
 # Criar um novo hospital, e o usuário/senha associado a ele
@@ -337,7 +337,7 @@ def create_hospital(
         return created_hospital
 
     log("Usuário que não é superuser tentou criar hospital", db)
-    return None
+    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou criar hospital")
 
 
 # Alterar um hospital já existente (qualquer campo exceto id, user_id)
@@ -360,7 +360,7 @@ def update_hospital(
         return updated_hospital
 
     log("Usuário que não é superuser tentou atualizar hospital", db)
-    return None
+    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou editar hospital")
 
 
 # Deletar um hospital existente
@@ -375,7 +375,7 @@ def delete_hospital(hospital_id: int, db: Session = Depends(get_db), token: str 
         return deleted
 
     log("Usuário que não é superuser tentou deletar hospital", db)
-    return None
+    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou apagar hospital")
 
 
 @app.get("/logs/", response_model=List[schemas.Log])
@@ -384,7 +384,7 @@ def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
     if logged_user.is_superuser:
         return crud.list_logs(db)
 
-    return []
+    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou ler os logs")
 
 
 @app.get("/test_get_hospital_user/", response_model=schemas.User)
