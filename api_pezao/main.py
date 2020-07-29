@@ -23,12 +23,7 @@ from .utils import sha256, is_valid_cpf, is_valid_email
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True)
-origins = [
-    "http://localhost.tiangolo.com",
-    "http://localhost:3000",
-    "http://localhost",
-    "http://localhost:8000",
-]
+origins = ["http://localhost:3000", "http://localhost", "http://localhost:8000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -146,6 +141,9 @@ def change_role(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
 ):
+    """
+    Altera o papel de um usuário no sistema
+    """
     logged_user = crud.get_current_user(db, token)
     updated_user = user
 
@@ -245,56 +243,65 @@ def create_result_just_for_test(
     return created_result
 
 
+# pylint: disable=too-many-arguments
 @app.get("/results/", response_model=List[schemas.Result])
 def read_results(
     db: Session = Depends(get_db),
-    DNV: str = "",
-    CNS: str = "",
-    CPF: str = "",
-    DataNasc: str = "",
-    DataColeta: str = "",
-    LocalColeta: str = "",
-    prMotherFirstname: str = "",
-    prMotherSurname: str = "",
+    dnv: str = "",
+    cns: str = "",
+    cpf: str = "",
+    data_nasc: str = "",
+    data_coleta: str = "",
+    local_coleta: str = "",
+    mother_firstname: str = "",
+    mother_surname: str = "",
     token: str = Depends(oauth2_scheme),
 ):
     """
-    Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
-    Se deixar o filtro vazio, ele não será considerado. Por exemplo, deixar todos os filtros vazios faz com que sejam listados todos os resultados existentes no banco.
-    Filtros de nome da mãe e de local de coleta funcionam com operador LIKE.
-    Colocar Ana fará com que apenas mães com nome = Ana apareçam.
-    Colocar Ana% fará com que mães com nome que começa com Ana apareçam.
-    Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
+    Lista resultados conforme os filtros: resultados cujo DNV é dado
+    e o CNS também é dado e assim por diante.
+
+    Se deixar o filtro vazio, ele não será considerado.
+    Por exemplo, deixar todos os filtros vazios faz com que
+    sejam listados todos os resultados existentes no banco.
+
+    Filtros de nome da mãe e de local de coleta funcionam com operador LIKE:
+        Colocar Ana fará com que apenas mães com nome = Ana apareçam.
+        Colocar Ana% fará com que mães com nome que começa com Ana apareçam.
+        Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
+
     O mesmo vale pros locais de coleta.
     """
 
     logged_user = crud.get_current_user(db, token)
     if not (logged_user.is_superuser or logged_user.is_staff):
-        CPF = logged_user.cpf
+        cpf = logged_user.cpf
 
     result_list = crud.read_results(
         db,
-        DNV,
-        CNS,
-        CPF,
-        DataNasc,
-        DataColeta,
-        LocalColeta,
-        prMotherFirstname,
-        prMotherSurname,
+        dnv,
+        cns,
+        cpf,
+        data_nasc,
+        data_coleta,
+        local_coleta,
+        mother_firstname,
+        mother_surname,
     )
 
     log(
-        "Resultados foram buscados com os seguintes filtros: DNV = %s, CNS = %s, CPF = %s, DataNasc = %s, DataColeta = %s, LocalColeta = %s, prMotherFirstname = %s, prMotherSurname = %s"
+        "Resultados foram buscados com os seguintes filtros: DNV = %s, "
+        "CNS = %s, CPF = %s, DataNasc = %s, DataColeta = %s, "
+        "LocalColeta = %s, prMotherFirstname = %s, prMotherSurname = %s"
         % (
-            DNV,
-            CNS,
-            CPF,
-            DataNasc,
-            DataColeta,
-            LocalColeta,
-            prMotherFirstname,
-            prMotherSurname,
+            dnv,
+            cns,
+            cpf,
+            data_nasc,
+            data_coleta,
+            local_coleta,
+            mother_firstname,
+            mother_surname,
         ),
         db,
     )
@@ -344,6 +351,9 @@ def create_hospital(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
 ):
+    """
+    Cria um novo hospital
+    """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         created_hospital = crud.create_hospital(db, hospital)
@@ -371,6 +381,9 @@ def update_hospital(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
 ):
+    """
+    Atualiza um hospital
+    """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         updated_hospital = crud.update_hospital(db, hospital)
@@ -394,6 +407,9 @@ def update_hospital(
 def delete_hospital(
     hospital_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
+    """
+    Deleta um hospital
+    """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         deleted = crud.delete_hospital(db, hospital_id)
@@ -410,6 +426,9 @@ def delete_hospital(
 
 @app.get("/logs/", response_model=List[schemas.Log])
 def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    """
+    Lista os logs
+    """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         return crud.list_logs(db)
@@ -420,5 +439,8 @@ def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 
 
 @app.get("/test_get_hospital_user/", response_model=schemas.User)
-def test_get_hospital_user(id: int, db: Session = Depends(get_db)):
-    return crud.test_get_hospital_user(db, id)
+def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
+    """
+    Teste do user de hospital
+    """
+    return crud.test_get_hospital_user(db, id_)
