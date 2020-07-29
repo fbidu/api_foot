@@ -1,3 +1,6 @@
+"""
+Módulo que oferece funções para log
+"""
 from .database import SessionLocal
 from .models.log import Log
 

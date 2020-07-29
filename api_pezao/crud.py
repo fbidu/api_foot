@@ -2,8 +2,8 @@
 CRUD = Create Read Update Delete
 """
 
+from datetime import datetime
 from typing import List
-from typing import Tuple
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -14,8 +14,6 @@ from api_pezao.models.user import User
 
 from . import models, schemas
 from .auth import get_password_hash
-
-from datetime import datetime
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> User:
@@ -33,6 +31,9 @@ def create_user(db: Session, user: schemas.UserCreate) -> User:
 
 
 def set_staff_role(user: schemas.User, staff: bool, db: Session) -> User:
+    """
+    Muda um usuário para staff
+    """
     db_user = db.query(models.User).filter(models.User.id == user.id).first()
     if db_user:
         db_user.is_staff = staff
@@ -43,6 +44,9 @@ def set_staff_role(user: schemas.User, staff: bool, db: Session) -> User:
 
 
 def set_superuser_role(user: schemas.User, superuser: bool, db: Session) -> User:
+    """
+    Muda um usuário para super_user
+    """
     db_user = db.query(models.User).filter(models.User.id == user.id).first()
     if db_user:
         db_user.is_superuser = superuser
@@ -107,46 +111,51 @@ def create_result(db: Session, result: schemas.ResultCreate):
     return db_result
 
 
+# pylint: disable=too-many-arguments
 def read_results(
     db: Session,
-    DNV: str = "",
-    CNS: str = "",
-    CPF: str = "",
-    DataNasc: str = "",
-    DataColeta: str = "",
-    LocalColeta: str = "",
-    prMotherFirstname: str = "",
-    prMotherSurname: str = "",
+    dnv: str = "",
+    cns: str = "",
+    cpf: str = "",
+    data_nascimento: str = "",
+    data_coleta: str = "",
+    local_coleta: str = "",
+    mother_firstname: str = "",
+    mother_surname: str = "",
 ):
     """
-    Lista resultados conforme os filtros: resultados cujo DNV é o dado e o CNS também é o dado e assim por diante.
-    Se deixar o filtro vazio, ele não será considerado. Por exemplo, deixar todos os filtros vazios faz com que sejam listados todos os resultados existentes no banco.
-    Filtros de nome da mãe e de local de coleta funcionam com operador LIKE.
-    Colocar Ana fará com que apenas mães com nome = Ana apareçam.
-    Colocar Ana% fará com que mães com nome que começa com Ana apareçam.
-    Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
+    Lista resultados conforme os filtros: resultados cujo DNV é dado e o CNS também,
+    é dado e assim por diante.
+
+    Se deixar o filtro vazio, ele não será considerado.
+    Por exemplo, deixar todos os filtros vazios faz com que sejam listados todos
+    os resultados existentes no banco.
+
+    Filtros de nome da mãe e de local de coleta funcionam com operador LIKE:
+        Colocar Ana fará com que apenas mães com nome = Ana apareçam.
+        Colocar Ana% fará com que mães com nome que começa com Ana apareçam.
+        Colocar %Ana% fará com que mães com nome que contém Ana apareçam.
+
     O mesmo vale pros locais de coleta.
     """
     results = db.query(models.Result)
 
-    if not DNV == "":
-        results = results.filter(models.Result.DNV == DNV)
-    if not CNS == "":
-        results = results.filter(models.Result.CNS == CNS)
-    if not CPF == "":
-        results = results.filter(models.Result.CPF == CPF)
-    if not DataNasc == "":
-        results = results.filter(models.Result.DataNasc == DataNasc)
-    if not DataColeta == "":
-        results = results.filter(models.Result.DataColeta == DataColeta)
-    if not LocalColeta == "":
-        results = results.filter(models.Result.LocalColeta.like(LocalColeta))
-    if not prMotherFirstname == "":
-        results = results.filter(
-            models.Result.prMotherFirstname.like(prMotherFirstname)
-        )
-    if not prMotherSurname == "":
-        results = results.filter(models.Result.prMotherSurname.like(prMotherSurname))
+    if dnv != "":
+        results = results.filter(models.Result.DNV == dnv)
+    if cns != "":
+        results = results.filter(models.Result.CNS == cns)
+    if cpf != "":
+        results = results.filter(models.Result.CPF == cpf)
+    if data_nascimento != "":
+        results = results.filter(models.Result.DataNasc == data_nascimento)
+    if data_coleta != "":
+        results = results.filter(models.Result.DataColeta == data_coleta)
+    if local_coleta != "":
+        results = results.filter(models.Result.LocalColeta.like(local_coleta))
+    if mother_firstname != "":
+        results = results.filter(models.Result.prMotherFirstname.like(mother_firstname))
+    if mother_surname != "":
+        results = results.filter(models.Result.prMotherSurname.like(mother_surname))
 
     results = results.order_by(models.Result.FILE_EXPORT_DATE.desc())
 
@@ -154,13 +163,16 @@ def read_results(
 
 
 def read_hospitals(db: Session, code: str = "", name: str = "", email: str = ""):
+    """
+    Lista hospitais na base
+    """
     hospitals = db.query(models.HospitalCS)
 
-    if not code == "":
+    if code != "":
         hospitals = hospitals.filter(models.HospitalCS.code == code)
-    if not name == "":
+    if name != "":
         hospitals = hospitals.filter(models.HospitalCS.name.like(name))
-    if not email == "":
+    if email != "":
         hospitals = hospitals.filter(
             or_(
                 models.HospitalCS.email1.like(email),
@@ -173,6 +185,9 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
 
 
 def create_hospital(db: Session, hospital: schemas.HospitalCSCreate):
+    """
+    Cria um novo hospital
+    """
     db_hospital = models.HospitalCS(**hospital.dict(exclude={"password"}))
 
     user = schemas.UserCreate(
@@ -196,6 +211,9 @@ def create_hospital(db: Session, hospital: schemas.HospitalCSCreate):
 
 
 def update_hospital(db: Session, hospital: schemas.HospitalCSUpdate):
+    """
+    Atualiza um hospital
+    """
     db_hospital = (
         db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital.id).first()
     )
@@ -226,14 +244,18 @@ def update_hospital(db: Session, hospital: schemas.HospitalCSUpdate):
         db.refresh(db_hospital)
 
         return db_hospital
+    return None
 
 
 def delete_hospital(db: Session, hospital_id: int):
+    """
+    Deleta um hospital
+    """
     db_hospital = (
         db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
     )
 
-    if db_hospital == None:
+    if db_hospital is None:
         return False
 
     db_user = db_hospital.user
@@ -249,6 +271,9 @@ def delete_hospital(db: Session, hospital_id: int):
 
 
 def test_get_hospital_user(db: Session, hospital_id: int):
+    """
+    Função de teste
+    """
     db_hospital = (
         db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
     )
