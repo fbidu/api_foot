@@ -3,16 +3,41 @@ Function send_sms: sends SMS
 """
 
 import re
+
+from requests import post
+
 from . import config
 
 
 def send_sms(number, text):
-    if True:
+    """
+    Dummy function for sms
+    """
+
+    if text and number:
         print("SMS Sent!")
         return True
-    else:
-        print("SMS Failed.")
-        return False
+
+    print("SMS Failed.")
+    return False
+
+
+def send_sms1(number, msg, username, password):
+    """
+    Another send sms
+    """
+    payload = {
+        "NumUsu": username,
+        "Senha": password,
+        "SeuNum": username,
+        "Celular": number,
+        "Mensagem": msg,
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    url = "https://webservices.twwwireless.com.br/reluzcap/wsreluzcap.asmx/EnviaSMS"
+    return post(url, data=payload, headers=headers)
 
 
 def verify_phone(number: str, settings: config.Settings = None):
@@ -61,18 +86,19 @@ def verify_phone(number: str, settings: config.Settings = None):
     # removes all non-digits from phone number string
     number = re.sub("[^0-9]", "", number)
 
-    # if there are no numbers on the phone string, it isn't a phone (error code 0)
+    # if there are no numbers on the phone string,
+    # it isn't a phone (error code 0)
     if not number:
         return 0
 
-    # if the first digit of the number itself is less than 6, it's not a cellphone number (error code 2)
-    elif int(number[2]) < 6:
+    # if the first digit of the number itself is less than 6,
+    # it's not a cellphone number (error code 2)
+    if int(number[2]) < 6:
         return 1
 
     # if the ddd doesn't match any valid ddd, the number doesn't have a valid ddd (error code 1)
-    elif number[:2] not in settings.valid_ddd:
+    if number[:2] not in settings.valid_ddd:
         return 2
 
     # if there are no errors, the number is valid
-    else:
-        return number
+    return number
