@@ -25,6 +25,7 @@ class TestHospital:
     client: TestClient
     db: Session
     payload: dict
+    test_hospital: HospitalCS
 
     @fixture(autouse=True)
     def __test_user(self, client):
@@ -63,7 +64,9 @@ class TestHospital:
         id_ = response.json()["id"]
         self.payload["type"] = self.payload.pop("type_")
 
-        return self.db.query(HospitalCS).filter(HospitalCS.id == id_).first()
+        self.test_hospital = (
+            self.db.query(HospitalCS).filter(HospitalCS.id == id_).first()
+        )
 
     def test_create_hospital_works(self):
         """
@@ -85,13 +88,32 @@ class TestHospital:
             self.db, payload, HospitalCS, "id", response.json()["id"]
         )
 
-    def test_read_hospial(self):
+    def _test_read_hospital(self, args=""):
         """
         Testa se a leitura de hospitais funciona
         """
-        response = self.client.get("/hospitals/")
+        response = self.client.get(f"/hospitals/?{args}")
+        assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
 
         hospital = data[0]
         assert_json_matches_payload(hospital, self.payload)
+
+    def test_read_all_hospitals(self):
+        """
+        Testa se a leitura de hospitais funciona
+        """
+        self._test_read_hospital()
+
+    def test_read_hospitals_by_code(self):
+        """
+        Testa se a leitura de hospital por código funciona
+        """
+        self._test_read_hospital(f"code={self.test_hospital.code}")
+
+    def test_read_hospitals_by_name(self):
+        """
+        Testa se a leitura de hospital por código funciona
+        """
+        self._test_read_hospital(f"name={self.test_hospital.name}")
