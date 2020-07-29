@@ -105,3 +105,13 @@ class TestAuth:
         assert "id" in user_data
         assert "password" not in user_data
         assert "email" in user_data
+
+    def test_me_without_token_fails(self):
+        """
+        There should be a /me endpoint that
+        returns info on the logged in user
+        """
+        response = self.client.get(
+            "/users/me/", headers={"authorization": "Bearer poteitou"}
+        )
+        assert response.status_code == 401

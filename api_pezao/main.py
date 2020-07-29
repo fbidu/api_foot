@@ -112,7 +112,12 @@ def read_current_user(
     """
     Retorna informações do usuário logado atualmente.
     """
-    return crud.get_current_user(db, token)
+    user = crud.get_current_user(db, token)
+
+    if not user:
+        raise HTTPException(401, "Token inválido")
+
+    return user
 
 
 @app.post("/users/", response_model=schemas.User, status_code=201)
