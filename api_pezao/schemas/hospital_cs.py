@@ -4,8 +4,6 @@ Modelos de validação para Hospitais e Centros de Saúde
 from datetime import datetime
 from pydantic import BaseModel
 
-from ..models import HospitalType
-
 
 class HospitalCSBase(BaseModel):
     """
@@ -15,7 +13,6 @@ class HospitalCSBase(BaseModel):
 
     code: str
     name: str
-    # type: HospitalType
     type: str
     email1: str
     email2: str
@@ -49,4 +46,8 @@ class HospitalCS(HospitalCSBase):
 
 
 class HospitalCSUpdate(HospitalCS):
+    """
+    Modelo para atualização de hospital.
+    """
+
     password: str = None

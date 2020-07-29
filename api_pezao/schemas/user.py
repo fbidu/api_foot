@@ -16,8 +16,12 @@ class UserBase(BaseModel):
     email: str = None
     login: str = None
 
+    # pylint: disable=no-self-argument,no-self-use
     @root_validator
     def check_user_has_at_least_one(cls, values):
+        """
+        Checa se o usuário tem pelo menos cpf, email ou login.
+        """
         user_cpf = values.get("cpf")
         user_email = values.get("email")
         user_login = values.get("login")
