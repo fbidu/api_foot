@@ -117,3 +117,11 @@ class TestHospital:
         Testa se a leitura de hospital por código funciona
         """
         self._test_read_hospital(f"name={self.test_hospital.name}")
+
+    def test_read_hospitals_by_email(self):
+        """
+        Testa se a leitura de hospital por código funciona
+        """
+        self._test_read_hospital(f"email={self.test_hospital.email1}")
+        self._test_read_hospital(f"email={self.test_hospital.email2}")
+        self._test_read_hospital(f"email={self.test_hospital.email3}")
