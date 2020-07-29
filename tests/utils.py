@@ -66,11 +66,11 @@ def create_demo_hospital(
     email1="testhosp1@test.com",
     email2="testhosp2@test.com",
     email3="testhosp3@test.com",
-    username="test@test.com",
     password="secret",
 ):
     """
-    Cria um hospital de teste
+    Cria um hospital de teste. O client deve possuir headers de autenticação
+    de superusuário
     """
     payload = {
         "code": code,
@@ -82,9 +82,7 @@ def create_demo_hospital(
         "password": password,
     }
 
-    return client.post(
-        "/hospitals/", json=payload, headers=auth_header(client, username, password)
-    )
+    return client.post("/hospitals/", json=payload)
 
 
 def assert_response_matches_payload(response, payload, expected_status=200):

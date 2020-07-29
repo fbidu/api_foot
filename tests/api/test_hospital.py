@@ -88,6 +88,16 @@ class TestHospital:
             self.db, payload, HospitalCS, "id", response.json()["id"]
         )
 
+    def test_create_hospital_unlogged_does_not_work(self):
+        """
+        Usuários anônimos não podem criar hospitais
+        """
+        client_ = self.client
+        client_.headers = {}
+        response = create_demo_hospital(client_)
+
+        assert response.status_code == 401
+
     def _test_read_hospital(self, args=""):
         """
         Testa se a leitura de hospitais funciona
@@ -99,6 +109,16 @@ class TestHospital:
 
         hospital = data[0]
         assert_json_matches_payload(hospital, self.payload)
+
+    def test_read_hospital_unlogged_does_not_work(self):
+        """
+        Usuários anônimos não podem criar hospitais
+        """
+        client_ = self.client
+        client_.headers = {}
+        response = self.client.get("/hospitals/")
+
+        assert response.status_code == 401
 
     def test_read_all_hospitals(self):
         """
