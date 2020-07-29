@@ -91,9 +91,7 @@ class TestAuth:
         There should be a /me endpoint that
         returns info on the logged in user
         """
-        response = self.client.get(
-            "/users/me/", headers=auth_header(self.client, password="secret")
-        )
+        response = self.client.get("/users/me/", headers=auth_header(self.client))
         assert response.status_code == 200
 
         user_data = response.json()

@@ -22,12 +22,18 @@ def post_pdf(sample_pdf, client) -> Response:
 
 
 def create_demo_user(
-    client, cpf="00000000000", email="teste@teste.com", password="secret"
+    client, cpf="00000000000", email="test@test.com", password="secret", super_user=True
 ) -> Response:
     """
     Creates a user for testing purposes
     """
-    payload = {"cpf": cpf, "name": "Teste", "email": email, "password": password}
+    payload = {
+        "cpf": cpf,
+        "name": "Teste",
+        "email": email,
+        "password": password,
+        "is_superuser": super_user,
+    }
 
     response = client.post("/users/", json=payload)
     return response
@@ -41,9 +47,39 @@ def log_user_in(client, username, password) -> Response:
     return client.post("/token", data=payload)
 
 
-def auth_header(client, username="test@test.com", password="test") -> Response:
+def auth_header(client, username="test@test.com", password="secret") -> Response:
     """
     Returns a dict containing the authorization header for a given user
     """
     token = log_user_in(client, username, password).json()["access_token"]
     return {"authorization": f"Bearer {token}"}
+
+
+# pylint: disable=too-many-arguments
+def create_demo_hospital(
+    client,
+    code="TEST_HC",
+    name="test hosp",
+    type_="CS",
+    email1="testhosp1@test.com",
+    email2="testhosp2@test.com",
+    email3="testhosp3@test.com",
+    username="test@test.com",
+    password="secret",
+):
+    """
+    Cria um hospital de teste
+    """
+    payload = {
+        "code": code,
+        "name": name,
+        "type": type_,
+        "email1": email1,
+        "email2": email2,
+        "email3": email3,
+        "password": password,
+    }
+
+    return client.post(
+        "/hospitals/", json=payload, headers=auth_header(client, username, password)
+    )

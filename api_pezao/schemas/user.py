@@ -15,6 +15,8 @@ class UserBase(BaseModel):
     name: str
     email: str = None
     login: str = None
+    is_superuser: bool = False
+    is_staff: bool = False
 
     # pylint: disable=no-self-argument,no-self-use
     @root_validator
