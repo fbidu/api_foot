@@ -12,6 +12,7 @@ sqlalchemy = "^1.3"
 python-multipart = "^0.0.5"
 pyjwt = "^1.7.1"
 passlib = {version = "^1.7.2", extras = ["bcrypt"]}
+python-jose = "^3.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = {version = "^5.3"}

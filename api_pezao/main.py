@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import config, crud, schemas, log
-from .auth import oauth2_scheme, verify_password
+from .auth import oauth2_scheme, verify_password, create_access_token
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
@@ -73,17 +73,17 @@ def login(
     """
     user = None
 
-    token = ""
+    username = ""
 
     if is_valid_email(form_data.username):
         user = crud.find_user(db=db, username=form_data.username)
-        token = user.email
+        username = user.email
     elif is_valid_cpf(form_data.username):
         user = crud.find_user(db=db, username=form_data.username)
-        token = user.cpf
+        username = user.cpf
     else:
         user = crud.find_user(db=db, username=form_data.username)
-        token = form_data.username
+        username = form_data.username
 
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
@@ -91,7 +91,10 @@ def login(
     if not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    return {"access_token": token, "token_type": "bearer"}
+    return {
+        "access_token": create_access_token({"sub": username}),
+        "token_type": "bearer",
+    }
 
 
 @app.get("/users/token")

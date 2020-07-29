@@ -1,14 +1,19 @@
 """
 Módulo que provê funções de autenticação
 """
+from datetime import datetime, timedelta
+from typing import Optional
 
-
+from jose import jwt
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+SECRET_KEY = "5e268048c43da6bab86bfa68c9166380fac82474b9c4ed0c62317d2d7fc1f031"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
 def verify_password(plain_password, hashed_password):
@@ -38,3 +43,23 @@ def get_password_hash(password):
 
     """
     return pwd_context.hash(password)
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """
+    Creates a JWT token
+
+
+    >>> from jose import jwt
+    >>> token = create_access_token({"name": "test"})
+    >>> jwt.get_unverified_claims(token)["name"]
+    'test'
+    """
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt

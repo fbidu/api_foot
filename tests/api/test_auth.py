@@ -2,6 +2,7 @@
 Testes funcionais para autenticação
 """
 from fastapi.testclient import TestClient
+from jose import jwt
 from pytest import fixture
 from sqlalchemy.orm.session import Session
 
@@ -48,6 +49,11 @@ class TestAuth:
         assert "access_token" in data
         assert "token_type" in data
         assert data["token_type"] == "bearer"
+
+        token = data["access_token"]
+        claims = jwt.get_unverified_claims(token)
+        assert "sub" in claims
+        assert claims["sub"] == self.test_user.email
 
     # pylint: disable=unused-argument
     def test_invalid_email_fails(self):

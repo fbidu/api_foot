@@ -4,10 +4,11 @@ CRUD = Create Read Update Delete
 
 from typing import List
 
+from jose import jwt
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..auth import get_password_hash
+from ..auth import get_password_hash, SECRET_KEY
 from ..models import User
 
 
@@ -89,5 +90,6 @@ def get_current_user(db: Session, token: str):
     """
     Retorna informações do usuário logado
     """
-    user = find_user(db, username=token)
+    token = jwt.decode(token, SECRET_KEY)
+    user = find_user(db, username=token["sub"])
     return user
