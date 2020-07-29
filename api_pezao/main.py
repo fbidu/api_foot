@@ -478,45 +478,5 @@ def set_scheduled_sms_sweep_time(
 
 @app.post("/sms_sweep")
 def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db)):
-    sms_list = crud.sms_sweep(db, hospitals)
-
-    for sms in sms_list:
-        if sms[0] == "0":
-            log(
-                "ERRO: resultado de id %s não possui número de telefone." % str(sms[2]),
-                db,
-            )
-        elif sms[0] == "1":
-            log(
-                "ERRO: resultado de id %s não possui um número de telefone celular."
-                % str(sms[2]),
-                db,
-            )
-        elif sms[0] == "2":
-            log(
-                "ERRO: DDD inválido no número de celular do resultado de id %s."
-                % str(sms[2]),
-                db,
-            )
-
-        else:
-            if sms_utils.send_sms(sms[:2]):
-                log(
-                    "SMS do resultado de id %s enviado para número %s com sucesso."
-                    % (str(sms[2]), sms[0]),
-                    db,
-                )
-                if not crud.confirm_sms(db, sms[2]):
-                    log(
-                        "ERRO: Ocorreu um erro confirmando o envio do SMS do resultado de id %s"
-                        % (str(sms[2])),
-                        db,
-                    )
-
-            else:
-                log(
-                    "ERRO: Não foi possível enviar o SMS do resultado de id %s para o número %s."
-                    % (str(sms[2]), sms[0]),
-                    db,
-                )
+    sms_utils.sms_intermediary(hospitals, db)
     return

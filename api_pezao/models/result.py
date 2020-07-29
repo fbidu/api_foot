@@ -48,7 +48,7 @@ class Result(Base):
     FILE_EXPORT_NAME = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
-    sms_sent = Column(Boolean)
+    sms_sent = Column(Boolean, default=False)
 
     log = relationship("Log", back_populates="result")
     templates_result = relationship("TemplatesResult", back_populates="result")

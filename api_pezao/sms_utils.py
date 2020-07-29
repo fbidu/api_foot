@@ -3,18 +3,35 @@ Function send_sms: sends SMS
 """
 
 import re
+<<<<<<< HEAD
 
 from requests import post
 
 from . import config
+=======
+from typing import List
+>>>>>>> 235d1ca... default False on sms_sent on result, half done on the system to run sms sweep after adding csv results to database
 
+from sqlalchemy.orm import Session
+from fastapi import Depends
 
+<<<<<<< HEAD
 def send_sms(number, text):
     """
     Dummy function for sms
     """
 
     if text and number:
+=======
+from . import config, log, crud
+
+
+def send_sms(number: str, text: str):
+    """
+    Sends SMS
+    """
+    if True:
+>>>>>>> 235d1ca... default False on sms_sent on result, half done on the system to run sms sweep after adding csv results to database
         print("SMS Sent!")
         return True
 
@@ -101,4 +118,57 @@ def verify_phone(number: str, settings: config.Settings = None):
         return 2
 
     # if there are no errors, the number is valid
+<<<<<<< HEAD
     return number
+=======
+    else:
+        return number
+
+
+def sms_intermediary(hospitals: List[str], db: Session):
+    """
+    Intermediary SMS-sending function, gets the necessary data, calls necessary functions, does log
+    """
+    sms_list = crud.sms_sweep(db, hospitals)
+
+    for sms in sms_list:
+        if sms[0] == "0":
+            log(
+                "ERRO: resultado de id %s não possui número de telefone." % str(sms[2]),
+                db,
+            )
+        elif sms[0] == "1":
+            log(
+                "ERRO: resultado de id %s não possui um número de telefone celular."
+                % str(sms[2]),
+                db,
+            )
+        elif sms[0] == "2":
+            log(
+                "ERRO: DDD inválido no número de celular do resultado de id %s."
+                % str(sms[2]),
+                db,
+            )
+
+        else:
+            if send_sms(sms[0], sms[1]):
+                log(
+                    "SMS do resultado de id %s enviado para número %s com sucesso."
+                    % (str(sms[2]), sms[0]),
+                    db,
+                )
+                if not crud.confirm_sms(db, sms[2]):
+                    log(
+                        "ERRO: Ocorreu um erro confirmando o envio do SMS do resultado de id %s"
+                        % (str(sms[2])),
+                        db,
+                    )
+
+            else:
+                log(
+                    "ERRO: Não foi possível enviar o SMS do resultado de id %s para o número %s."
+                    % (str(sms[2]), sms[0]),
+                    db,
+                )
+    return
+>>>>>>> 235d1ca... default False on sms_sent on result, half done on the system to run sms sweep after adding csv results to database
