@@ -31,6 +31,7 @@ def create_user(db: Session, user: schemas.UserCreate) -> User:
 
     return db_user
 
+
 def set_staff_role(user: schemas.User, staff: bool, db: Session) -> User:
     db_user = db.query(models.User).filter(models.User.id == user.id).first()
     if db_user:
@@ -40,6 +41,7 @@ def set_staff_role(user: schemas.User, staff: bool, db: Session) -> User:
 
     return db_user
 
+
 def set_superuser_role(user: schemas.User, superuser: bool, db: Session) -> User:
     db_user = db.query(models.User).filter(models.User.id == user.id).first()
     if db_user:
@@ -48,6 +50,7 @@ def set_superuser_role(user: schemas.User, superuser: bool, db: Session) -> User
         db.refresh(db_user)
 
     return db_user
+
 
 def list_users(db: Session) -> List[User]:
     """
@@ -170,7 +173,7 @@ def read_hospitals(db: Session, code: str = "", name: str = "", email: str = "")
 
 
 def create_hospital(db: Session, hospital: schemas.HospitalCSCreate):
-    db_hospital = models.HospitalCS(**hospital.dict(exclude={'password'}))
+    db_hospital = models.HospitalCS(**hospital.dict(exclude={"password"}))
 
     user = schemas.UserCreate(
         cpf=None,

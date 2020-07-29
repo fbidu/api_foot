@@ -125,7 +125,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     created_user = crud.create_user(db=db, user=user)
 
     # ANA: ISSO ESTÁ AQUI SÓ PARA EU FAZER TESTE, TEMOS QUE TIRAR DEPOIS
-    if created_user.login == 'CIPOI_ADMIN':
+    if created_user.login == "CIPOI_ADMIN":
         created_user.is_superuser = True
     ###############################################################
 
@@ -137,8 +137,15 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     return created_user
 
+
 @app.post("/roles/", response_model=schemas.User)
-def change_role(user: schemas.User, is_staff: bool = False, is_superuser: bool = False, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def change_role(
+    user: schemas.User,
+    is_staff: bool = False,
+    is_superuser: bool = False,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+):
     logged_user = crud.get_current_user(db, token)
     updated_user = user
 
@@ -153,7 +160,10 @@ def change_role(user: schemas.User, is_staff: bool = False, is_superuser: bool =
         return updated_user
 
     log("Um usuário sem privilégio tentou alterar flag de outro", db)
-    raise HTTPException(status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro")
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro"
+    )
+
 
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
@@ -167,7 +177,9 @@ def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme
         return user_list
 
     log(f"Usuário {logged_user.name}, que não é superuser, tentou listar usuários!", db)
-    raise HTTPException(status_code=403, detail="Usuário sem permissão tentou listar usuários")
+    raise HTTPException(
+        status_code=403, detail="Usuário sem permissão tentou listar usuários"
+    )
 
 
 @app.post("/csv/")
@@ -293,8 +305,11 @@ def read_results(
 # Listar hospitais para o admin, com filtros se ele desejar
 @app.get("/hospitals/", response_model=List[schemas.HospitalCS])
 def read_hospitals(
-    db: Session = Depends(get_db), code: str = "", name: str = "", email: str = "",
-    token: str = Depends(oauth2_scheme)
+    db: Session = Depends(get_db),
+    code: str = "",
+    name: str = "",
+    email: str = "",
+    token: str = Depends(oauth2_scheme),
 ):
     """
     Lista hospitais conforme os filtros. Se o filtro estiver vazio, não é considerado.
@@ -312,8 +327,12 @@ def read_hospitals(
 
         return hospital_list
 
-    log(f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db)
-    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou listar hospitais")
+    log(
+        f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db
+    )
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem permissão tentou listar hospitais"
+    )
 
 
 # Criar um novo hospital, e o usuário/senha associado a ele
@@ -321,8 +340,9 @@ def read_hospitals(
 
 @app.post("/hospitals/", response_model=schemas.HospitalCS)
 def create_hospital(
-    hospital: schemas.HospitalCSCreate, db: Session = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
+    hospital: schemas.HospitalCSCreate,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
 ):
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
@@ -337,15 +357,19 @@ def create_hospital(
         return created_hospital
 
     log("Usuário que não é superuser tentou criar hospital", db)
-    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou criar hospital")
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem permissão tentou criar hospital"
+    )
 
 
 # Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
+
 @app.put("/hospitals/", response_model=schemas.HospitalCS)
 def update_hospital(
-    hospital: schemas.HospitalCSUpdate, db: Session = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
+    hospital: schemas.HospitalCSUpdate,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
 ):
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
@@ -360,12 +384,16 @@ def update_hospital(
         return updated_hospital
 
     log("Usuário que não é superuser tentou atualizar hospital", db)
-    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou editar hospital")
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem permissão tentou editar hospital"
+    )
 
 
 # Deletar um hospital existente
 @app.delete("/hospitals/", response_model=bool)
-def delete_hospital(hospital_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def delete_hospital(
+    hospital_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         deleted = crud.delete_hospital(db, hospital_id)
@@ -375,7 +403,9 @@ def delete_hospital(hospital_id: int, db: Session = Depends(get_db), token: str 
         return deleted
 
     log("Usuário que não é superuser tentou deletar hospital", db)
-    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou apagar hospital")
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem permissão tentou apagar hospital"
+    )
 
 
 @app.get("/logs/", response_model=List[schemas.Log])
@@ -384,7 +414,9 @@ def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
     if logged_user.is_superuser:
         return crud.list_logs(db)
 
-    raise HTTPException(status_code=403, detail="Um usuário sem permissão tentou ler os logs")
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem permissão tentou ler os logs"
+    )
 
 
 @app.get("/test_get_hospital_user/", response_model=schemas.User)

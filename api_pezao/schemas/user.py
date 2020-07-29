@@ -18,11 +18,13 @@ class UserBase(BaseModel):
 
     @root_validator
     def check_user_has_at_least_one(cls, values):
-        user_cpf = values.get('cpf')
-        user_email = values.get('email')
-        user_login = values.get('login')
+        user_cpf = values.get("cpf")
+        user_email = values.get("email")
+        user_login = values.get("login")
         if user_cpf is None and user_email is None and user_login is None:
-            raise ValueError('User should have at least one of these: cpf, email, login')
+            raise ValueError(
+                "User should have at least one of these: cpf, email, login"
+            )
         return values
 
 

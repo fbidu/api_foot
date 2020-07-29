@@ -15,7 +15,7 @@ class HospitalCSBase(BaseModel):
 
     code: str
     name: str
-    #type: HospitalType
+    # type: HospitalType
     type: str
     email1: str
     email2: str
@@ -26,7 +26,9 @@ class HospitalCSCreate(HospitalCSBase):
     """
     Define o comportamento de criação de uma instância de HospitalCS
     """
+
     password: str
+
 
 class HospitalCS(HospitalCSBase):
     """
@@ -44,6 +46,7 @@ class HospitalCS(HospitalCSBase):
         """
 
         orm_mode = True
+
 
 class HospitalCSUpdate(HospitalCS):
     password: str = None
