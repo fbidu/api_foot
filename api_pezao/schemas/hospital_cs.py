@@ -45,7 +45,7 @@ class HospitalCS(HospitalCSBase):
         orm_mode = True
 
 
-class HospitalCSUpdate(HospitalCS):
+class HospitalCSUpdate(HospitalCSBase):
     """
     Modelo para atualização de hospital.
     """

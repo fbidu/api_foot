@@ -3,6 +3,7 @@ Here be awesome code!
 """
 from functools import lru_cache
 from pathlib import Path
+
 from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -324,7 +325,7 @@ def read_hospitals(
     """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
-        hospital_list = crud.read_hospitals(db, code, name, email)
+        hospital_list = crud.read_hospitals(db, code=code, name=name, email=email)
 
         log(
             "Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s"
@@ -375,8 +376,9 @@ def create_hospital(
 # Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
 
-@app.put("/hospitals/", response_model=schemas.HospitalCS)
+@app.put("/hospitals/{hospital_id}/", response_model=schemas.HospitalCS)
 def update_hospital(
+    hospital_id: int,
     hospital: schemas.HospitalCSUpdate,
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
@@ -386,7 +388,12 @@ def update_hospital(
     """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
-        updated_hospital = crud.update_hospital(db, hospital)
+        db_hospital = crud.read_hospitals(db, id_=hospital_id)[0]
+
+        if not db_hospital:
+            raise HTTPException(status_code=404, detail="Hospital não encontrado")
+
+        updated_hospital = crud.update_hospital(db, db_hospital, hospital)
 
         log(
             "Um hospital teve dados atualizados: code = %s, type = %s, name = %s."

@@ -145,3 +145,22 @@ class TestHospital:
         self._test_read_hospital(f"email={self.test_hospital.email1}")
         self._test_read_hospital(f"email={self.test_hospital.email2}")
         self._test_read_hospital(f"email={self.test_hospital.email3}")
+
+    def test_update_hospital(self):
+        """
+        Testa se a atualização de um hospital funciona
+        """
+
+        payload = {
+            "code": "TEST_HC_novo",
+            "name": "test hosp_novo",
+            "type": "CS_novo",
+            "email1": "testhosp1@test.com_novo",
+            "email2": "testhosp2@test.com_novo",
+            "email3": "testhosp3@test.com_novo",
+        }
+
+        response = self.client.put(f"/hospitals/{self.test_hospital.id}/", json=payload)
+
+        assert response.status_code == 200
+        assert_response_matches_payload(response, payload)
