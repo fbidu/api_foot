@@ -1,7 +1,9 @@
 """
 Utilitary function to aid testing
 """
+from typing import Any
 from requests import Response
+from sqlalchemy.orm.session import Session
 from api_pezao.utils import sha256
 
 
@@ -83,3 +85,37 @@ def create_demo_hospital(
     return client.post(
         "/hospitals/", json=payload, headers=auth_header(client, username, password)
     )
+
+
+def assert_response_matches_payload(response, payload, expected_status=200):
+    """
+    Helper function to ease checking if a given JSON Response matches an
+    input payload that was given to it.
+
+    This function expects that the response's JSON contains at least ALL
+    the fields defined on the payload
+    """
+    assert response.status_code == expected_status
+
+    data = response.json()
+    response_keys = set(data.keys())
+    for key, value in payload.items():
+        assert key in response_keys, f"Key '{key}' not present in the response"
+        assert data[key] == value, f"Value for '{key}' does not match"
+
+
+def assert_payload_in_database(
+    db: Session, payload: dict, model, key: str, key_value: Any
+):
+    """
+    Assert if a given JSON Payload is present in the db, inside the given model.
+    The key argument and value should refer to that model's primary key
+    """
+
+    db_entity = db.query(model).filter(getattr(model, key) == key_value).first()
+
+    assert db_entity
+
+    for key_, value in payload.items():
+        assert hasattr(db_entity, key_), f"Key '{key_}' not present in the response"
+        assert getattr(db_entity, key_) == value, f"Value for '{key_}' does not match"
