@@ -410,7 +410,7 @@ def update_hospital(
 
 
 # Deletar um hospital existente
-@app.delete("/hospitals/", response_model=bool)
+@app.delete("/hospitals/{hospital_id}/", response_model=bool)
 def delete_hospital(
     hospital_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
@@ -419,7 +419,12 @@ def delete_hospital(
     """
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
-        deleted = crud.delete_hospital(db, hospital_id)
+        db_hospital = crud.read_hospitals(db, id_=hospital_id)[0]
+
+        if not db_hospital:
+            raise HTTPException(status_code=404, detail="Hospital não encontrado")
+
+        deleted = crud.delete_hospital(db, db_hospital)
 
         log("Tentativa de deletar hospital de ID %s: %s" % (hospital_id, deleted), db)
 

@@ -164,3 +164,12 @@ class TestHospital:
 
         assert response.status_code == 200
         assert_response_matches_payload(response, payload)
+
+    def test_delete_hospital(self):
+        """
+        Testa se a deleção de um hospital funciona
+        """
+
+        response = self.client.delete(f"/hospitals/{self.test_hospital.id}/")
+
+        assert response.status_code == 200

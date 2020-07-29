@@ -98,17 +98,10 @@ def update_hospital(
     return db_hospital
 
 
-def delete_hospital(db: Session, hospital_id: int):
+def delete_hospital(db: Session, db_hospital: models.HospitalCS):
     """
     Deleta um hospital
     """
-    db_hospital = (
-        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
-    )
-
-    if db_hospital is None:
-        return False
-
     db_user = db_hospital.user
 
     db.delete(db_hospital)
