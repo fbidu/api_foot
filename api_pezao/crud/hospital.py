@@ -118,3 +118,13 @@ def delete_hospital(db: Session, hospital_id: int):
     db.commit()
 
     return True
+
+
+def test_get_hospital_user(db: Session, hospital_id: int):
+    """
+    Função de teste
+    """
+    db_hospital = (
+        db.query(models.HospitalCS).filter(models.HospitalCS.id == hospital_id).first()
+    )
+    return db_hospital.user
