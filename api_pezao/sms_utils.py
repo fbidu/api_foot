@@ -46,7 +46,7 @@ def send_sms1(number, msg, username, password):
     payload = {
         "NumUsu": username,
         "Senha": password,
-        "SeuNum": username,
+        "SeuNum": 12345,
         "Celular": number,
         "Mensagem": msg,
     }
@@ -54,7 +54,9 @@ def send_sms1(number, msg, username, password):
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
     url = "https://webservices.twwwireless.com.br/reluzcap/wsreluzcap.asmx/EnviaSMS"
-    return post(url, data=payload, headers=headers)
+    response = post(url, data=payload, headers=headers)
+
+    return response.status_code == 200 and "NOK" not in response.text
 
 
 def verify_phone(number: str, settings: config.Settings = None):
