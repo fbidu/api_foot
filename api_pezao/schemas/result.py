@@ -2,7 +2,7 @@
 Define modelo de dados para resultados
 """
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class ResultBase(BaseModel):
