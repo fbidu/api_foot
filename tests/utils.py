@@ -98,10 +98,17 @@ def assert_response_matches_payload(response, payload, expected_status=200):
     assert response.status_code == expected_status
 
     data = response.json()
-    response_keys = set(data.keys())
+    assert_json_matches_payload(data, payload)
+
+
+def assert_json_matches_payload(json: dict, payload: dict):
+    """
+    Checks if a given JSON object contains at least all the keys
+    in a given payload and if their values match
+    """
     for key, value in payload.items():
-        assert key in response_keys, f"Key '{key}' not present in the response"
-        assert data[key] == value, f"Value for '{key}' does not match"
+        assert key in json, f"Key '{key}' not present in the response"
+        assert json[key] == value, f"Value for '{key}' does not match"
 
 
 def assert_payload_in_database(
