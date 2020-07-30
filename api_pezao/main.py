@@ -8,15 +8,7 @@ from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import (
-    Depends,
-    FastAPI,
-    File,
-    HTTPException,
-    UploadFile,
-    Body,
-    BackgroundTasks,
-)
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -461,18 +453,6 @@ def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
     Teste do user de hospital
     """
     return crud.test_get_hospital_user(db, id_)
-
-
-@app.put("/sms/toggle")
-def toggle_sms(
-    activate: bool = Body(..., embed=True),
-    settings: config.Settings = Depends(get_settings),
-):
-    """
-    Endpoint que ativa ou desativa o envio de sms
-    """
-    settings.daily_sms_sweep_active = activate
-    return {"daily_sms_sweep_active": activate}
 
 
 @app.post("/sms_sweep")

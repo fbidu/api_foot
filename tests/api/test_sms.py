@@ -14,7 +14,6 @@ from api_pezao.crud import (
     sms_sweep,
     confirm_sms,
 )
-from api_pezao.main import get_settings
 from api_pezao.models import HospitalCS, User, TemplateSMS, TemplatesResult, Result
 from api_pezao.schemas import ResultCreate
 from ..utils import auth_header, create_demo_hospital, create_demo_user
@@ -223,23 +222,3 @@ class TestSMS:
         confirm_sms(self.db, 1)
         self.db.refresh(db_result)
         assert db_result.sms_sent
-
-    def test_sms_activate(self):
-        """
-        Testa se a ativação de SMS funciona
-        """
-        settings = get_settings()
-        settings.daily_sms_sweep_active = False
-        response = self.client.put("/sms/toggle", json={"activate": True})
-        assert response.status_code == 200
-        assert settings.daily_sms_sweep_active
-
-    def test_sms_deactivate(self):
-        """
-        Testa se a desativação de SMS funciona
-        """
-        settings = get_settings()
-        settings.daily_sms_sweep_active = True
-        response = self.client.put("/sms/toggle", json={"activate": False})
-        assert response.status_code == 200
-        assert not settings.daily_sms_sweep_active
