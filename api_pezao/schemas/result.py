@@ -2,8 +2,8 @@
 Define modelo de dados para resultados
 """
 from datetime import datetime
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
-
+from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
+import re
 
 class ResultBase(BaseModel):
     """
@@ -39,6 +39,18 @@ class ResultBase(BaseModel):
     RECORD_CREATION_DATE: datetime  # date?
     FILE_EXPORT_DATE: datetime  # date?
     FILE_EXPORT_NAME: str
+
+    @validator('CPF')
+    def cpf_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
+
+    @validator('CNS')
+    def cns_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
+
+    @validator('DNV')
+    def dnv_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
 
 
 class ResultCreate(ResultBase):

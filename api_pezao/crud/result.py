@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from .. import models, schemas
 
+import re
+
 # pylint: disable=too-many-arguments
 def read_results(
     db: Session,
@@ -33,6 +35,10 @@ def read_results(
     O mesmo vale pros locais de coleta.
     """
     results = db.query(models.Result)
+
+    dnv = ''.join(re.findall(r"\d", dnv))
+    cns = ''.join(re.findall(r"\d", cns))
+    cpf = ''.join(re.findall(r"\d", cpf))
 
     if dnv != "":
         results = results.filter(models.Result.DNV == dnv)

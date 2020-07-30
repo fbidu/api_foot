@@ -2,7 +2,8 @@
 Oferece modelos de validação para Usuários
 """
 from datetime import datetime
-from pydantic import BaseModel, root_validator  # pylint: disable=no-name-in-module
+import re
+from pydantic import BaseModel, validator, root_validator  # pylint: disable=no-name-in-module
 
 
 class UserBase(BaseModel):
@@ -32,6 +33,10 @@ class UserBase(BaseModel):
                 "User should have at least one of these: cpf, email, login"
             )
         return values
+
+    @validator('cpf')
+    def cpf_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
 
 
 class UserCreate(UserBase):
