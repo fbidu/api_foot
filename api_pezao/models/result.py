@@ -2,7 +2,7 @@
 Define modelo SQL para resultados
 """
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 from ..database import Base
@@ -48,6 +48,7 @@ class Result(Base):
     FILE_EXPORT_NAME = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
+    sms_sent = Column(Boolean, default=False)
 
     log = relationship("Log", back_populates="result")
     templates_result = relationship("TemplatesResult", back_populates="result")

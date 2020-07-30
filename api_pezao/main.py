@@ -8,11 +8,11 @@ from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from . import config, crud, schemas, log
+from . import config, crud, schemas, log, sms_utils
 from .auth import oauth2_scheme, verify_password, create_access_token
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
@@ -244,11 +244,6 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """
     created_user = crud.create_user(db=db, user=user)
 
-    # ANA: ISSO ESTÁ AQUI SÓ PARA EU FAZER TESTE, TEMOS QUE TIRAR DEPOIS
-    if created_user.login == "CIPOI_ADMIN":
-        created_user.is_superuser = True
-    ###############################################################
-
     log(
         "Foi criado um usuário com os seguintes dados: cpf = %s, email = %s, login = %s"
         % (created_user.cpf, created_user.email, created_user.login),
@@ -467,9 +462,6 @@ def read_hospitals(
     )
 
 
-# Criar um novo hospital, e o usuário/senha associado a ele
-
-
 @app.post("/hospitals/", response_model=schemas.HospitalCS)
 def create_hospital(
     hospital: schemas.HospitalCSCreate,
@@ -495,9 +487,6 @@ def create_hospital(
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou criar hospital"
     )
-
-
-# Alterar um hospital já existente (qualquer campo exceto id, user_id)
 
 
 @app.put("/hospitals/{hospital_id}/", response_model=schemas.HospitalCS)
@@ -580,3 +569,16 @@ def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
     Teste do user de hospital
     """
     return crud.test_get_hospital_user(db, id_)
+
+
+@app.post("/sms_sweep")
+def sms_sweep(
+    background_tasks: BackgroundTasks,
+    hospitals: List[str] = None,
+    db: Session = Depends(get_db),
+):
+    """
+    Envia todos os SMSs pendentes
+    """
+    background_tasks.add_task(sms_utils.sms_intermediary, hospitals, db)
+    return {"message": "SMSs scheduled"}
