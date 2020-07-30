@@ -457,26 +457,26 @@ def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
 
 @app.put("/sms_activate")
 def activate_scheduled_sms_sweep(settings: config.Settings = Depends(get_settings)):
+    """
+    Ativa sms diário
+    """
     settings.daily_sms_sweep_active = True
-    return
+    return "SMS diário ativado!"
 
 
 @app.put("/sms_deactivate")
 def deactivate_scheduled_sms_sweep(settings: config.Settings = Depends(get_settings)):
+    """
+    Desativa SMS diário
+    """
     settings.daily_sms_sweep_active = False
-    return
-
-
-@app.put("/sms_change_time")
-def set_scheduled_sms_sweep_time(
-    new_hour: int, new_minutes: int, settings: config.Settings = Depends(get_settings)
-):
-    new_time = str(new_minutes) + " " + str(new_hour) + " * * *"
-    settings.sms_sweep_time = new_time
-    return
+    return "SMS diário desativado!"
 
 
 @app.post("/sms_sweep")
 def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db)):
+    """
+    Envia todos os SMSs pendentes
+    """
     sms_utils.sms_intermediary(hospitals, db)
-    return
+    return "Enviando SMSs!"
