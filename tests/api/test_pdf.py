@@ -7,6 +7,7 @@ from pathlib import Path
 from pytest import fixture
 
 from api_pezao import config, main
+from api_pezao import deps
 from api_pezao.utils import sha256
 
 from ..utils import post_pdf, check_files_equal
@@ -55,7 +56,7 @@ def test_post_pdf_obeys_env(client, sample_pdf):
     assert target_path.exists(), "Falha ao criar pasta para testar envio de PDF!"
 
     settings = config.Settings(pdf_storage_path=str(target_path.absolute()))
-    main.app.dependency_overrides[main.get_settings] = lambda: settings
+    main.app.dependency_overrides[deps.get_settings] = lambda: settings
 
     response = post_pdf(sample_pdf, client)
 
