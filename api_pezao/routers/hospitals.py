@@ -162,3 +162,11 @@ def delete_hospital(
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou apagar hospital"
     )
+
+
+@router.get("/test_get_hospital_user/", response_model=schemas.User)
+def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
+    """
+    Teste do user de hospital
+    """
+    return crud.test_get_hospital_user(db, id_)
