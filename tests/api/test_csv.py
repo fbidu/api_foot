@@ -3,8 +3,10 @@ Testes funcionais para envio de PDF
 """
 from pathlib import Path
 
+from api_pezao.crud.result import read_results
 
-def test_post_csv(client):
+
+def test_post_csv(client, db):
     """
     Testa se o envio de um arquivo para /csv retorna o número de linhas nele
     """
@@ -18,3 +20,6 @@ def test_post_csv(client):
     content = response.json()
 
     assert content["lines"] == 4
+
+    db_results = read_results(db)
+    assert len(db_results) == 4
