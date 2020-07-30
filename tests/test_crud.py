@@ -39,8 +39,6 @@ def test_find_user_by_cpf(db: Session, test_user: User):
 
     assert found_user
     assert test_user == found_user
-<<<<<<< HEAD
-=======
 
 
 def test_find_user_by_both_cpf_and_email(db: Session, test_user: User):
@@ -98,4 +96,3 @@ def test_sms_sweep(db: Session):
     assert message_to_sent[0] == db_result.ptnPhone1
     assert message_to_sent[1] == template_sms.msg
     assert message_to_sent[2] == db_result.id
->>>>>>> 923bd3b... Add tests
