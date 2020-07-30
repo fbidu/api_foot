@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..auth import get_password_hash, SECRET_KEY
 from ..models import User
+import re
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> User:
@@ -76,7 +77,10 @@ def find_user(db: Session, username: str) -> User:
     """
 
     query = db.query(models.User)
-    user = query.filter(models.User.cpf == username).first()
+
+    cpf_username = ''.join(re.findall(r"\d", username))
+
+    user = query.filter(models.User.cpf == cpf_username).first()
 
     if user is None:
         user = query.filter(models.User.email == username).first()
