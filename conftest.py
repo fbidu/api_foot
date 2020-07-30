@@ -6,7 +6,7 @@ from pytest import fixture
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from api_pezao import main
+from api_pezao import deps, main
 from api_pezao.database import Base
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -47,6 +47,6 @@ def client(db):
     def __get_db_fixture():
         return db
 
-    main.app.dependency_overrides[main.get_db] = __get_db_fixture
+    main.app.dependency_overrides[deps.get_db] = __get_db_fixture
 
     return TestClient(main.app)

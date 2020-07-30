@@ -10,35 +10,35 @@ class ResultBase(BaseModel):
     ResultBase lista os campos que estão sempre disponíveis
     """
 
-    id: int
     IDExport: int
-    Barcode: int  # type?
-    NumLote: int  # fieldname?
-    DataNasc: str  # date?
-    HoraNasc: str  # date?
-    DataColeta: str  # date?
-    HoraColeta: str  # date?
-    prMotherFirstname: str  # fieldname?
-    prMotherSurname: str  # fieldname?
+    Barcode: int
+    NumLote: int
+    DataNasc: str
+    HoraNasc: str
+    DataColeta: str
+    HoraColeta: str
+    prMotherFirstname: str
+    prMotherSurname: str
     CPF: str
     ptnFirstname: str
     ptnSurname: str
     DNV: str
-    CNS: str  # type?
+    CNS: str
     ptnEmail: str
     ptnPhone1: str
     ptnPhone2: str
-    CodLocColeta: str  # type?
+    CodLocColeta: str
     LocalColeta: str
-    COD_LocColeta: str  # type? repeat? fieldname?
-    COD_HospNasc: str  # type? repeat? fieldname?
+    COD_LocColeta: str
+    COD_HospNasc: str
     HospNasc: str
     LocalNasc: str
     PDF_Filename: str
-    Tipo_SMS: str  # type?
-    RECORD_CREATION_DATE: datetime  # date?
-    FILE_EXPORT_DATE: datetime  # date?
+    Tipo_SMS: str
+    RECORD_CREATION_DATE: datetime
+    FILE_EXPORT_DATE: datetime
     FILE_EXPORT_NAME: str
+    sms_sent: bool = False
 
     @validator('CPF')
     def cpf_numbers(cls, v):
