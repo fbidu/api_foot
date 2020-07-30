@@ -5,8 +5,8 @@ from fastapi import Depends, HTTPException, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from .. import crud, log
-from ..auth import verify_password, create_access_token
+from .. import crud, log, schemas
+from ..auth import verify_password, create_access_token, oauth2_scheme
 from ..deps import get_db
 from ..utils import is_valid_cpf, is_valid_email
 
@@ -178,3 +178,50 @@ def login2_family(
     token = create_access_token({"sub": username})
 
     return {"access_token": token, "token_type": "bearer", "user_data": user}
+
+
+@router.post("/roles/", response_model=schemas.User)
+def change_role(
+    user: schemas.User,
+    is_staff: bool = False,
+    is_superuser: bool = False,
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+):
+    """
+    Altera o papel de um usuário no sistema
+    """
+    logged_user = crud.get_current_user(db, token)
+    updated_user = user
+
+    if logged_user.is_staff:
+        updated_user = crud.set_staff_role(user, is_staff, db)
+
+        log(
+            f"[FLAGS DE USUÁRIO] Usuário staff ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}",
+            db,
+            user_id=logged_user.id,
+        )
+
+        return updated_user
+    if logged_user.is_superuser:
+        updated_user = crud.set_staff_role(user, is_staff, db)
+        updated_user = crud.set_superuser_role(user, is_superuser, db)
+
+        log(
+            f"[FLAGS DE USUÁRIO] Usuário superuser ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}, e flag superuser para {is_superuser}",
+            db,
+            user_id=logged_user.id,
+        )
+
+        return updated_user
+
+    log(
+        f"[FLAGS DE USUÁRIO] Usuário {logged_user.name}, de id = {logged_user.id}, não é staff nem superuser, e tentou alterar flags do usuário {updated_user.name} (de id = {updated_user.id}) para staff={is_staff} e superuser={is_superuser}",
+        db,
+        user_id=logged_user.id,
+    )
+
+    raise HTTPException(
+        status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro"
+    )

@@ -57,53 +57,6 @@ def home():
     return "Hello, world!"
 
 
-@app.post("/roles/", response_model=schemas.User)
-def change_role(
-    user: schemas.User,
-    is_staff: bool = False,
-    is_superuser: bool = False,
-    db: Session = Depends(get_db),
-    token: str = Depends(oauth2_scheme),
-):
-    """
-    Altera o papel de um usuário no sistema
-    """
-    logged_user = crud.get_current_user(db, token)
-    updated_user = user
-
-    if logged_user.is_staff:
-        updated_user = crud.set_staff_role(user, is_staff, db)
-
-        log(
-            f"[FLAGS DE USUÁRIO] Usuário staff ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}",
-            db,
-            user_id=logged_user.id,
-        )
-
-        return updated_user
-    if logged_user.is_superuser:
-        updated_user = crud.set_staff_role(user, is_staff, db)
-        updated_user = crud.set_superuser_role(user, is_superuser, db)
-
-        log(
-            f"[FLAGS DE USUÁRIO] Usuário superuser ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}, e flag superuser para {is_superuser}",
-            db,
-            user_id=logged_user.id,
-        )
-
-        return updated_user
-
-    log(
-        f"[FLAGS DE USUÁRIO] Usuário {logged_user.name}, de id = {logged_user.id}, não é staff nem superuser, e tentou alterar flags do usuário {updated_user.name} (de id = {updated_user.id}) para staff={is_staff} e superuser={is_superuser}",
-        db,
-        user_id=logged_user.id,
-    )
-
-    raise HTTPException(
-        status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro"
-    )
-
-
 @app.post("/csv/")
 def read_csv(csv_file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
