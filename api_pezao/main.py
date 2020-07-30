@@ -9,16 +9,15 @@ from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, BackgroundTasks
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import config, crud, schemas, log, sms_utils
-from .auth import oauth2_scheme, verify_password, create_access_token
+from .auth import oauth2_scheme
 from .csv_input import import_csv
 from .database import engine, Base
 from .pdf_input import save_pdf
 from .schemas.pdf_processed import PDFProcessed
-from .utils import sha256, is_valid_cpf, is_valid_email
+from .utils import sha256
 
 from .routers import auth, users
 from .deps import get_db
