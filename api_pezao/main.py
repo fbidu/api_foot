@@ -133,6 +133,85 @@ def login2(
         "user_data": read_current_user(db, token)
     }
 
+@app.post("/token2_staff_or_admin")
+def login2_staff_or_admin(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
+    """
+    Realiza o login de um usuário aceitando como input um formulário com
+    `username` e `password`. O `username` pode ser o e-mail ou CPF de
+    um usuário.
+    """
+    user = None
+
+    username = ""
+
+    if is_valid_email(form_data.username):
+        user = crud.find_user(db=db, username=form_data.username)
+        username = user.email
+    elif is_valid_cpf(form_data.username):
+        user = crud.find_user(db=db, username=form_data.username)
+        username = user.cpf
+    else:
+        user = crud.find_user(db=db, username=form_data.username)
+        username = form_data.username
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    if not verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    if not user.is_staff or (not user.is_superuser):
+        raise HTTPException(status_code=401, detail="User is not staff or superuser")
+
+    token = create_access_token({"sub": username})
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user_data": read_current_user(db, token)
+    }
+
+@app.post("/token2_family")
+def login2_family(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
+    """
+    Realiza o login de um usuário aceitando como input um formulário com
+    `username` e `password`. O `username` pode ser o e-mail ou CPF de
+    um usuário.
+    """
+    user = None
+
+    username = ""
+
+    if is_valid_email(form_data.username):
+        user = crud.find_user(db=db, username=form_data.username)
+        username = user.email
+    elif is_valid_cpf(form_data.username):
+        user = crud.find_user(db=db, username=form_data.username)
+        username = user.cpf
+    else:
+        user = crud.find_user(db=db, username=form_data.username)
+        username = form_data.username
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    if not verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    if user.is_staff or user.is_superuser:
+        raise HTTPException(status_code=401, detail="User is not family")
+
+    token = create_access_token({"sub": username})
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user_data": read_current_user(db, token)
+    }
 
 @app.get("/users/token")
 def read_token(token: str = Depends(oauth2_scheme)):
