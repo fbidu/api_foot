@@ -20,32 +20,30 @@ class Result(Base):
     id = Column(Integer, primary_key=True, index=True)
     IDExport = Column(Integer, unique=True, index=True)
     Barcode = Column(String)
-    NumLote = Column(Integer)
-    DataNasc = Column(String)  # date?
-    HoraNasc = Column(String)  # date?
-    DataColeta = Column(String)  # date?
-    HoraColeta = Column(String)  # date?
+    LotNumber = Column(Integer)
+    DataNasc = Column(String)
+    HoraNasc = Column(String)
+    DataColeta = Column(String)
     prMotherFirstname = Column(String)
     prMotherSurname = Column(String)
     CPF = Column(String)
     ptnFirstname = Column(String)
     ptnSurname = Column(String)
     DNV = Column(String)
-    CNS = Column(String)  # type?
+    CNS = Column(String)
     ptnEmail = Column(String)
     ptnPhone1 = Column(String)
     ptnPhone2 = Column(String)
-    CodLocColeta = Column(String)  # type?
+    COD_LocColeta = Column(String)
     LocalColeta = Column(String)
-    COD_LocColeta = Column(String)  # type? repeat?
-    COD_HospNasc = Column(String)  # type? repeat?
-    HospNasc = Column(String)
+    COD_HospitalNasc = Column(String)
+    HospitalNasc = Column(String)
     LocalNasc = Column(String)
     PDF_Filename = Column(String)
-    Tipo_SMS = Column(String)  # type?
-    RECORD_CREATION_DATE = Column(DateTime, default=datetime.utcnow)  # date?
-    FILE_EXPORT_DATE = Column(DateTime, default=datetime.utcnow)  # date?
+    PDF_ImageDate = Column(DateTime, default=datetime.utcnow)
+    FILE_EXPORT_DATE = Column(DateTime, default=datetime.utcnow)
     FILE_EXPORT_NAME = Column(String)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
     sms_sent = Column(Boolean, default=False)

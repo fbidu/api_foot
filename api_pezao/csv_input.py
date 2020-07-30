@@ -21,6 +21,34 @@ def import_csv(csv_content):
     next(csv_reader)  # Skip the header
     line_count = 0
 
+    transform = {
+        "id_reportedPatientsExport": "IDExport",
+        "SpcCode1_Barcode": "Barcode",
+        "SpcCode2_LotNumber": "LotNumber",
+        "BirthDate": "DataNasc",
+        "BirthTime": "HoraNasc",
+        "MotherName": "prMotherFirstname",
+        "MotherSurname": "prMotherSurname",
+        "MotherSSN_CPF": "CPF",
+        "PatientName": "ptnFirstName",
+        "PatientSurname": "ptnSurname",
+        "PatientSSN_DNV": "DNV",
+        "PatientMedRec2_CNS": "CNS",
+        "PatientEmail": "ptnEmail",
+        "PatientPhone1": "ptnPhone1",
+        "PatientPhone2": "ptnPhone2",
+        "sd2ColTimePart_DataHoraColeta": "DataColeta",
+        "cntCode1_LocalColeta": "COD_LocalColeta",
+        "cntFacility_LocalColeta": "LocalColeta",
+        "cntCode1_HospitalNasc": "COD_HospitalNasc",
+        "cntFacility_HospitalNasc": "HospitalNasc",
+        "rqsCity_LocalNasc": "LocalNasc",
+        "PDF_ImageFileName": "PDF_Filename",
+        "PDF_ImageDate": "PDF_ImageDate",
+        "FILE_EXPORT_DATE": "FILE_EXPORT_DATE",
+        "FILE_EXPORT_NAME": "FILE_EXPORT_NAME",
+    }
+
     for _ in csv_reader:
         line_count += 1
 

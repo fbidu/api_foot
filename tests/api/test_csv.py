@@ -22,4 +22,4 @@ def test_post_csv(client, db):
     assert content["lines"] == 160
 
     db_results = read_results(db)
-    assert len(db_results) == 4
+    assert len(db_results) == 159

@@ -7,15 +7,19 @@ from pydantic import BaseModel
 from pydantic.class_validators import validator
 from pydantic.error_wrappers import ValidationError
 from api_pezao import csv_input
+from api_pezao.crud.result import read_results
 
 
-def test_import_csv():
+def test_import_csv(db):
     """
     testa se a função de import_csv retorna o total correto de linhas
     """
     sample_file = Path("tests/demo.csv").absolute()
     content = open(sample_file)
     assert csv_input.import_csv(content) == 159
+
+    db_results = read_results(db)
+    assert len(db_results) == 159
 
 
 def test_csv_to_pydantic():
