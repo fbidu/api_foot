@@ -7,6 +7,18 @@ from sqlalchemy.orm import Session
 from .. import models, sms_utils
 
 
+def lists_unsent_sms(db: Session, hospital_list: List[str] = None):
+    """
+    Lista todos os SMSs que precisam ser enviados. Se um argumento hospital_list
+    for oferecido contendo o COD_LocColeta de uma unidade, apenas os SMSs
+    daquelas unidades são considerados.
+    """
+    unsent_sms = db.query(models.Result).filter(~models.Result.sms_sent)
+    if hospital_list:
+        return unsent_sms.filter(models.Result.COD_LocColeta.in_(hospital_list)).all()
+    return unsent_sms.all()
+
+
 def sms_sweep(db: Session, hospital_list: List[str] = None):
     """
     Returns a (phone, message, result id) for every SMS that needs to be sent
@@ -14,18 +26,7 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
     in those hospitals only
     """
 
-    if not hospital_list:
-        # no defined hospitals -> return every result which SMS hadn't been sent yet
-        result_list = db.query(models.Result).filter(~models.Result.sms_sent).all()
-    else:
-        # defined hospitals -> return not sent results whose hospital code is in hospitals list
-        result_list = (
-            db.query(models.Result)
-            .filter(
-                ~models.Result.sms_sent, models.Result.COD_LocColeta.in_(hospital_list)
-            )
-            .all()
-        )
+    result_list = hospital_list(db, hospital_list)
 
     # creates a list of SMS to be returned
     # every entry in the list is a tuple (phone, message)
