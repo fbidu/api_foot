@@ -3,26 +3,15 @@ Function send_sms: sends SMS
 """
 
 import re
-<<<<<<< HEAD
 
 from requests import post
 
 from . import config
-=======
 from typing import List
->>>>>>> 235d1ca... default False on sms_sent on result, half done on the system to run sms sweep after adding csv results to database
 
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
-<<<<<<< HEAD
-def send_sms(number, text):
-    """
-    Dummy function for sms
-    """
-
-    if text and number:
-=======
 from . import config, log, crud
 
 
@@ -31,7 +20,6 @@ def send_sms(number: str, text: str):
     Sends SMS
     """
     if True:
->>>>>>> 235d1ca... default False on sms_sent on result, half done on the system to run sms sweep after adding csv results to database
         print("SMS Sent!")
         return True
 
@@ -127,11 +115,7 @@ def verify_phone(number: str, settings: config.Settings = None):
         return 2
 
     # if there are no errors, the number is valid
-<<<<<<< HEAD
     return number
-=======
-    else:
-        return number
 
 
 def sms_intermediary(hospitals: List[str], db: Session):
@@ -180,4 +164,3 @@ def sms_intermediary(hospitals: List[str], db: Session):
                     db,
                 )
     return
->>>>>>> 235d1ca... default False on sms_sent on result, half done on the system to run sms sweep after adding csv results to database
