@@ -36,7 +36,8 @@ class UserBase(BaseModel):
 
     @validator('cpf')
     def cpf_numbers(cls, v):
-        return ''.join(re.findall(r"\d", v))
+        if v:
+            return ''.join(re.findall(r"\d", v))
 
 
 class UserCreate(UserBase):

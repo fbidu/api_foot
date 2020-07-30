@@ -36,15 +36,14 @@ def read_results(
     """
     results = db.query(models.Result)
 
-    dnv = ''.join(re.findall(r"\d", dnv))
-    cns = ''.join(re.findall(r"\d", cns))
-    cpf = ''.join(re.findall(r"\d", cpf))
-
     if dnv != "":
+        dnv = ''.join(re.findall(r"\d", dnv))
         results = results.filter(models.Result.DNV == dnv)
     if cns != "":
+        cns = ''.join(re.findall(r"\d", cns))
         results = results.filter(models.Result.CNS == cns)
     if cpf != "":
+        cpf = ''.join(re.findall(r"\d", cpf))
         results = results.filter(models.Result.CPF == cpf)
     if data_nascimento != "":
         results = results.filter(models.Result.DataNasc == data_nascimento)
