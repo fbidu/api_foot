@@ -225,8 +225,21 @@ class TestSMS:
         assert db_result.sms_sent
 
     def test_sms_activate(self):
+        """
+        Testa se a ativação de SMS funciona
+        """
         settings = get_settings()
         settings.daily_sms_sweep_active = False
-        response = self.client.put("/sms_activate")
+        response = self.client.put("/sms/toggle", json={"activate": True})
         assert response.status_code == 200
         assert settings.daily_sms_sweep_active
+
+    def test_sms_deactivate(self):
+        """
+        Testa se a desativação de SMS funciona
+        """
+        settings = get_settings()
+        settings.daily_sms_sweep_active = True
+        response = self.client.put("/sms/toggle", json={"activate": False})
+        assert response.status_code == 200
+        assert not settings.daily_sms_sweep_active

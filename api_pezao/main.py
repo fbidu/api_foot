@@ -8,7 +8,7 @@ from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -455,22 +455,16 @@ def test_get_hospital_user(id_: int, db: Session = Depends(get_db)):
     return crud.test_get_hospital_user(db, id_)
 
 
-@app.put("/sms_activate")
-def activate_scheduled_sms_sweep(settings: config.Settings = Depends(get_settings)):
+@app.put("/sms/toggle")
+def toggle_sms(
+    activate: bool = Body(..., embed=True),
+    settings: config.Settings = Depends(get_settings),
+):
     """
-    Ativa sms diário
+    Endpoint que ativa ou desativa o envio de sms
     """
-    settings.daily_sms_sweep_active = True
-    return "SMS diário ativado!"
-
-
-@app.put("/sms_deactivate")
-def deactivate_scheduled_sms_sweep(settings: config.Settings = Depends(get_settings)):
-    """
-    Desativa SMS diário
-    """
-    settings.daily_sms_sweep_active = False
-    return "SMS diário desativado!"
+    settings.daily_sms_sweep_active = activate
+    return {"daily_sms_sweep_active": activate}
 
 
 @app.post("/sms_sweep")
