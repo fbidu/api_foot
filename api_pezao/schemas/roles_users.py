@@ -1,22 +1,22 @@
 """
-Define Pydantic models for the data structures.
+Modelos de validação para as relações entre Usuário e Roles
 """
 from pydantic import BaseModel
 
-# pylint: disable=too-few-public-methods
-class UserBase(BaseModel):
+
+class RolesUsersBase(BaseModel):
     """
-    UserBase defines the fields available for an user in any
-    point of its lifecycle.
+    RolesUsersBase define a base para relação user-role.
+    Essa relação sempre possuirá user_id e role_id
     """
 
-    email: str
-    cpf: str
-    first_name: str = None
-    last_name: str = None
+    # descriptions are a bit wonky, im a little lost
+
+    user_id: int
+    role_id: int
 
 
-class UserCreate(UserBase):
+class RolesUsersCreate(RolesUsersBase):
     """
     UserCreate defines additional fields that should be used
     while creating an user that weren't defined on `UserBase`
@@ -25,12 +25,10 @@ class UserCreate(UserBase):
     pass
 
 
-class User(UserBase):
+class RolesUsers(RolesUsersBase):
     """
     Defines a Pydantic model for an user
     """
-
-    id: int
 
     class Config:
         """

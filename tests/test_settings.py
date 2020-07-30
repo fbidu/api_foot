@@ -4,7 +4,7 @@ Testa se as configurações estão disponíveis
 from os import environ
 from pytest import fixture
 from api_pezao.config import Settings
-from api_pezao.main import get_settings
+from api_pezao.deps import get_settings
 
 # pylint: disable=redefined-outer-name
 

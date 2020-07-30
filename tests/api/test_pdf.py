@@ -7,6 +7,8 @@ from pathlib import Path
 from pytest import fixture
 
 from api_pezao import config, main
+from api_pezao import deps
+from api_pezao.utils import sha256
 
 from ..utils import post_pdf, check_files_equal
 
@@ -20,7 +22,7 @@ def sample_pdf():
     return Path("tests/demo.pdf").absolute()
 
 
-def test_post_pdf(client, sample_pdf):
+def test_post_pdf(client, sample_pdf: Path):
     """
     Testa se o envio de um arquivo para /pdf retorna o tamanho dele e salva
     """
@@ -31,7 +33,10 @@ def test_post_pdf(client, sample_pdf):
 
     content = response.json()
 
-    assert content == 10453
+    assert content["length"] == 10453
+    assert content["sha256"] == sha256(sample_pdf)
+    assert content["filename"] == sample_pdf.name
+
     assert Path("/tmp/demo.pdf").exists()
     assert check_files_equal(sample_pdf, "/tmp/demo.pdf")
 
@@ -51,7 +56,7 @@ def test_post_pdf_obeys_env(client, sample_pdf):
     assert target_path.exists(), "Falha ao criar pasta para testar envio de PDF!"
 
     settings = config.Settings(pdf_storage_path=str(target_path.absolute()))
-    main.app.dependency_overrides[main.get_settings] = lambda: settings
+    main.app.dependency_overrides[deps.get_settings] = lambda: settings
 
     response = post_pdf(sample_pdf, client)
 
