@@ -8,7 +8,15 @@ from typing import List
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, Body
+from fastapi import (
+    Depends,
+    FastAPI,
+    File,
+    HTTPException,
+    UploadFile,
+    Body,
+    BackgroundTasks,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -468,9 +476,13 @@ def toggle_sms(
 
 
 @app.post("/sms_sweep")
-def sms_sweep(hospitals: List[str] = None, db: Session = Depends(get_db)):
+def sms_sweep(
+    background_tasks: BackgroundTasks,
+    hospitals: List[str] = None,
+    db: Session = Depends(get_db),
+):
     """
     Envia todos os SMSs pendentes
     """
-    sms_utils.sms_intermediary(hospitals, db)
-    return "Enviando SMSs!"
+    background_tasks.add_task(sms_utils.sms_intermediary, hospitals, db)
+    return {"message": "SMSs scheduled"}

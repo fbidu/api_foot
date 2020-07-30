@@ -110,40 +110,18 @@ def sms_intermediary(hospitals: List[str], db: Session):
 
     for sms in sms_list:
         if sms[0] == "0":
-            log(
-                "ERRO: resultado de id %s não possui número de telefone." % str(sms[2]),
-                db,
-            )
-        elif sms[0] == "1":
-            log(
-                "ERRO: resultado de id %s não possui um número de telefone celular."
-                % str(sms[2]),
-                db,
-            )
-        elif sms[0] == "2":
-            log(
-                "ERRO: DDD inválido no número de celular do resultado de id %s."
-                % str(sms[2]),
-                db,
-            )
+            log(f"ERRO: resultado de id {sms[2]} não possui número de telefone.", db)
+            continue
+        if sms[0] == "1":
+            log(f"ERRO: resultado de id {sms[2]} não possui um número de celular.", db)
+            continue
+        if sms[0] == "2":
+            log(f"ERRO: DDD inválido no celular do resultado de id {sms[2]}.", db)
+            continue
 
-        else:
-            if send_sms(sms[0], sms[1]):
-                log(
-                    "SMS do resultado de id %s enviado para número %s com sucesso."
-                    % (str(sms[2]), sms[0]),
-                    db,
-                )
-                if not crud.confirm_sms(db, sms[2]):
-                    log(
-                        "ERRO: Ocorreu um erro confirmando o envio do SMS do resultado de id %s"
-                        % (str(sms[2])),
-                        db,
-                    )
+        sms_successful = send_sms(sms[0], sms[1])
 
-            else:
-                log(
-                    "ERRO: Não foi possível enviar o SMS do resultado de id %s para o número %s."
-                    % (str(sms[2]), sms[0]),
-                    db,
-                )
+        if sms_successful:
+            log(f"SMS do resultado {sms[2]} enviado para {sms[0]} com sucesso.", db)
+            continue
+        log(f"ERRO: No envido o SMS do resultado {sms[2]} para {sms[0]}.", db)
