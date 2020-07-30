@@ -42,27 +42,6 @@ def home():
     return "Hello, world!"
 
 
-@app.post(
-    "/result_creation_just_for_test/", response_model=schemas.Result, status_code=201
-)
-def create_result_just_for_test(
-    result: schemas.ResultCreate, db: Session = Depends(get_db)
-):
-    """
-    Receives a new result record in `result` and creates
-    a new result in the current database
-    """
-    created_result = crud.create_result(db=db, result=result)
-
-    log(
-        f"[CRIAÇÃO DE RESULTADO] Foi criado um resultado para fins de teste. ID do resultado de teste: {created_result.id}",
-        db,
-        result_id=created_result.id,
-    )
-
-    return created_result
-
-
 # Listar hospitais para o admin, com filtros se ele desejar
 @app.get("/hospitals/", response_model=List[schemas.HospitalCS])
 def read_hospitals(
