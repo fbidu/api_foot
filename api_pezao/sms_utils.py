@@ -3,31 +3,15 @@ Function send_sms: sends SMS
 """
 
 import re
-
-from requests import post
-
-from . import config
 from typing import List
 
+from requests import post
 from sqlalchemy.orm import Session
-from fastapi import Depends
 
 from . import config, log, crud
 
 
-def send_sms(number: str, text: str):
-    """
-    Sends SMS
-    """
-    if True:
-        print("SMS Sent!")
-        return True
-
-    print("SMS Failed.")
-    return False
-
-
-def send_sms1(number, text, msg_id=0, settings=None):
+def send_sms(number, text, msg_id=0, settings=None):
     """
     Another send sms
     """
@@ -163,4 +147,3 @@ def sms_intermediary(hospitals: List[str], db: Session):
                     % (str(sms[2]), sms[0]),
                     db,
                 )
-    return

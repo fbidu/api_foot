@@ -10,4 +10,3 @@ from .roles_users import RolesUsers
 from .templates_result import TemplatesResult
 from .template_sms import TemplateSMS
 from .user import User
-
