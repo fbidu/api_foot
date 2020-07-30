@@ -1,3 +1,6 @@
+"""
+SMS CRUD
+"""
 from typing import List
 from sqlalchemy.orm import Session
 
@@ -7,7 +10,8 @@ from .. import models, sms_utils
 def sms_sweep(db: Session, hospital_list: List[str] = None):
     """
     Returns a (phone, message, result id) for every SMS that needs to be sent
-    If a list of hospitals is provided, returns SMSs to be sent from exams made in those hospitals only
+    If a list of hospitals is provided, returns SMSs to be sent from exams made
+    in those hospitals only
     """
 
     if not hospital_list:
@@ -35,17 +39,18 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
 
         # checks if there are valid mobile phone numbers for sending SMS on that result.
         # valid numbers are saved to the valid_phones list
-        # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd) are saved on error_codes list
+        # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd)
+        # are saved on error_codes list
 
         result_phones = [result.ptnPhone1, result.ptnPhone2]
         if result_phones:
             for phone in [result.ptnPhone1, result.ptnPhone2]:
                 if phone:
-                    v = sms_utils.verify_phone(phone)
-                    if isinstance(v, int):
-                        error_codes.append(v)
+                    verification_code = sms_utils.verify_phone(phone)
+                    if isinstance(verification_code, int):
+                        error_codes.append(verification_code)
                     else:
-                        valid_phones.append(v)
+                        valid_phones.append(verification_code)
 
         # if there are no valid numbers, report back the gravest error found (smaller number)
         if not valid_phones:
@@ -59,8 +64,10 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
             # if there are valid phones...
 
             # find the sms message to be sent:
-            # look in the template_results table for the entry with same result_id as the result's id
-            # then, look in the template_sms table for the entry with same id as the discovered
+            # look in the template_results table for the entry with same
+            # result_id as the result's id
+            # then, look in the template_sms table for the entry with same
+            # id as the discovered
             # template_results' template_id
             for message in result.templates_result:
                 for phone in valid_phones:
@@ -71,6 +78,9 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
 
 
 def confirm_sms(db: Session, result_id):
+    """
+    Registra que o sms de um resultado foi enviado
+    """
     db_result = db.query(models.Result).filter(models.Result.id == result_id)
     db_result.sms_sent = True
 
