@@ -7,8 +7,14 @@ from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy.orm.session import Session
 
-from api_pezao.crud import create_result, read_results, lists_unsent_sms, sms_sweep
-from api_pezao.models import HospitalCS, User, TemplateSMS, TemplatesResult
+from api_pezao.crud import (
+    create_result,
+    read_results,
+    lists_unsent_sms,
+    sms_sweep,
+    confirm_sms,
+)
+from api_pezao.models import HospitalCS, User, TemplateSMS, TemplatesResult, Result
 from api_pezao.schemas import ResultCreate
 from ..utils import auth_header, create_demo_hospital, create_demo_user
 
@@ -206,3 +212,13 @@ class TestSMS:
             ("19995322524", "hello, world!", 1),
             ("19995322525", "hello, world!", 1),
         ]
+
+    def test_confirm_sms(self):
+        """
+        Testa se o registro de sms enviado funciona
+        """
+        db_result = self.db.query(Result).filter(Result.id == 1).first()
+        assert not db_result.sms_sent
+        confirm_sms(self.db, 1)
+        self.db.refresh(db_result)
+        assert db_result.sms_sent

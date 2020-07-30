@@ -100,9 +100,8 @@ def confirm_sms(db: Session, result_id):
     """
     Registra que o sms de um resultado foi enviado
     """
-    db_result = db.query(models.Result).filter(models.Result.id == result_id)
+    db_result = db.query(models.Result).filter(models.Result.id == result_id).first()
     db_result.sms_sent = True
 
     db.commit()
     db.refresh(db_result)
-    return True
