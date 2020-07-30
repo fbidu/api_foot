@@ -35,6 +35,8 @@ def read_hospitals(
             )
         )
 
+    hospitals = hospitals.filter(models.HospitalCS.deleted == False)
+
     return hospitals.all()
 
 
@@ -103,11 +105,10 @@ def delete_hospital(db: Session, db_hospital: models.HospitalCS):
     Deleta um hospital
     """
     db_user = db_hospital.user
-
-    db.delete(db_hospital)
+    db_hospital.deleted = True
 
     if db_user:
-        db.delete(db_user)
+        db_user.deleted = True
 
     db.commit()
 

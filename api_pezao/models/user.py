@@ -26,6 +26,7 @@ class User(Base):
 
     is_superuser = Column(Boolean, default=False)
     is_staff = Column(Boolean, default=False)
+    deleted = Column(Boolean, default=False)
 
     log = relationship("Log", back_populates="user")
     roles_users = relationship("RolesUsers", back_populates="user")

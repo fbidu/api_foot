@@ -57,7 +57,7 @@ def list_users(db: Session) -> List[User]:
     """
     Lists all the registered users
     """
-    return db.query(models.User).all()
+    return db.query(models.User).filter(models.User.deleted == False).all()
 
 
 def find_user(db: Session, username: str) -> User:
@@ -80,12 +80,12 @@ def find_user(db: Session, username: str) -> User:
 
     cpf_username = ''.join(re.findall(r"\d", username))
 
-    user = query.filter(models.User.cpf == cpf_username).first()
+    user = query.filter(models.User.cpf == cpf_username and models.User.deleted == False).first()
 
     if user is None:
-        user = query.filter(models.User.email == username).first()
+        user = query.filter(models.User.email == username and models.User.deleted == False).first()
     if user is None:
-        user = query.filter(models.User.login == username).first()
+        user = query.filter(models.User.login == username and models.User.deleted == False).first()
 
     return user
 

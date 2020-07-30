@@ -59,6 +59,7 @@ class User(UserBase):
     updated_at: datetime
     is_superuser: bool
     is_staff: bool
+    deleted: bool = False
 
     class Config:
         """
