@@ -15,15 +15,22 @@ from sqlalchemy.orm import Session
 from . import config, crud, schemas, log, sms_utils
 from .auth import oauth2_scheme, verify_password, create_access_token
 from .csv_input import import_csv
-from .database import SessionLocal, engine, Base
+from .database import engine, Base
 from .pdf_input import save_pdf
 from .schemas.pdf_processed import PDFProcessed
 from .utils import sha256, is_valid_cpf, is_valid_email
+
+from .routers import auth, users
+from .deps import get_db
 
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True)
+app.include_router(auth.router)
+app.include_router(users.router)
+
+
 origins = ["http://localhost:3000", "http://localhost", "http://localhost:8000"]
 
 app.add_middleware(
@@ -43,241 +50,12 @@ def get_settings():
     return config.Settings()
 
 
-def get_db():
-    """
-    Returns a new DB instance
-    """
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()  # pylint: disable=no-member
-
-
 @app.get("/")
 def home():
     """
     The root of the API
     """
     return "Hello, world!"
-
-
-@app.post("/token")
-def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
-    """
-    Realiza o login de um usuário aceitando como input um formulário com
-    `username` e `password`. O `username` pode ser o e-mail ou CPF de
-    um usuário.
-    """
-    user = None
-
-    username = ""
-
-    if is_valid_email(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.email
-    elif is_valid_cpf(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.cpf
-    else:
-        user = crud.find_user(db=db, username=form_data.username)
-        username = form_data.username
-
-    if not user:
-        log(
-            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login igual a {form_data.username}",
-            db,
-        )
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    if not verify_password(form_data.password, user.password):
-        log(
-            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário {form_data.username} não coincide com hash que temos no banco para o usuário {form_data.username} => Senha incorreta!",
-            db,
-        )
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    log(
-        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, e token de acesso criado para o usuário {form_data.username}",
-        db,
-    )
-    return {
-        "access_token": create_access_token({"sub": username}),
-        "token_type": "bearer",
-    }
-
-
-@app.post("/token2")
-def login2(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
-    """
-    Realiza o login de um usuário aceitando como input um formulário com
-    `username` e `password`. O `username` pode ser o e-mail ou CPF de
-    um usuário.
-    """
-    user = None
-
-    username = ""
-
-    if is_valid_email(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.email
-    elif is_valid_cpf(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.cpf
-    else:
-        user = crud.find_user(db=db, username=form_data.username)
-        username = form_data.username
-
-    if not user:
-        log(
-            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login igual a {form_data.username}",
-            db,
-        )
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    if not verify_password(form_data.password, user.password):
-        log(
-            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário {form_data.username} não coincide com hash que temos no banco para o usuário {form_data.username} => Senha incorreta!",
-            db,
-        )
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    token = create_access_token({"sub": username})
-    log(
-        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, e token de acesso criado para o usuário {form_data.username}",
-        db,
-    )
-
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user_data": read_current_user(db, token),
-    }
-
-
-@app.post("/token2_staff_or_admin")
-def login2_staff_or_admin(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
-    """
-    Realiza o login de um usuário aceitando como input um formulário com
-    `username` e `password`. O `username` pode ser o e-mail ou CPF de
-    um usuário.
-    """
-    user = None
-
-    username = ""
-
-    if is_valid_email(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.email
-    elif is_valid_cpf(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.cpf
-    else:
-        user = crud.find_user(db=db, username=form_data.username)
-        username = form_data.username
-
-    if not user:
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    if not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    if not user.is_staff or (not user.is_superuser):
-        raise HTTPException(status_code=401, detail="User is not staff or superuser")
-
-    token = create_access_token({"sub": username})
-
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user_data": read_current_user(db, token),
-    }
-
-
-@app.post("/token2_family")
-def login2_family(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
-    """
-    Realiza o login de um usuário aceitando como input um formulário com
-    `username` e `password`. O `username` pode ser o e-mail ou CPF de
-    um usuário.
-    """
-    user = None
-
-    username = ""
-
-    if is_valid_email(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.email
-    elif is_valid_cpf(form_data.username):
-        user = crud.find_user(db=db, username=form_data.username)
-        username = user.cpf
-    else:
-        user = crud.find_user(db=db, username=form_data.username)
-        username = form_data.username
-
-    if not user:
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    if not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-    if user.is_staff or user.is_superuser:
-        raise HTTPException(status_code=401, detail="User is not family")
-
-    token = create_access_token({"sub": username})
-
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user_data": read_current_user(db, token),
-    }
-
-
-@app.get("/users/token")
-def read_token(token: str = Depends(oauth2_scheme)):
-    """
-    Dado um `token` retorna informações sobre ele.
-    """
-    return {"token": token}
-
-
-@app.get("/users/me", response_model=schemas.User)
-def read_current_user(
-    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
-):
-    """
-    Retorna informações do usuário logado atualmente.
-    """
-    user = crud.get_current_user(db, token)
-
-    if not user:
-        raise HTTPException(401, "Token inválido")
-
-    return user
-
-
-@app.post("/users/", response_model=schemas.User, status_code=201)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    """
-    Receives a new user record in `user` and creates
-    a new user in the current database
-    """
-    created_user = crud.create_user(db=db, user=user)
-
-    log(
-        f"[CRIAÇÃO DE USUÁRIO] Usuário criado com CPF = {created_user.cpf}, e-mail = {created_user.email}, login = {created_user.login}",
-        db,
-    )
-
-    return created_user
 
 
 @app.post("/roles/", response_model=schemas.User)
@@ -324,33 +102,6 @@ def change_role(
 
     raise HTTPException(
         status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro"
-    )
-
-
-@app.get("/users/", response_model=List[schemas.User])
-def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    """
-    Lists all users
-    """
-    logged_user = crud.get_current_user(db, token)
-    if logged_user.is_superuser:
-        user_list = crud.list_users(db)
-
-        log(
-            f"[LISTA DE USUÁRIOS] Usuários foram listados pelo superuser {logged_user.name}",
-            db,
-            user_id=logged_user.id,
-        )
-
-        return user_list
-
-    log(
-        f"[LISTA DE USUÁRIOS] Usuário {logged_user.name}, que não é superuser, tentou listar usuários!",
-        db,
-        user_id=logged_user.id,
-    )
-    raise HTTPException(
-        status_code=403, detail="Usuário sem permissão tentou listar usuários"
     )
 
 
