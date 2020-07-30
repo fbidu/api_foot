@@ -1,10 +1,15 @@
 """
 SMS CRUD
 """
+
+from collections import namedtuple
 from typing import List
 from sqlalchemy.orm import Session
 
 from .. import models, sms_utils
+from ..models import Result
+
+VerificationResult = namedtuple("VerificationResult", ["valid_phones", "error_codes"])
 
 
 def lists_unsent_sms(db: Session, hospital_list: List[str] = None):
@@ -19,6 +24,32 @@ def lists_unsent_sms(db: Session, hospital_list: List[str] = None):
     return unsent_sms.all()
 
 
+def verify_result_phones(result: Result) -> VerificationResult:
+    """
+    Dado um resultado, retorna o estado de validade de seus telefones
+    """
+    # checks if there are valid mobile phone numbers for sending SMS on that result.
+    # valid numbers are saved to the valid_phones list
+    # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd)
+    # are saved on error_codes list
+
+    if not (result.ptnPhone1 or result.ptnPhone2):
+        return VerificationResult([], [])
+
+    result_phones = [phone for phone in (result.ptnPhone1, result.ptnPhone2) if phone]
+    error_codes = []
+    valid_phones = []
+
+    for phone in result_phones:
+        verification_code = sms_utils.verify_phone(phone)
+        if isinstance(verification_code, int):
+            error_codes.append(verification_code)
+        else:
+            valid_phones.append(verification_code)
+
+    return VerificationResult(valid_phones, error_codes)
+
+
 def sms_sweep(db: Session, hospital_list: List[str] = None):
     """
     Returns a (phone, message, result id) for every SMS that needs to be sent
@@ -26,32 +57,20 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
     in those hospitals only
     """
 
-    result_list = hospital_list(db, hospital_list)
+    result_list = lists_unsent_sms(db, hospital_list)
 
     # creates a list of SMS to be returned
     # every entry in the list is a tuple (phone, message)
     sms_list = []
 
-    # for each result that needs SMS to be sent:
     for result in result_list:
 
         valid_phones = []
         error_codes = []
 
-        # checks if there are valid mobile phone numbers for sending SMS on that result.
-        # valid numbers are saved to the valid_phones list
-        # error codes (0: no phones, 1: no mobile phones, 2: invalid ddd)
-        # are saved on error_codes list
-
-        result_phones = [result.ptnPhone1, result.ptnPhone2]
-        if result_phones:
-            for phone in [result.ptnPhone1, result.ptnPhone2]:
-                if phone:
-                    verification_code = sms_utils.verify_phone(phone)
-                    if isinstance(verification_code, int):
-                        error_codes.append(verification_code)
-                    else:
-                        valid_phones.append(verification_code)
+        validation = verify_result_phones(result)
+        valid_phones.extend(validation.valid_phones)
+        error_codes.extend(validation.error_codes)
 
         # if there are no valid numbers, report back the gravest error found (smaller number)
         if not valid_phones:
@@ -74,7 +93,6 @@ def sms_sweep(db: Session, hospital_list: List[str] = None):
                 for phone in valid_phones:
                     sms_list.append((phone, message.template_sms.msg, result.id))
 
-    # returns list of sms messages to be sent
     return sms_list
 
 

@@ -7,17 +7,10 @@ from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy.orm.session import Session
 
-from api_pezao.crud import create_result, read_results, lists_unsent_sms
-from api_pezao.models import HospitalCS, User
+from api_pezao.crud import create_result, read_results, lists_unsent_sms, sms_sweep
+from api_pezao.models import HospitalCS, User, TemplateSMS, TemplatesResult
 from api_pezao.schemas import ResultCreate
-from ..utils import (
-    auth_header,
-    create_demo_hospital,
-    create_demo_user,
-    assert_payload_in_database,
-    assert_response_matches_payload,
-    assert_json_matches_payload,
-)
+from ..utils import auth_header, create_demo_hospital, create_demo_user
 
 
 class TestSMS:
@@ -75,6 +68,12 @@ class TestSMS:
 
     @fixture(autouse=True)
     def _test_results(self):
+
+        template_sms = TemplateSMS(msg="hello, world!")
+        self.db.add(template_sms)
+        self.db.commit()
+        self.db.refresh(template_sms)
+
         self.results = [
             ResultCreate(
                 IDExport=123,
@@ -92,8 +91,8 @@ class TestSMS:
                 DNV="123456",
                 CNS="0000",
                 ptnEmail="test1@test1.com",
-                ptnPhone1="00000000001",
-                ptnPhone2="00000000011",
+                ptnPhone1="19 99532-2524",
+                ptnPhone2="19995322525",
                 CodLocColeta=self.payload["code"],
                 LocalColeta=self.payload["code"],
                 COD_LocColeta=self.payload["code"],
@@ -170,7 +169,11 @@ class TestSMS:
         ]
 
         for result in self.results:
-            create_result(self.db, result)
+            db_result = create_result(self.db, result)
+            self.db.add(
+                TemplatesResult(result_id=db_result.id, template_id=template_sms.id)
+            )
+            self.db.commit()
 
     def test_results_ok(self):
         """
@@ -184,3 +187,22 @@ class TestSMS:
         """
         assert len(lists_unsent_sms(self.db)) == 2
         assert len(lists_unsent_sms(self.db, [self.payload["code"]])) == 1
+
+    def test_sms_sweep(self):
+        """
+        Verifica se o sweep de sms performa de acordo
+        """
+        all_to_sent = sms_sweep(self.db)
+        assert len(all_to_sent) == 3
+        assert all_to_sent == [
+            ("19995322524", "hello, world!", 1),
+            ("19995322525", "hello, world!", 1),
+            ("1", None, 2),
+        ]
+
+        to_be_sent = sms_sweep(self.db, [self.payload["code"]])
+        assert len(to_be_sent) == 2
+        assert to_be_sent == [
+            ("19995322524", "hello, world!", 1),
+            ("19995322525", "hello, world!", 1),
+        ]
