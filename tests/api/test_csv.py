@@ -19,7 +19,7 @@ def test_post_csv(client, db):
 
     content = response.json()
 
-    assert content["lines"] == 160
+    assert content["lines"] == 159
 
     db_results = read_results(db)
     assert len(db_results) == 159

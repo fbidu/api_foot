@@ -7,19 +7,21 @@ import csv
 from pydantic import BaseModel
 import pydantic
 
+from .models import Result
+from .schemas import ResultCreate
+
+
 CSVToPydanticError = namedtuple(
     "CSVToPydanticError", ["csv_record", "validation_error"]
 )
 CSVToPydanticResult = namedtuple("CSVToPydanticResult", ["objects", "errors"])
 
 
-def import_csv(csv_content):
+def import_csv(csv_content, db):
     """
     Reads a csv file and returns its line length
     """
-    csv_reader = csv.reader(csv_content, delimiter=";")
-    next(csv_reader)  # Skip the header
-    line_count = 0
+    csv_reader = csv.DictReader(csv_content, delimiter=",")
 
     transform = {
         "id_reportedPatientsExport": "IDExport",
@@ -49,10 +51,14 @@ def import_csv(csv_content):
         "FILE_EXPORT_NAME": "FILE_EXPORT_NAME",
     }
 
-    for _ in csv_reader:
-        line_count += 1
+    results = csv_to_pydantic(csv_reader, ResultCreate, transform)
 
-    return line_count
+    for result in results.objects:
+        db_result = Result(**result.dict())
+        db.add(db_result)
+
+    db.commit()
+    return len(results.objects)
 
 
 def csv_to_pydantic(

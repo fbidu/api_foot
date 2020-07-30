@@ -33,7 +33,7 @@ class ResultBase(BaseModel):
     HospitalNasc: str = ""
     LocalNasc: str = ""
     PDF_Filename: str = ""
-    PDF_ImageDate: str = ""
+    PDF_ImageDate: datetime = None
     FILE_EXPORT_DATE: datetime = None
     FILE_EXPORT_NAME: str = ""
     sms_sent: bool = False
@@ -49,6 +49,10 @@ class ResultBase(BaseModel):
     @validator("DNV")
     def dnv_numbers(cls, v):
         return "".join(re.findall(r"\d", v))
+
+    # @validator("FILE_EXPORT_DATE", "PDF_ImageDate")
+    # def parse_date(cls, v):
+    #     return datetime.strptime(v[:-3], "%Y-%m-%d %H:%M:%S.%f")
 
 
 class ResultCreate(ResultBase):

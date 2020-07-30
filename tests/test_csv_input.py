@@ -16,7 +16,7 @@ def test_import_csv(db):
     """
     sample_file = Path("tests/demo.csv").absolute()
     content = open(sample_file)
-    assert csv_input.import_csv(content) == 159
+    assert csv_input.import_csv(content, db) == 159
 
     db_results = read_results(db)
     assert len(db_results) == 159
