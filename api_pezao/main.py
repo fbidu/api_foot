@@ -86,15 +86,28 @@ def login(
         username = form_data.username
 
     if not user:
+        log(
+            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login igual a {form_data.username}",
+            db,
+        )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     if not verify_password(form_data.password, user.password):
+        log(
+            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário {form_data.username} não coincide com hash que temos no banco para o usuário {form_data.username} => Senha incorreta!",
+            db,
+        )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
+    log(
+        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, e token de acesso criado para o usuário {form_data.username}",
+        db,
+    )
     return {
         "access_token": create_access_token({"sub": username}),
         "token_type": "bearer",
     }
+
 
 @app.post("/token2")
 def login2(
@@ -120,18 +133,31 @@ def login2(
         username = form_data.username
 
     if not user:
+        log(
+            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login igual a {form_data.username}",
+            db,
+        )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     if not verify_password(form_data.password, user.password):
+        log(
+            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário {form_data.username} não coincide com hash que temos no banco para o usuário {form_data.username} => Senha incorreta!",
+            db,
+        )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     token = create_access_token({"sub": username})
+    log(
+        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, e token de acesso criado para o usuário {form_data.username}",
+        db,
+    )
 
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user_data": read_current_user(db, token)
+        "user_data": read_current_user(db, token),
     }
+
 
 @app.post("/token2_staff_or_admin")
 def login2_staff_or_admin(
@@ -170,8 +196,9 @@ def login2_staff_or_admin(
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user_data": read_current_user(db, token)
+        "user_data": read_current_user(db, token),
     }
+
 
 @app.post("/token2_family")
 def login2_family(
@@ -210,8 +237,9 @@ def login2_family(
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user_data": read_current_user(db, token)
+        "user_data": read_current_user(db, token),
     }
+
 
 @app.get("/users/token")
 def read_token(token: str = Depends(oauth2_scheme)):
@@ -245,8 +273,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     created_user = crud.create_user(db=db, user=user)
 
     log(
-        "Foi criado um usuário com os seguintes dados: cpf = %s, email = %s, login = %s"
-        % (created_user.cpf, created_user.email, created_user.login),
+        f"[CRIAÇÃO DE USUÁRIO] Usuário criado com CPF = {created_user.cpf}, e-mail = {created_user.email}, login = {created_user.login}",
         db,
     )
 
@@ -269,15 +296,32 @@ def change_role(
 
     if logged_user.is_staff:
         updated_user = crud.set_staff_role(user, is_staff, db)
-        log("Um usuário staff atualizou a flag staff de outro", db)
+
+        log(
+            f"[FLAGS DE USUÁRIO] Usuário staff ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}",
+            db,
+            user_id=logged_user.id,
+        )
+
         return updated_user
     if logged_user.is_superuser:
         updated_user = crud.set_staff_role(user, is_staff, db)
         updated_user = crud.set_superuser_role(user, is_superuser, db)
-        log("Um usuário superuser atualizou as flags staff e superuser de outro", db)
+
+        log(
+            f"[FLAGS DE USUÁRIO] Usuário superuser ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}, e flag superuser para {is_superuser}",
+            db,
+            user_id=logged_user.id,
+        )
+
         return updated_user
 
-    log("Um usuário sem privilégio tentou alterar flag de outro", db)
+    log(
+        f"[FLAGS DE USUÁRIO] Usuário {logged_user.name}, de id = {logged_user.id}, não é staff nem superuser, e tentou alterar flags do usuário {updated_user.name} (de id = {updated_user.id}) para staff={is_staff} e superuser={is_superuser}",
+        db,
+        user_id=logged_user.id,
+    )
+
     raise HTTPException(
         status_code=403, detail="Um usuário sem privilégio tentou alterar flag de outro"
     )
@@ -291,10 +335,20 @@ def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme
     logged_user = crud.get_current_user(db, token)
     if logged_user.is_superuser:
         user_list = crud.list_users(db)
-        log(f"Usuários foram listados pelo superuser {logged_user.name}.", db)
+
+        log(
+            f"[LISTA DE USUÁRIOS] Usuários foram listados pelo superuser {logged_user.name}",
+            db,
+            user_id=logged_user.id,
+        )
+
         return user_list
 
-    log(f"Usuário {logged_user.name}, que não é superuser, tentou listar usuários!", db)
+    log(
+        f"[LISTA DE USUÁRIOS] Usuário {logged_user.name}, que não é superuser, tentou listar usuários!",
+        db,
+        user_id=logged_user.id,
+    )
     raise HTTPException(
         status_code=403, detail="Usuário sem permissão tentou listar usuários"
     )
@@ -311,7 +365,7 @@ def read_csv(csv_file: UploadFile = File(...), db: Session = Depends(get_db)):
         content = content.split("\n")
         lines = import_csv(content)
 
-    log("CSV foi importado.", db)
+    log("[CSV] CSV foi importado.", db)
 
     return {"lines": lines}
 
@@ -335,7 +389,7 @@ def read_pdf(
 
     save_pdf(content, filename)
 
-    log("PDF foi importado.", db)
+    log("[PDF] PDF foi importado.", db)
 
     return PDFProcessed(
         length=len(content), filename=pdf_file.filename, sha256=sha256(filename)
@@ -355,9 +409,9 @@ def create_result_just_for_test(
     created_result = crud.create_result(db=db, result=result)
 
     log(
-        "Foi criado um resultado para fins de teste. ID do resultado: %s"
-        % (created_result.id),
+        f"[CRIAÇÃO DE RESULTADO] Foi criado um resultado para fins de teste. ID do resultado de teste: {created_result.id}",
         db,
+        result_id=created_result.id,
     )
 
     return created_result
@@ -412,7 +466,7 @@ def read_results(
     log(
         "Resultados foram buscados com os seguintes filtros: DNV = %s, "
         "CNS = %s, CPF = %s, DataNasc = %s, DataColeta = %s, "
-        "LocalColeta = %s, prMotherFirstname = %s, prMotherSurname = %s"
+        "LocalColeta = %s, prMotherFirstname = %s, prMotherSurname = %s, pelo usuário %s"
         % (
             dnv,
             cns,
@@ -422,8 +476,10 @@ def read_results(
             local_coleta,
             mother_firstname,
             mother_surname,
+            logged_user.name,
         ),
         db,
+        user_id=logged_user.id,
     )
 
     return result_list
@@ -447,15 +503,18 @@ def read_hospitals(
         hospital_list = crud.read_hospitals(db, code=code, name=name, email=email)
 
         log(
-            "Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s"
-            % (code, name, email),
+            "Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s, pelo usuário %s"
+            % (code, name, email, logged_user.name),
             db,
+            user_id=logged_user.id,
         )
 
         return hospital_list
 
     log(
-        f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.", db
+        f"Usuário {logged_user.name}, que não é superuser, tentou listar hospitais.",
+        db,
+        user_id=logged_user.id,
     )
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou listar hospitais"
@@ -476,14 +535,24 @@ def create_hospital(
         created_hospital = crud.create_hospital(db, hospital)
 
         log(
-            "Novo hospital foi criado com code = %s, type = %s, name = %s."
-            % (created_hospital.code, created_hospital.type, created_hospital.name),
+            "Novo hospital foi criado com code = %s, type = %s, name = %s, pelo usuário %s"
+            % (
+                created_hospital.code,
+                created_hospital.type,
+                created_hospital.name,
+                logged_user.name,
+            ),
             db,
+            user_id=logged_user.id,
         )
 
         return created_hospital
 
-    log("Usuário que não é superuser tentou criar hospital", db)
+    log(
+        f"Usuário {logged_user.name}, que não é superuser, tentou criar hospital",
+        db,
+        user_id=logged_user.id,
+    )
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou criar hospital"
     )
@@ -509,14 +578,24 @@ def update_hospital(
         updated_hospital = crud.update_hospital(db, db_hospital, hospital)
 
         log(
-            "Um hospital teve dados atualizados: code = %s, type = %s, name = %s."
-            % (updated_hospital.code, updated_hospital.type, updated_hospital.name),
+            "Um hospital teve dados atualizados: code = %s, type = %s, name = %s, pelo usuário %s"
+            % (
+                updated_hospital.code,
+                updated_hospital.type,
+                updated_hospital.name,
+                logged_user.name,
+            ),
             db,
+            user_id=logged_user.id,
         )
 
         return updated_hospital
 
-    log("Usuário que não é superuser tentou atualizar hospital", db)
+    log(
+        f"Usuário {logged_user.name}, que não é superuser, tentou atualizar hospital",
+        db,
+        user_id=logged_user.id,
+    )
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou editar hospital"
     )
@@ -539,11 +618,20 @@ def delete_hospital(
 
         deleted = crud.delete_hospital(db, db_hospital)
 
-        log("Tentativa de deletar hospital de ID %s: %s" % (hospital_id, deleted), db)
+        log(
+            "Tentativa de deletar hospital de ID %s, por parte do usuário %s: %s"
+            % (hospital_id, logged_user.name, deleted),
+            db,
+            user_id=logged_user.id,
+        )
 
         return deleted
 
-    log("Usuário que não é superuser tentou deletar hospital", db)
+    log(
+        f"Usuário {logged_user.name}, que não é superuser, tentou deletar hospital",
+        db,
+        user_id=logged_user.id,
+    )
     raise HTTPException(
         status_code=403, detail="Um usuário sem permissão tentou apagar hospital"
     )
@@ -559,7 +647,8 @@ def read_logs(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
         return crud.list_logs(db)
 
     raise HTTPException(
-        status_code=403, detail="Um usuário sem permissão tentou ler os logs"
+        status_code=403,
+        detail=f"Um usuário ({logged_user.name}) sem permissão tentou ler os logs",
     )
 
 

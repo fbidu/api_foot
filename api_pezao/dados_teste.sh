@@ -1,4 +1,5 @@
 # Criar usuário
+curl -X POST "http://127.0.0.1:8000/users/" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"cpf\":\"444.619.448-83\",\"name\":\"Ana Clara Zoppi Serpa\",\"email\":\"anaclara.zoppiserpa@gmail.com\",\"login\":\"CIPOI_ADMIN\",\"password\":\"string\"}"
 
 curl -X POST "http://127.0.0.1:8000/users/" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"cpf\":\"444.619.448-83\",\"name\":\"Ana Clara Zoppi Serpa\",\"email\":\"anaclara.zoppiserpa@gmail.com\",\"login\":null,\"password\":\"string\"}"
 
