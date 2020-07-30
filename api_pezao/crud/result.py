@@ -45,11 +45,11 @@ def read_results(
     if data_coleta != "":
         results = results.filter(models.Result.DataColeta == data_coleta)
     if local_coleta != "":
-        results = results.filter(models.Result.LocalColeta.like(local_coleta))
+        results = results.filter(models.Result.LocalColeta.ilike('%'+local_coleta+'%'))
     if mother_firstname != "":
-        results = results.filter(models.Result.prMotherFirstname.like(mother_firstname))
+        results = results.filter(models.Result.prMotherFirstname.ilike('%'+mother_firstname+'%'))
     if mother_surname != "":
-        results = results.filter(models.Result.prMotherSurname.like(mother_surname))
+        results = results.filter(models.Result.prMotherSurname.ilike('%'+mother_surname+'%'))
 
     results = results.order_by(models.Result.FILE_EXPORT_DATE.desc())
 

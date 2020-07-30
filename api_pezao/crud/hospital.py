@@ -25,13 +25,13 @@ def read_hospitals(
     if code != "":
         hospitals = hospitals.filter(models.HospitalCS.code == code)
     if name != "":
-        hospitals = hospitals.filter(models.HospitalCS.name.like(name))
+        hospitals = hospitals.filter(models.HospitalCS.name.ilike('%'+name+'%'))
     if email != "":
         hospitals = hospitals.filter(
             or_(
-                models.HospitalCS.email1.like(email),
-                models.HospitalCS.email2.like(email),
-                models.HospitalCS.email3.like(email),
+                models.HospitalCS.email1.ilike('%'+email+'%'),
+                models.HospitalCS.email2.ilike('%'+email+'%'),
+                models.HospitalCS.email3.ilike('%'+email+'%'),
             )
         )
 
