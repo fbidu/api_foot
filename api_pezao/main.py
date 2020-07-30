@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import config, crud, schemas, log, sms_utils
-from .auth import oauth2_scheme, verify_password
+from .auth import oauth2_scheme, verify_password, create_access_token
 from .csv_input import import_csv
 from .database import SessionLocal, engine, Base
 from .pdf_input import save_pdf
