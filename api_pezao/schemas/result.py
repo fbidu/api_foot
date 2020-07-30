@@ -2,43 +2,55 @@
 Define modelo de dados para resultados
 """
 from datetime import datetime
-from pydantic import BaseModel
-
+from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
+import re
 
 class ResultBase(BaseModel):
     """
     ResultBase lista os campos que estão sempre disponíveis
     """
 
-    id: int
     IDExport: int
-    Barcode: int  # type?
-    NumLote: int  # fieldname?
-    DataNasc: str  # date?
-    HoraNasc: str  # date?
-    DataColeta: str  # date?
-    HoraColeta: str  # date?
-    ptnMotherFirstname: str  # fieldname?
-    ptnMotherSurname: str  # fieldname?
+    Barcode: int
+    NumLote: int
+    DataNasc: str
+    HoraNasc: str
+    DataColeta: str
+    HoraColeta: str
+    prMotherFirstname: str
+    prMotherSurname: str
     CPF: str
     ptnFirstname: str
     ptnSurname: str
     DNV: str
-    CNS: str  # type?
+    CNS: str
     ptnEmail: str
     ptnPhone1: str
     ptnPhone2: str
-    CodLocColeta: str  # type?
+    CodLocColeta: str
     LocalColeta: str
-    COD_LocColeta: str  # type? repeat? fieldname?
-    COD_HospNasc: str  # type? repeat? fieldname?
+    COD_LocColeta: str
+    COD_HospNasc: str
     HospNasc: str
     LocalNasc: str
     PDF_Filename: str
-    Tipo_SMS: str  # type?
-    RECODRD_CREATION_DATE: datetime  # date?
-    FILE_EXPORT_DATE: datetime  # date?
+    Tipo_SMS: str
+    RECORD_CREATION_DATE: datetime
+    FILE_EXPORT_DATE: datetime
     FILE_EXPORT_NAME: str
+    sms_sent: bool = False
+
+    @validator('CPF')
+    def cpf_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
+
+    @validator('CNS')
+    def cns_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
+
+    @validator('DNV')
+    def dnv_numbers(cls, v):
+        return ''.join(re.findall(r"\d", v))
 
 
 class ResultCreate(ResultBase):

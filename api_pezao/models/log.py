@@ -16,10 +16,11 @@ class Log(Base):
     __tablename__ = "log"
 
     id = Column(Integer, primary_key=True, index=True)
-    results_id = Column(Integer, ForeignKey('result.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    client_ip = Column(String)
-    client_date_time = Column(DateTime, default=datetime.utcnow)
+    results_id = Column(Integer, ForeignKey("result.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=True)
+    client_ip = Column(String, nullable=True)
+    message = Column(String)
+    client_date_time = Column(DateTime, default=datetime.utcnow, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
 

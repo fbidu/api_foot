@@ -2,7 +2,7 @@
 Define modelos de validação para Logs
 """
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class LogBase(BaseModel):
@@ -12,9 +12,10 @@ class LogBase(BaseModel):
     """
 
     client_date_time: datetime
-    results_id: int
-    user_id: int
-    client_ip: str
+    results_id: int = None
+    user_id: int = None
+    client_ip: str = None
+    message: str
 
 
 class LogCreate(LogBase):

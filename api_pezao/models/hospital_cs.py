@@ -3,7 +3,7 @@ Define modelo SQL para Hospital CS
 """
 import datetime
 import enum
-from sqlalchemy import Column, Enum, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
 from ..database import Base
@@ -28,11 +28,12 @@ class HospitalCS(Base):
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, unique=True, index=True)
     name = Column(String)
-    type = Column(Enum(HospitalType))
+    # type = Column(Enum(HospitalType))
+    type = Column(String)
     email1 = Column(String)
     email2 = Column(String)
     email3 = Column(String)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 

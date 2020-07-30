@@ -2,7 +2,8 @@
 Oferece modelos de validação para Usuários
 """
 from datetime import datetime
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, validator, root_validator  # pylint: disable=no-name-in-module
 
 
 class UserBase(BaseModel):
@@ -11,10 +12,32 @@ class UserBase(BaseModel):
     point of its lifecycle.
     """
 
-    cpf: str
+    cpf: str = None
     name: str
-    email: str
-    password: str
+    email: str = None
+    login: str = None
+    is_superuser: bool = False
+    is_staff: bool = False
+
+    # pylint: disable=no-self-argument,no-self-use
+    @root_validator
+    def check_user_has_at_least_one(cls, values):
+        """
+        Checa se o usuário tem pelo menos cpf, email ou login.
+        """
+        user_cpf = values.get("cpf")
+        user_email = values.get("email")
+        user_login = values.get("login")
+        if user_cpf is None and user_email is None and user_login is None:
+            raise ValueError(
+                "User should have at least one of these: cpf, email, login"
+            )
+        return values
+
+    @validator('cpf')
+    def cpf_numbers(cls, v):
+        if v:
+            return ''.join(re.findall(r"\d", v))
 
 
 class UserCreate(UserBase):
@@ -23,7 +46,7 @@ class UserCreate(UserBase):
     while creating an user that weren't defined on `UserBase`
     """
 
-    pass
+    password: str
 
 
 class User(UserBase):
@@ -34,6 +57,8 @@ class User(UserBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    is_superuser: bool
+    is_staff: bool
 
     class Config:
         """
