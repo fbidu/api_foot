@@ -100,3 +100,15 @@ def get_current_user(db: Session, token: str):
         return None
 
     return user
+
+
+def delete_user(db: Session, user_id: int) -> schemas.User:
+    """
+    Deleta um usuário usando de soft_delete
+    """
+    db_user = db.query(User).get(user_id)
+    db_user.deleted = True
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
