@@ -65,11 +65,15 @@ def read_pdf(
     pdf_file: UploadFile = File(...),
     settings: config.Settings = Depends(get_settings),
     db: Session = Depends(get_db),
+    authorization: str = Header(None),
 ):
     """
     Receives and stores a PDF file. The location of the file will be determined
     by the `pdf_storage_path` config.
     """
+    if authorization != settings.upload_secret:
+        raise HTTPException(401, "Operação inválida!")
+
     file = pdf_file.file
     content = file.read()
 

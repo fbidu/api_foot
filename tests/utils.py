@@ -22,7 +22,9 @@ def post_pdf(sample_pdf, client) -> Response:
     Posts a file to the main PDF endpoint
     """
     files = {"pdf_file": open(sample_pdf, "rb")}
-    return client.post("/pdf/", files=files)
+    return client.post(
+        "/pdf/", files=files, headers={"authorization": get_settings().upload_secret}
+    )
 
 
 # pylint:disable=too-many-arguments
