@@ -29,6 +29,7 @@ class CSVTypes(str, Enum):
     hospitals = "hospitals"
 
 
+# pylint: disable=redefined-builtin
 @router.post("/csv/")
 def read_csv(
     type: CSVTypes,

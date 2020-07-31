@@ -13,7 +13,10 @@ from api_pezao.crud.result import read_results
 from api_pezao.models import TemplatesResult, TemplateSMS
 
 
-def _import_test_results(db):
+def import_test_results(db):
+    """
+    Função auxiliar de importação de CSV
+    """
     sample_file = Path("tests/demo.csv").absolute()
     content = open(sample_file)
     return csv_input.import_results_csv(content, db)
@@ -24,7 +27,7 @@ def test_import_results_csv(db):
     testa se a função de import_csv retorna o total correto de linhas
     """
 
-    imported_objects = _import_test_results(db)
+    imported_objects = import_test_results(db)
     assert len(imported_objects) == 159
 
     db_results = read_results(db)
@@ -44,7 +47,7 @@ def test_import_templates_results_csv(db):
 
     assert len(db_objects) == 159
 
-    results = _import_test_results(db)
+    results = import_test_results(db)
     template_sms_0 = db_objects[0]
 
     assert template_sms_0.template_id == 1
