@@ -3,7 +3,7 @@ Files router
 """
 from pathlib import Path
 
-from fastapi import Depends, File, UploadFile, APIRouter
+from fastapi import Depends, File, UploadFile, APIRouter, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import config, log
@@ -19,10 +19,18 @@ router = APIRouter()
 
 
 @router.post("/csv/")
-def read_csv(csv_file: UploadFile = File(...), db: Session = Depends(get_db)):
+def read_csv(
+    csv_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    authorization: str = Header(None),
+    settings: config.Settings = Depends(get_settings),
+):
     """
     Receives a CSV input file
     """
+    if authorization != settings.upload_secret:
+        raise HTTPException(401, "Operação inválida!")
+
     with csv_file.file as file:
         content = file.read()
         content = content.decode("utf-8")
