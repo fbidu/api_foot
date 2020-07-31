@@ -1,7 +1,10 @@
 """
 Warmup functions
 """
+from getpass import getpass
+from pprint import pprint
 import requests
+
 
 # pylint: disable=invalid-name
 
@@ -39,6 +42,22 @@ class Warmup:
         """
         return self._import_csv(filename, type_="templates_results")
 
+    def create_super_user(self, name, email, password):
+        """
+        Creates a new user
+        """
+        data = {
+            "name": name,
+            "email": email,
+            "password": password,
+            "is_superuser": True,
+        }
+        response = requests.post(
+            f"{self.api_url}/users/", headers=self.headers, json=data
+        )
+
+        return response.json()
+
 
 def process_option(option_, *args, **kwargs):
     """
@@ -53,6 +72,12 @@ def process_option(option_, *args, **kwargs):
         filename = input("Digite o caminho completo do arquivo: ")
 
         return options[option_](filename=filename, *args, **kwargs)
+    if option == "3":
+        name = input("Digite o nome do usuário ")
+        email = input("Digite o email do usuário ")
+        senha = getpass("Digite a senha: ")
+
+        return warm.create_super_user(name, email, senha)
 
     return "Erro"
 
@@ -75,10 +100,11 @@ if __name__ == "__main__":
 
         [1] Importar resultados
         [2] Importar Templates Results
+        [3] Criar Super Usuário
         [q] Sair
         """
         )
 
         option = input("> ")
 
-        print(process_option(option))
+        pprint(process_option(option))
