@@ -1,0 +1,70 @@
+JSONs para user
+==========
+{
+  "cpf": "444.619.448-83",
+  "name": "Ana Clara Zoppi Serpa",
+  "email": "anaclara.zoppiserpa@gmail.com",
+  "login": null,
+  "is_superuser": false,
+  "is_staff": false,
+  "password": "pass"
+}
+
+{
+  "cpf": "074.761.958-17",
+  "name": "Rita Aparecida Zoppi",
+  "email": "rita.aparecida.zoppi@gmail.com",
+  "login": null,
+  "is_superuser": false,
+  "is_staff": false,
+  "password": "pass"
+}
+
+{
+  "cpf": "555.555.555-55",
+  "name": "Dante Sparda",
+  "email": null,
+  "login": null,
+  "is_superuser": false,
+  "is_staff": false,
+  "password": "pass"
+}
+
+{
+  "cpf": null,
+  "name": "Administração CIPOI",
+  "email": null,
+  "login": "cipoi",
+  "is_superuser": true,
+  "is_staff": false,
+  "password": "pass"
+}
+
+{
+  "cpf": null,
+  "name": "Duas flags",
+  "email": null,
+  "login": "admin_e_staff",
+  "is_superuser": true,
+  "is_staff": true,
+  "password": "pass"
+}
+
+{
+  "cpf": null,
+  "name": "Enfermeira Joy",
+  "email": null,
+  "login": "joy",
+  "is_superuser": false,
+  "is_staff": true,
+  "password": "pass"
+}
+
+JSONs para hospital
+=============
+
+Teste 1: logins de diferentes tipos
+
+Teste 2: tela de busca de resultados
+Teste 3: criação, edição e deleção de hospitais como admin
+Teste 4: tentar acessar telas que não posso (ex: tela de admin como família, tela de admin como funcionário...)
