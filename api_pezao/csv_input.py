@@ -17,7 +17,7 @@ CSVToPydanticError = namedtuple(
 CSVToPydanticResult = namedtuple("CSVToPydanticResult", ["objects", "errors"])
 
 
-def import_csv(csv_content, db):
+def import_results_csv(csv_content, db):
     """
     Reads a csv file and returns its line length
     """
