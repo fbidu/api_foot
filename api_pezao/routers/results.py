@@ -96,7 +96,7 @@ def create_result_just_for_test(
     log(
         f"[CRIAÇÃO DE RESULTADO] Foi criado um resultado para fins de teste. ID do resultado de teste: {created_result.id}",
         db,
-        result_id=created_result.id,
+        results_id=created_result.id,
     )
 
     return created_result

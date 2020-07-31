@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy.orm.session import Session
 
+from api_pezao.crud.hospital import read_hospitals
 from api_pezao.models import HospitalCS, User
 from ..utils import (
     auth_header,
@@ -173,3 +174,16 @@ class TestHospital:
         response = self.client.delete(f"/hospitals/{self.test_hospital.id}/")
 
         assert response.status_code == 200
+        deleted_hospital = response.json()
+
+        # Testa se a deleção foi soft
+
+        # 1. O hospital não deve aparecer mais numa busca comum
+        assert len(read_hospitals(self.db)) == 0
+
+        # 2. Mas o hospital ainda deve estar presente
+        query = self.db.query(HospitalCS).all()
+
+        assert len(query) == 1
+        assert query[0].id == deleted_hospital["id"]
+        assert query[0].code == deleted_hospital["code"]

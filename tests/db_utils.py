@@ -14,11 +14,12 @@ def create_test_user(
     cpf="00000000000",
     password="secret",
     name="test",
+    **kwargs
 ) -> User:
     """
     Cria um usuário de testes dentro do banco de dados
     """
-    user = UserCreate(email=email, cpf=cpf, password=password, name=name)
+    user = UserCreate(email=email, cpf=cpf, password=password, name=name, **kwargs)
     user = create_user(db, user)
 
     return user

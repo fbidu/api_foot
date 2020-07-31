@@ -135,7 +135,7 @@ def login2_staff_or_admin(
     if not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    if not user.is_staff or (not user.is_superuser):
+    if not user.is_staff and (not user.is_superuser):
         raise HTTPException(status_code=401, detail="User is not staff or superuser")
 
     token = create_access_token({"sub": username})

@@ -36,6 +36,7 @@ class HospitalCS(HospitalCSBase):
     created_at: datetime
     updated_at: datetime
     user_id: int
+    deleted: bool = False
 
     class Config:
         """
