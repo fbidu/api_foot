@@ -1,7 +1,7 @@
 """
 CRUD = Create Read Update Delete
 """
-
+import re
 from typing import List
 
 from jose import jwt, JWTError
@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..auth import get_password_hash, SECRET_KEY
 from ..models import User
-import re
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> User:
@@ -57,7 +56,7 @@ def list_users(db: Session) -> List[User]:
     """
     Lists all the registered users
     """
-    return db.query(models.User).all()
+    return db.query(models.User).filter(~models.User.deleted).all()
 
 
 def find_user(db: Session, username: str) -> User:
@@ -76,9 +75,9 @@ def find_user(db: Session, username: str) -> User:
         cpf (str, opcional): CPF para ser buscado
     """
 
-    query = db.query(models.User)
+    query = db.query(models.User).filter(~models.User.deleted)
 
-    cpf_username = ''.join(re.findall(r"\d", username))
+    cpf_username = "".join(re.findall(r"\d", username))
 
     user = query.filter(models.User.cpf == cpf_username).first()
 
@@ -101,3 +100,15 @@ def get_current_user(db: Session, token: str):
         return None
 
     return user
+
+
+def delete_user(db: Session, user_id: int) -> schemas.User:
+    """
+    Deleta um usuário usando de soft_delete
+    """
+    db_user = db.query(User).get(user_id)
+    db_user.deleted = True
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user

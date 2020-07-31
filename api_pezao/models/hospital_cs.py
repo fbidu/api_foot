@@ -3,7 +3,7 @@ Define modelo SQL para Hospital CS
 """
 import datetime
 import enum
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from ..database import Base
@@ -36,5 +36,6 @@ class HospitalCS(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    deleted = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="hospital_cs")

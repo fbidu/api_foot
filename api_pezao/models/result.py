@@ -19,33 +19,31 @@ class Result(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     IDExport = Column(Integer, unique=True, index=True)
-    Barcode = Column(String)
-    NumLote = Column(Integer)
-    DataNasc = Column(String)  # date?
-    HoraNasc = Column(String)  # date?
-    DataColeta = Column(String)  # date?
-    HoraColeta = Column(String)  # date?
-    prMotherFirstname = Column(String)
-    prMotherSurname = Column(String)
-    CPF = Column(String)
-    ptnFirstname = Column(String)
-    ptnSurname = Column(String)
-    DNV = Column(String)
-    CNS = Column(String)  # type?
-    ptnEmail = Column(String)
-    ptnPhone1 = Column(String)
-    ptnPhone2 = Column(String)
-    CodLocColeta = Column(String)  # type?
-    LocalColeta = Column(String)
-    COD_LocColeta = Column(String)  # type? repeat?
-    COD_HospNasc = Column(String)  # type? repeat?
-    HospNasc = Column(String)
-    LocalNasc = Column(String)
-    PDF_Filename = Column(String)
-    Tipo_SMS = Column(String)  # type?
-    RECORD_CREATION_DATE = Column(DateTime, default=datetime.utcnow)  # date?
-    FILE_EXPORT_DATE = Column(DateTime, default=datetime.utcnow)  # date?
-    FILE_EXPORT_NAME = Column(String)
+    Barcode = Column(String, nullable=True)
+    LotNumber = Column(Integer, nullable=True)
+    DataNasc = Column(String, nullable=True)
+    HoraNasc = Column(String, nullable=True)
+    DataColeta = Column(String, nullable=True)
+    prMotherFirstname = Column(String, nullable=True)
+    prMotherSurname = Column(String, nullable=True)
+    CPF = Column(String, nullable=True)
+    ptnFirstname = Column(String, nullable=True)
+    ptnSurname = Column(String, nullable=True)
+    DNV = Column(String, nullable=True)
+    CNS = Column(String, nullable=True)
+    ptnEmail = Column(String, nullable=True)
+    ptnPhone1 = Column(String, nullable=True)
+    ptnPhone2 = Column(String, nullable=True)
+    COD_LocColeta = Column(String, nullable=True)
+    LocalColeta = Column(String, nullable=True)
+    COD_HospitalNasc = Column(String, nullable=True)
+    HospitalNasc = Column(String, nullable=True)
+    LocalNasc = Column(String, nullable=True)
+    PDF_Filename = Column(String, nullable=True)
+    PDF_ImageDate = Column(DateTime, default=datetime.utcnow)
+    FILE_EXPORT_DATE = Column(DateTime, default=datetime.utcnow)
+    FILE_EXPORT_NAME = Column(String, nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
     sms_sent = Column(Boolean, default=False)

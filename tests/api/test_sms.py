@@ -177,7 +177,9 @@ class TestSMS:
         for result in self.results:
             db_result = create_result(self.db, result)
             self.db.add(
-                TemplatesResult(result_id=db_result.id, template_id=template_sms.id)
+                TemplatesResult(
+                    IDExport=db_result.IDExport, template_id=template_sms.id
+                )
             )
             self.db.commit()
 

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     """
 
     pdf_storage_path: str = "/tmp"
+    upload_secret: str = "c99b3e00f5215e1e103d9358a77435f0014c2d589b37fac8c417aafd351067bd"
 
     sms_username: str = "FUNCAMP02"
     sms_password: str = "Pezao$2020"

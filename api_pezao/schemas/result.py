@@ -2,8 +2,10 @@
 Define modelo de dados para resultados
 """
 from datetime import datetime
-from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 import re
+
+from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
+
 
 class ResultBase(BaseModel):
     """
@@ -11,46 +13,44 @@ class ResultBase(BaseModel):
     """
 
     IDExport: int
-    Barcode: int
-    NumLote: int
-    DataNasc: str
-    HoraNasc: str
-    DataColeta: str
-    HoraColeta: str
-    prMotherFirstname: str
-    prMotherSurname: str
-    CPF: str
-    ptnFirstname: str
-    ptnSurname: str
-    DNV: str
-    CNS: str
-    ptnEmail: str
-    ptnPhone1: str
-    ptnPhone2: str
-    CodLocColeta: str
-    LocalColeta: str
-    COD_LocColeta: str
-    COD_HospNasc: str
-    HospNasc: str
-    LocalNasc: str
-    PDF_Filename: str
-    Tipo_SMS: str
-    RECORD_CREATION_DATE: datetime
-    FILE_EXPORT_DATE: datetime
-    FILE_EXPORT_NAME: str
+    Barcode: str = ""
+    LotNumber: str = ""
+    DataNasc: str = ""
+    HoraNasc: str = ""
+    DataColeta: str = ""
+    prMotherFirstname: str = ""
+    prMotherSurname: str = ""
+    CPF: str = ""
+    ptnFirstname: str = ""
+    ptnSurname: str = ""
+    DNV: str = ""
+    CNS: str = ""
+    ptnEmail: str = ""
+    ptnPhone1: str = ""
+    ptnPhone2: str = ""
+    COD_LocColeta: str = ""
+    LocalColeta: str = ""
+    COD_HospitalNasc: str = ""
+    HospitalNasc: str = ""
+    LocalNasc: str = ""
+    PDF_Filename: str = ""
+    PDF_ImageDate: datetime = None
+    FILE_EXPORT_DATE: datetime = None
+    FILE_EXPORT_NAME: str = ""
     sms_sent: bool = False
 
-    @validator('CPF')
+    # pylint: disable=invalid-name,missing-function-docstring,no-self-argument,no-self-use
+    @validator("CPF")
     def cpf_numbers(cls, v):
-        return ''.join(re.findall(r"\d", v))
+        return "".join(re.findall(r"\d", v))
 
-    @validator('CNS')
+    @validator("CNS")
     def cns_numbers(cls, v):
-        return ''.join(re.findall(r"\d", v))
+        return "".join(re.findall(r"\d", v))
 
-    @validator('DNV')
+    @validator("DNV")
     def dnv_numbers(cls, v):
-        return ''.join(re.findall(r"\d", v))
+        return "".join(re.findall(r"\d", v))
 
 
 class ResultCreate(ResultBase):

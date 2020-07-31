@@ -33,7 +33,7 @@ def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme
         return user_list
 
     log(
-        f"[LISTA DE USUÁRIOS] Usuário {logged_user.name}, que não é superuser, tentou listar usuários!",
+        f"[LISTA DE USUÁRIOS] Usuário comum {logged_user.name}, tentou listar usuários!",
         db,
         user_id=logged_user.id,
     )
@@ -74,8 +74,31 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     created_user = crud.create_user(db=db, user=user)
 
     log(
-        f"[CRIAÇÃO DE USUÁRIO] Usuário criado com CPF = {created_user.cpf}, e-mail = {created_user.email}, login = {created_user.login}",
+        "[CRIAÇÃO DE USUÁRIO] Usuário criado com "
+        f"CPF = {created_user.cpf}, e-mail = {created_user.email}, "
+        f"login = {created_user.login}",
         db,
     )
 
     return created_user
+
+
+@router.delete("/users/{user_id}", response_model=schemas.User)
+def delete_user(
+    user_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
+    """
+    Deleta um usuário
+    """
+    logged_user = crud.get_current_user(db, token)
+    if not logged_user.is_superuser:
+        log(
+            f"Usuário {logged_user.name}, que não é superuser, tentou deletar usuário {user_id}!",
+            db,
+            user_id=logged_user.id,
+        )
+        raise HTTPException(
+            status_code=403, detail="Você não tem permissão para deletar usuários"
+        )
+
+    return crud.delete_user(db, user_id)
