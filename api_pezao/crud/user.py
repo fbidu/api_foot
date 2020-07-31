@@ -1,7 +1,7 @@
 """
 CRUD = Create Read Update Delete
 """
-
+import re
 from typing import List
 
 from jose import jwt, JWTError
@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..auth import get_password_hash, SECRET_KEY
 from ..models import User
-import re
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> User:
@@ -57,7 +56,7 @@ def list_users(db: Session) -> List[User]:
     """
     Lists all the registered users
     """
-    return db.query(models.User).filter(models.User.deleted == False).all()
+    return db.query(models.User).filter(~models.User.deleted).all()
 
 
 def find_user(db: Session, username: str) -> User:
@@ -76,16 +75,16 @@ def find_user(db: Session, username: str) -> User:
         cpf (str, opcional): CPF para ser buscado
     """
 
-    query = db.query(models.User)
+    query = db.query(models.User).filter(~models.User.deleted)
 
-    cpf_username = ''.join(re.findall(r"\d", username))
+    cpf_username = "".join(re.findall(r"\d", username))
 
-    user = query.filter(models.User.cpf == cpf_username and models.User.deleted == False).first()
+    user = query.filter(models.User.cpf == cpf_username).first()
 
     if user is None:
-        user = query.filter(models.User.email == username and models.User.deleted == False).first()
+        user = query.filter(models.User.email == username).first()
     if user is None:
-        user = query.filter(models.User.login == username and models.User.deleted == False).first()
+        user = query.filter(models.User.login == username).first()
 
     return user
 
