@@ -2,7 +2,7 @@
 Warmup functions
 """
 from getpass import getpass
-from pprint import pprint
+from pathlib import Path
 import requests
 
 
@@ -58,6 +58,28 @@ class Warmup:
 
         return response.json()
 
+    def import_pdf(self, folder_path: str):
+        """
+        Imports all the PDFs of a folder
+        """
+        folder = Path(folder_path)
+        failures = 0
+        successes = 0
+        for file in folder.glob("*.pdf"):
+            print(f"Processando {file.absolute()}")
+            files = {"pdf_file": open(file.absolute(), "rb")}
+            result = requests.post(
+                f"{self.api_url}/pdf/", headers=self.headers, files=files
+            )
+
+            if result.status_code > 399:
+                print(f"Falha ao processar {file.absolute()}")
+                failures += 1
+            else:
+                print(f"Processado com sucesso {file.absolute()}")
+                successes += 1
+        return f"{successes} PDFs Importados com sucesso. {failures} falhas"
+
 
 def process_option(option_, *args, **kwargs):
     """
@@ -78,6 +100,16 @@ def process_option(option_, *args, **kwargs):
         senha = getpass("Digite a senha: ")
 
         return warm.create_super_user(name, email, senha)
+
+    if option == "4":
+        folder_path = input("Digite o caminho completo da pasta com PDFs: ")
+        confirm = input(
+            f"Todos os arquivos PDFs de {folder_path} serão importados. Continuar? [s/n]"
+        )
+
+        if confirm.lower() == "s":
+            return warm.import_pdf(folder_path)
+        return "Opção inválida."
 
     return "Erro"
 
@@ -101,10 +133,11 @@ if __name__ == "__main__":
         [1] Importar resultados
         [2] Importar Templates Results
         [3] Criar Super Usuário
+        [4] Importar PDFs
         [q] Sair
         """
         )
 
         option = input("> ")
 
-        pprint(process_option(option))
+        print(process_option(option))
