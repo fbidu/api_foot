@@ -3,23 +3,60 @@ Testes unitários para o módulo de leitura de CSV
 """
 from csv import DictReader
 from pathlib import Path
+
 from pydantic import BaseModel
 from pydantic.class_validators import validator
 from pydantic.error_wrappers import ValidationError
+
 from api_pezao import csv_input
 from api_pezao.crud.result import read_results
+from api_pezao.models import TemplatesResult, TemplateSMS
+
+
+def _import_test_results(db):
+    sample_file = Path("tests/demo.csv").absolute()
+    content = open(sample_file)
+    return csv_input.import_results_csv(content, db)
 
 
 def test_import_results_csv(db):
     """
     testa se a função de import_csv retorna o total correto de linhas
     """
-    sample_file = Path("tests/demo.csv").absolute()
-    content = open(sample_file)
-    assert csv_input.import_results_csv(content, db) == 159
+
+    imported_objects = _import_test_results(db)
+    assert len(imported_objects) == 159
 
     db_results = read_results(db)
     assert len(db_results) == 159
+
+
+def test_import_templates_results_csv(db):
+    """
+    Testa se a importação da relação results-templates funciona
+    """
+    sample_file = Path("tests/demo_templates_result.csv").absolute()
+    content = open(sample_file)
+
+    assert len(csv_input.import_templates_results_csv(content, db)) == 159
+
+    db_objects = db.query(TemplatesResult).all()
+
+    assert len(db_objects) == 159
+
+    results = _import_test_results(db)
+    template_sms_0 = db_objects[0]
+
+    assert template_sms_0.template_id == 1
+    assert template_sms_0.IDExport == results[0].IDExport
+    assert template_sms_0.result.IDExport == results[0].IDExport
+
+    db_template = TemplateSMS(id=1, msg="test")
+    db.add(db_template)
+    db.commit()
+    db.refresh(db_template)
+
+    assert template_sms_0.template_sms.msg == db_template.msg
 
 
 def test_csv_to_pydantic():

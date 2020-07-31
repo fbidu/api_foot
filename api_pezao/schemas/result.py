@@ -2,8 +2,9 @@
 Define modelo de dados para resultados
 """
 from datetime import datetime
-from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 import re
+
+from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 
 
 class ResultBase(BaseModel):
@@ -11,7 +12,7 @@ class ResultBase(BaseModel):
     ResultBase lista os campos que estão sempre disponíveis
     """
 
-    IDExport: str = ""
+    IDExport: int
     Barcode: str = ""
     LotNumber: str = ""
     DataNasc: str = ""
@@ -38,6 +39,7 @@ class ResultBase(BaseModel):
     FILE_EXPORT_NAME: str = ""
     sms_sent: bool = False
 
+    # pylint: disable=invalid-name,missing-function-docstring,no-self-argument,no-self-use
     @validator("CPF")
     def cpf_numbers(cls, v):
         return "".join(re.findall(r"\d", v))
@@ -49,10 +51,6 @@ class ResultBase(BaseModel):
     @validator("DNV")
     def dnv_numbers(cls, v):
         return "".join(re.findall(r"\d", v))
-
-    # @validator("FILE_EXPORT_DATE", "PDF_ImageDate")
-    # def parse_date(cls, v):
-    #     return datetime.strptime(v[:-3], "%Y-%m-%d %H:%M:%S.%f")
 
 
 class ResultCreate(ResultBase):

@@ -27,7 +27,7 @@ def read_csv(csv_file: UploadFile = File(...), db: Session = Depends(get_db)):
         content = file.read()
         content = content.decode("utf-8")
         content = content.split("\n")
-        lines = import_results_csv(content, db)
+        lines = len(import_results_csv(content, db))
 
     log("[CSV] CSV foi importado.", db)
 

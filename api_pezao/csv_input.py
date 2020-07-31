@@ -7,8 +7,8 @@ import csv
 from pydantic import BaseModel
 import pydantic
 
-from .models import Result
-from .schemas import ResultCreate
+from .models import Result, TemplatesResult
+from .schemas import ResultCreate, TemplatesResultCreate
 
 
 CSVToPydanticError = namedtuple(
@@ -58,7 +58,25 @@ def import_results_csv(csv_content, db):
         db.add(db_result)
 
     db.commit()
-    return len(results.objects)
+    return results.objects
+
+
+def import_templates_results_csv(csv_content, db):
+    """
+    Importa um csv que liga resultados à templates
+    """
+    csv_reader = csv.DictReader(csv_content, delimiter=",")
+
+    transform = {"id_reportedPatientsExport": "IDExport", "SMS_Code": "template_id"}
+
+    converted = csv_to_pydantic(csv_reader, TemplatesResultCreate, transform)
+
+    for template_result in converted.objects:
+        db_template_result = TemplatesResult(**template_result.dict())
+        db.add(db_template_result)
+
+    db.commit()
+    return converted.objects
 
 
 def csv_to_pydantic(

@@ -9,7 +9,7 @@ class TemplatesResultBase(BaseModel):
     Valida campos que são sempre necessários ao lidar com templates
     """
 
-    result_id: int
+    IDExport: int
     template_id: int
 
 
