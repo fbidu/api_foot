@@ -37,7 +37,7 @@ class Warmup:
         """
         Import CSV de templates_results
         """
-        return self._import_csv(filename, type_="results")
+        return self._import_csv(filename, type_="templates_results")
 
 
 def process_option(option_, *args, **kwargs):

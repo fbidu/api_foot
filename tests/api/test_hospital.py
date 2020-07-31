@@ -62,6 +62,8 @@ class TestHospital:
         }
         response = create_demo_hospital(self.client, **self.payload)
 
+        response.raise_for_status()
+
         id_ = response.json()["id"]
         self.payload["type"] = self.payload.pop("type_")
 

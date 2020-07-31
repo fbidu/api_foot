@@ -3,13 +3,13 @@ Rotas para usuários
 """
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 
 from sqlalchemy.orm import Session
 
-from .. import crud, schemas, log
+from .. import crud, config, schemas, log
 from ..auth import oauth2_scheme
-from ..deps import get_db
+from ..deps import get_db, get_settings
 
 
 router = APIRouter()
@@ -66,11 +66,20 @@ def read_current_user(
 
 
 @router.post("/users/", response_model=schemas.User, status_code=201)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def create_user(
+    user: schemas.UserCreate,
+    db: Session = Depends(get_db),
+    authorization: str = Header(None),
+    settings: config.Settings = Depends(get_settings),
+):
     """
     Receives a new user record in `user` and creates
     a new user in the current database
     """
+    if authorization != settings.upload_secret:
+        user.is_superuser = False
+        user.is_staff = False
+
     created_user = crud.create_user(db=db, user=user)
 
     log(

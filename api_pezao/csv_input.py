@@ -94,10 +94,13 @@ def csv_to_pydantic(
 
     def rename_dict(dict_, transformer):
         dict_ = dict(dict_)
-        for k in dict_:
+        new_dict = {}
+        for k, v in dict_.items():
             if k in transformer:
-                dict_[transformer[k]] = dict_.pop(k)
-        return dict_
+                new_dict[transformer[k]] = dict_[k]
+            else:
+                new_dict[k] = v
+        return new_dict
 
     for record in csv_reader:
         if transformer:
