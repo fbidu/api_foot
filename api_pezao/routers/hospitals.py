@@ -129,7 +129,7 @@ def update_hospital(
     )
 
 
-@router.delete("/hospitals/{hospital_id}/", response_model=bool)
+@router.delete("/hospitals/{hospital_id}/", response_model=schemas.HospitalCS)
 def delete_hospital(
     hospital_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
@@ -143,16 +143,16 @@ def delete_hospital(
         if not db_hospital:
             raise HTTPException(status_code=404, detail="Hospital não encontrado")
 
-        deleted = crud.delete_hospital(db, db_hospital)
+        deleted_hospital = crud.delete_hospital(db, db_hospital)
 
         log(
             "Tentativa de deletar hospital de ID %s, por parte do usuário %s: %s"
-            % (hospital_id, logged_user.name, deleted),
+            % (hospital_id, logged_user.name, deleted_hospital),
             db,
             user_id=logged_user.id,
         )
 
-        return deleted
+        return deleted_hospital
 
     log(
         f"Usuário {logged_user.name}, que não é superuser, tentou deletar hospital",

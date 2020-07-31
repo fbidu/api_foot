@@ -25,17 +25,17 @@ def read_hospitals(
     if code != "":
         hospitals = hospitals.filter(models.HospitalCS.code == code)
     if name != "":
-        hospitals = hospitals.filter(models.HospitalCS.name.ilike('%'+name+'%'))
+        hospitals = hospitals.filter(models.HospitalCS.name.ilike("%" + name + "%"))
     if email != "":
         hospitals = hospitals.filter(
             or_(
-                models.HospitalCS.email1.ilike('%'+email+'%'),
-                models.HospitalCS.email2.ilike('%'+email+'%'),
-                models.HospitalCS.email3.ilike('%'+email+'%'),
+                models.HospitalCS.email1.ilike("%" + email + "%"),
+                models.HospitalCS.email2.ilike("%" + email + "%"),
+                models.HospitalCS.email3.ilike("%" + email + "%"),
             )
         )
 
-    hospitals = hospitals.filter(models.HospitalCS.deleted == False)
+    hospitals = hospitals.filter(~models.HospitalCS.deleted)
 
     return hospitals.all()
 
@@ -111,8 +111,9 @@ def delete_hospital(db: Session, db_hospital: models.HospitalCS):
         db_user.deleted = True
 
     db.commit()
+    db.refresh(db_hospital)
 
-    return True
+    return db_hospital
 
 
 def test_get_hospital_user(db: Session, hospital_id: int):
