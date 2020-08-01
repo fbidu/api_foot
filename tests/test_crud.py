@@ -4,7 +4,7 @@ Testes unitários para as funções de banco de dados
 from pytest import fixture
 from sqlalchemy.orm import Session
 
-from api_pezao import crud
+from api_pezao import auth, crud
 from api_pezao.models import User
 
 from .db_utils import create_test_user
@@ -38,3 +38,17 @@ def test_find_user_by_cpf(db: Session, test_user: User):
 
     assert found_user
     assert test_user == found_user
+
+
+def test_create_patient_user(db: Session):
+    """
+    Testa a criação de um usuário para um paciente
+    """
+
+    cpf = "00000000000"
+    user, password = crud.create_patient_user(db, cpf, name="teste")
+
+    db_user = db.query(User).get(user.id)
+    assert db_user.cpf == cpf
+
+    assert auth.verify_password(password, db_user.password)
