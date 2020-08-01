@@ -37,7 +37,7 @@ def import_results_csv(csv_content, db, create_users=True, send_sms_=False):
         "MotherName": "prMotherFirstname",
         "MotherSurname": "prMotherSurname",
         "MotherSSN_CPF": "CPF",
-        "PatientName": "ptnFirstName",
+        "PatientName": "ptnFirstname",
         "PatientSurname": "ptnSurname",
         "PatientSSN_DNV": "DNV",
         "PatientMedRec2_CNS": "CNS",
