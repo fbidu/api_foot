@@ -22,7 +22,7 @@ def send_sms(number, text, msg_id=0, settings=None):
     if not settings.sms_active:
         log(
             f"Pedido de envio de SMS para {number} mas o SMS está desabilitado!",
-            logging.WARNING,
+            level=logging.WARNING,
         )
 
     payload = {
