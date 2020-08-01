@@ -6,9 +6,12 @@ from enum import Enum
 from pathlib import Path
 
 from fastapi import Depends, File, UploadFile, APIRouter, Header, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from .. import config, log
+from ..auth import oauth2_scheme
+from ..crud import get_current_user, read_results
 from ..csv_input import import_results_csv, import_templates_results_csv
 
 from ..pdf_input import save_pdf
@@ -88,3 +91,28 @@ def read_pdf(
     return PDFProcessed(
         length=len(content), filename=pdf_file.filename, sha256=sha256(filename)
     )
+
+
+@router.get("/pdf/{file_name}")
+def return_pdf(
+    file_name: str,
+    settings: config.Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+):
+    """
+    Retorna o pdf do resultado
+    """
+    logged_user = get_current_user(db, token)
+
+    if not logged_user:
+        raise HTTPException(403)
+
+    results = read_results(db, cpf=logged_user.cpf, PDF_Filename=file_name)
+
+    if not results:
+        raise HTTPException(404)
+
+    result_path = Path(settings.pdf_storage_path).joinpath(file_name)
+
+    return FileResponse(str(result_path.absolute()))

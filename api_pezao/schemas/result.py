@@ -71,6 +71,11 @@ class Result(ResultBase):
     created_at: datetime
     updated_at: datetime
 
+    # pylint: disable=invalid-name,missing-function-docstring,no-self-argument,no-self-use
+    @validator("PDF_Filename")
+    def pdf_file(cls, v):
+        return f"/pdf/{v}"
+
     class Config:
         """
         Metadata to define the orm_mode of sqlalchemy

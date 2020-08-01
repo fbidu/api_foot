@@ -1,13 +1,14 @@
 """
 CRUD = Create Read Update Delete
 """
+import re
+
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
 
-import re
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments, invalid-name
 def read_results(
     db: Session,
     dnv: str = "",
@@ -18,6 +19,7 @@ def read_results(
     local_coleta: str = "",
     mother_firstname: str = "",
     mother_surname: str = "",
+    PDF_Filename: str = "",
 ):
     """
     Lista resultados conforme os filtros: resultados cujo DNV é dado e o CNS também,
@@ -37,24 +39,32 @@ def read_results(
     results = db.query(models.Result)
 
     if dnv != "":
-        dnv = ''.join(re.findall(r"\d", dnv))
+        dnv = "".join(re.findall(r"\d", dnv))
         results = results.filter(models.Result.DNV == dnv)
     if cns != "":
-        cns = ''.join(re.findall(r"\d", cns))
+        cns = "".join(re.findall(r"\d", cns))
         results = results.filter(models.Result.CNS == cns)
     if cpf != "":
-        cpf = ''.join(re.findall(r"\d", cpf))
+        cpf = "".join(re.findall(r"\d", cpf))
         results = results.filter(models.Result.CPF == cpf)
     if data_nascimento != "":
         results = results.filter(models.Result.DataNasc == data_nascimento)
     if data_coleta != "":
         results = results.filter(models.Result.DataColeta == data_coleta)
     if local_coleta != "":
-        results = results.filter(models.Result.LocalColeta.ilike('%'+local_coleta+'%'))
+        results = results.filter(
+            models.Result.LocalColeta.ilike("%" + local_coleta + "%")
+        )
     if mother_firstname != "":
-        results = results.filter(models.Result.prMotherFirstname.ilike('%'+mother_firstname+'%'))
+        results = results.filter(
+            models.Result.prMotherFirstname.ilike("%" + mother_firstname + "%")
+        )
     if mother_surname != "":
-        results = results.filter(models.Result.prMotherSurname.ilike('%'+mother_surname+'%'))
+        results = results.filter(
+            models.Result.prMotherSurname.ilike("%" + mother_surname + "%")
+        )
+    if PDF_Filename != "":
+        results = results.filter(models.Result.PDF_Filename.like(PDF_Filename))
 
     results = results.order_by(models.Result.FILE_EXPORT_DATE.desc())
 

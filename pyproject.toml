@@ -14,6 +14,8 @@ pyjwt = "^1.7.1"
 passlib = {version = "^1.7.2", extras = ["bcrypt"]}
 python-jose = "^3.1.0"
 aiofiles = "^0.5.0"
+requests = "^2.24.0"
+ipdb = "^0.13.3"
 
 [tool.poetry.dev-dependencies]
 pytest = {version = "^5.3"}
