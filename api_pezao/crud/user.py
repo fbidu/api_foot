@@ -123,6 +123,12 @@ def create_patient_user(db: Session, cpf: str, name: str) -> Tuple[User, str]:
     Retorna o objeto criado no banco e uma senha aleatória criada
     para o usuário.
     """
+    db_user = find_user(db, username=cpf)
+
+    # Usuário já existe
+    if db_user:
+        return db_user, None
+
     password = "".join(choices(ascii_letters + digits, k=8))
     user = schemas.UserCreate(cpf=cpf, name=name, password=password)
     db_user = create_user(db, user)

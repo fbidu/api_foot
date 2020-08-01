@@ -54,6 +54,7 @@ def test_post_pdf(client, db, sample_pdf: Path, mocker):
         PDF_Filename="demo.pdf",
         ptnPhone1="11000111000",
         prMotherFirstname="Teste",
+        prMotherSurname="Teste",
     )
 
     response = post_pdf(sample_pdf, client)
@@ -71,7 +72,7 @@ def test_post_pdf(client, db, sample_pdf: Path, mocker):
     assert check_files_equal(sample_pdf, "/tmp/demo.pdf")
 
     # pylint: disable=no-member
-    sms_utils.send_sms.assert_called_with(db_result.ptnPhone1, "hey")
+    sms_utils.send_sms.assert_called()
 
     db_user = find_user(db, username=db_result.CPF)
 

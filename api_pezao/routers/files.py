@@ -94,7 +94,21 @@ def read_pdf(
             cpf=db_result.CPF,
             name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
         )
-        sms_utils.send_sms(db_result.ptnPhone1, "hey")
+
+        sms_message = f"{user.name}, o resultado do exame do pézinho está pronto. "
+
+        if password:
+            sms_message += f"Faça login com seu cpf e a senha {password}"
+
+        number = db_result.ptnPhone1 or db_result.ptnPhone2
+
+        if number:
+            sms_utils.send_sms(number, sms_message)
+        else:
+            log(
+                f"[PDF] Arquivo {pdf_file.filename} importado mas sem "
+                "celulares associados. SMS não será enviado."
+            )
     else:
         log(
             f"[PDF] Arquivo {pdf_file.filename} importado mas sem "
