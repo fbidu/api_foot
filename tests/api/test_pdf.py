@@ -15,7 +15,7 @@ from api_pezao.crud import create_patient_user
 from api_pezao.schemas import ResultCreate
 from api_pezao.utils import sha256
 
-from ..utils import auth_header, post_pdf, check_files_equal
+from ..utils import auth_header, post_pdf, check_files_equal, create_demo_user
 
 
 # pylint: disable=redefined-outer-name
@@ -111,3 +111,9 @@ def test_result_contains_full_pdf_path(client, db, sample_pdf):
 
     wrong_pdf = client.get("/pdf/demo1.pdf", headers=auth_headers)
     assert wrong_pdf.status_code == 404
+
+    create_demo_user(client, cpf="123456789011")
+    auth_headers = auth_header(client)
+    result_pdf = client.get("/pdf/demo.pdf", headers=auth_headers)
+
+    assert result_pdf.status_code == 200

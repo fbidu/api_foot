@@ -108,7 +108,10 @@ def return_pdf(
     if not logged_user:
         raise HTTPException(403)
 
-    results = read_results(db, cpf=logged_user.cpf, PDF_Filename=file_name)
+    if logged_user.is_staff or logged_user.is_superuser:
+        results = read_results(db, PDF_Filename=file_name)
+    else:
+        results = read_results(db, cpf=logged_user.cpf, PDF_Filename=file_name)
 
     if not results:
         raise HTTPException(404)
