@@ -89,7 +89,8 @@ def import_templates_results_csv(csv_content, db):
             inserted.append(template_result)
         else:
             log(
-                f"Pulando template #{idx} pois não existe resultado com IDExport={template_result.IDExport}",
+                f"Pulando template #{idx} pois não existe resultado com "
+                f"IDExport={template_result.IDExport}",
                 level=logging.WARNING,
             )
 
