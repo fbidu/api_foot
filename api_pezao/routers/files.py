@@ -115,4 +115,4 @@ def return_pdf(
 
     result_path = Path(settings.pdf_storage_path).joinpath(file_name)
 
-    return FileResponse(str(result_path.absolute()))
+    return FileResponse(str(result_path.absolute()), media_type="application/pdf")
