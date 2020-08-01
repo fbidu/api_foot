@@ -14,13 +14,13 @@ from api_pezao.crud.user import list_users
 from api_pezao.models import TemplatesResult, TemplateSMS
 
 
-def import_test_results(db):
+def import_test_results(db, create_users=False):
     """
     Função auxiliar de importação de CSV
     """
     sample_file = Path("tests/demo.csv").absolute()
     content = open(sample_file)
-    return csv_input.import_results_csv(content, db)
+    return csv_input.import_results_csv(content, db, create_users)
 
 
 def test_import_results_csv(db):
@@ -28,13 +28,13 @@ def test_import_results_csv(db):
     testa se a função de import_csv retorna o total correto de linhas
     """
 
-    imported_objects = import_test_results(db)
-    assert len(imported_objects) == 111
+    imported_objects = import_test_results(db, create_users=True)
+    assert len(imported_objects) == 40
 
     db_results = read_results(db)
-    assert len(db_results) == 111
+    assert len(db_results) == 40
 
-    # assert len(list_users(db)) == 159
+    assert len(list_users(db)) == 39
 
 
 def test_import_templates_results_csv(db):
@@ -44,11 +44,11 @@ def test_import_templates_results_csv(db):
     sample_file = Path("tests/demo_templates_result.csv").absolute()
     content = open(sample_file)
     results = import_test_results(db)
-    assert len(csv_input.import_templates_results_csv(content, db)) == 111
+    assert len(csv_input.import_templates_results_csv(content, db)) == 40
 
     db_objects = db.query(TemplatesResult).all()
 
-    assert len(db_objects) == 111
+    assert len(db_objects) == 40
 
     template_sms_0 = db_objects[0]
 

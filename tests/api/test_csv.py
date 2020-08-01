@@ -34,10 +34,10 @@ def test_post_results_csv(client, db):
 
     content = response.json()
 
-    assert content["lines"] == 111
+    assert content["lines"] == 40
 
     db_results = read_results(db)
-    assert len(db_results) == 111
+    assert len(db_results) == 40
 
 
 def test_post_templates_results_csv(client, db):
@@ -55,10 +55,10 @@ def test_post_templates_results_csv(client, db):
 
     content = response.json()
 
-    assert content["lines"] == 111
+    assert content["lines"] == 40
 
     db_objects = db.query(TemplatesResult).all()
-    assert len(db_objects) == 111
+    assert len(db_objects) == 40
 
     template_sms_0 = db_objects[0]
 

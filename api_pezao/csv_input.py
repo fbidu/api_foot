@@ -8,7 +8,7 @@ import logging
 from pydantic import BaseModel
 import pydantic
 
-from .crud import create_patient_user
+from .crud import create_patient_user, find_user
 from .log import log
 from .models import Result, TemplatesResult
 from .schemas import ResultCreate, TemplatesResultCreate
@@ -20,7 +20,7 @@ CSVToPydanticError = namedtuple(
 CSVToPydanticResult = namedtuple("CSVToPydanticResult", ["objects", "errors"])
 
 
-def import_results_csv(csv_content, db):
+def import_results_csv(csv_content, db, create_users=True):
     """
     Reads a csv file and returns its line length
     """
@@ -61,11 +61,14 @@ def import_results_csv(csv_content, db):
         db_result = Result(**result.dict())
         db.add(db_result)
         inserted.append(result)
-        # create_patient_user(
-        #     db,
-        #     cpf=db_result.CPF,
-        #     name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
-        # )
+
+        db_user = find_user(db, db_result.CPF)
+        if not db_user and create_users:
+            create_patient_user(
+                db,
+                cpf=db_result.CPF,
+                name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
+            )
 
     db.commit()
     return inserted

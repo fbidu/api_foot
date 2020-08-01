@@ -16,7 +16,7 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
-    cpf = Column(String, unique=True, nullable=True)
+    cpf = Column(String, unique=True, index=True)
     name = Column(String)
     email = Column(String, unique=True, nullable=True)
     login = Column(String, unique=True, nullable=True)
