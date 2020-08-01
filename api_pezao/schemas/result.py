@@ -20,10 +20,10 @@ class ResultBase(BaseModel):
     DataColeta: str = None
     prMotherFirstname: str = None
     prMotherSurname: str = None
-    CPF: str = None
+    CPF: str
     ptnFirstname: str = None
     ptnSurname: str = None
-    DNV: str = None
+    DNV: str
     CNS: str = None
     ptnEmail: str = None
     ptnPhone1: str = None

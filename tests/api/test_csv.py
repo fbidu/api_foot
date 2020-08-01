@@ -34,10 +34,10 @@ def test_post_results_csv(client, db):
 
     content = response.json()
 
-    assert content["lines"] == 159
+    assert content["lines"] == 111
 
     db_results = read_results(db)
-    assert len(db_results) == 159
+    assert len(db_results) == 111
 
 
 def test_post_templates_results_csv(client, db):
@@ -47,6 +47,7 @@ def test_post_templates_results_csv(client, db):
     header = {"authorization": get_settings().upload_secret}
     sample_file = Path("tests/demo_templates_result.csv").absolute()
     files = {"csv_file": open(sample_file, "r")}
+    results = import_test_results(db)
     response = client.post("/csv/?type=templates_results", files=files, headers=header)
 
     assert response.status_code == 200
@@ -54,11 +55,11 @@ def test_post_templates_results_csv(client, db):
 
     content = response.json()
 
-    assert content["lines"] == 159
+    assert content["lines"] == 111
 
     db_objects = db.query(TemplatesResult).all()
-    assert len(db_objects) == 159
-    results = import_test_results(db)
+    assert len(db_objects) == 111
+
     template_sms_0 = db_objects[0]
 
     assert template_sms_0.template_id == 1

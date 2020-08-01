@@ -10,6 +10,7 @@ from pydantic.error_wrappers import ValidationError
 
 from api_pezao import csv_input
 from api_pezao.crud.result import read_results
+from api_pezao.crud.user import list_users
 from api_pezao.models import TemplatesResult, TemplateSMS
 
 
@@ -28,10 +29,12 @@ def test_import_results_csv(db):
     """
 
     imported_objects = import_test_results(db)
-    assert len(imported_objects) == 159
+    assert len(imported_objects) == 111
 
     db_results = read_results(db)
-    assert len(db_results) == 159
+    assert len(db_results) == 111
+
+    # assert len(list_users(db)) == 159
 
 
 def test_import_templates_results_csv(db):
@@ -40,14 +43,13 @@ def test_import_templates_results_csv(db):
     """
     sample_file = Path("tests/demo_templates_result.csv").absolute()
     content = open(sample_file)
-
-    assert len(csv_input.import_templates_results_csv(content, db)) == 159
+    results = import_test_results(db)
+    assert len(csv_input.import_templates_results_csv(content, db)) == 111
 
     db_objects = db.query(TemplatesResult).all()
 
-    assert len(db_objects) == 159
+    assert len(db_objects) == 111
 
-    results = import_test_results(db)
     template_sms_0 = db_objects[0]
 
     assert template_sms_0.template_id == 1
