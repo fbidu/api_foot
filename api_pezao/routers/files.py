@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from .. import config, log, sms_utils
 from ..auth import oauth2_scheme
-from ..crud import get_current_user, read_results
+from ..crud import get_current_user, read_results, create_patient_user
 from ..csv_input import import_results_csv, import_templates_results_csv
 
 from ..pdf_input import save_pdf
@@ -87,14 +87,19 @@ def read_pdf(
 
     db_results = read_results(db, PDF_Filename=pdf_file.filename)
 
-    if not db_results:
+    if db_results:
+        db_result = db_results[0]
+        user, password = create_patient_user(
+            db,
+            cpf=db_result.CPF,
+            name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
+        )
+        sms_utils.send_sms(db_result.ptnPhone1, "hey")
+    else:
         log(
             f"[PDF] Arquivo {pdf_file.filename} importado mas sem "
             "resultado associado. SMS não será enviado."
         )
-    else:
-        db_result = db_results[0]
-        sms_utils.send_sms(db_result.ptnPhone1, "hey")
 
     log("[PDF] PDF foi importado.", db)
 

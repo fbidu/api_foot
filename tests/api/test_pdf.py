@@ -11,7 +11,7 @@ from pytest import fixture
 from api_pezao import config, main
 from api_pezao import deps
 from api_pezao.models.result import Result
-from api_pezao.crud import create_patient_user
+from api_pezao.crud import create_patient_user, find_user
 from api_pezao.schemas import ResultCreate
 from api_pezao.utils import sha256
 from api_pezao import sms_utils
@@ -53,6 +53,7 @@ def test_post_pdf(client, db, sample_pdf: Path, mocker):
         CPF="01010101011",
         PDF_Filename="demo.pdf",
         ptnPhone1="11000111000",
+        prMotherFirstname="Teste",
     )
 
     response = post_pdf(sample_pdf, client)
@@ -71,6 +72,10 @@ def test_post_pdf(client, db, sample_pdf: Path, mocker):
 
     # pylint: disable=no-member
     sms_utils.send_sms.assert_called_with(db_result.ptnPhone1, "hey")
+
+    db_user = find_user(db, username=db_result.CPF)
+
+    assert db_user
 
 
 def test_post_pdf_obeys_env(client, sample_pdf):
@@ -108,6 +113,8 @@ def test_result_contains_full_pdf_path(client, db, sample_pdf):
     Testa se o usuário logado consegue pegar seus resultados
     """
 
+    post_pdf(sample_pdf, client)
+
     db_result = create_demo_result(
         db, IDExport=1, DNV=1, CNS=1, CPF="00000000000", PDF_Filename="demo.pdf"
     )
@@ -116,7 +123,6 @@ def test_result_contains_full_pdf_path(client, db, sample_pdf):
     )
 
     assert db_result
-    post_pdf(sample_pdf, client)
 
     _, password = create_patient_user(db, db_result.CPF, "teste")
     auth_headers = auth_header(client, username=db_result.CPF, password=password)
