@@ -9,7 +9,7 @@ from fastapi import Depends, File, UploadFile, APIRouter, Header, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from .. import config, log
+from .. import config, log, sms_utils
 from ..auth import oauth2_scheme
 from ..crud import get_current_user, read_results
 from ..csv_input import import_results_csv, import_templates_results_csv
@@ -54,7 +54,7 @@ def read_csv(
         content = content.decode("utf-8")
         content = content.split("\n")
         if type == CSVTypes.results:
-            lines = len(import_results_csv(content, db, send_sms_=True))
+            lines = len(import_results_csv(content, db))
         elif type == CSVTypes.templates_results:
             lines = len(import_templates_results_csv(content, db))
 
@@ -83,8 +83,18 @@ def read_pdf(
     # Builds the path
     target_path = Path(settings.pdf_storage_path)
     filename = target_path.joinpath(pdf_file.filename)
-
     save_pdf(content, filename)
+
+    db_results = read_results(db, PDF_Filename=pdf_file.filename)
+
+    if not db_results:
+        log(
+            f"[PDF] Arquivo {pdf_file.filename} importado mas sem "
+            "resultado associado. SMS não será enviado."
+        )
+    else:
+        db_result = db_results[0]
+        sms_utils.send_sms(db_result.ptnPhone1, "hey")
 
     log("[PDF] PDF foi importado.", db)
 

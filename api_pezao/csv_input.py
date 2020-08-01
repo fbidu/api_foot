@@ -21,7 +21,7 @@ CSVToPydanticError = namedtuple(
 CSVToPydanticResult = namedtuple("CSVToPydanticResult", ["objects", "errors"])
 
 
-def import_results_csv(csv_content, db, create_users=True, send_sms_=False):
+def import_results_csv(csv_content, db, create_users=True):
     """
     Reads a csv file and returns its line length
     """
@@ -70,7 +70,7 @@ def import_results_csv(csv_content, db, create_users=True, send_sms_=False):
                 cpf=db_result.CPF,
                 name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
             )
-            if send_sms_ and (db_result.ptnPhone1 or db_result.ptnPhone2):
+            if db_result.ptnPhone1 or db_result.ptnPhone2:
                 message = (
                     f"{user.name}, o resultado do exame do pézinho está pronto. "
                     f"Faça login com seu cpf e a senha {password}"
