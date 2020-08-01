@@ -146,3 +146,4 @@ analyzer/.snakemake
 # End of https://www.gitignore.io/api/python,visualstudiocode
 *.db
 .idea/*
+tests/small_demo.csv
