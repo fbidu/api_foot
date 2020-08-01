@@ -1,10 +1,13 @@
 """
 Here be awesome code!
 """
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from . import log
 from .database import engine, Base
+from .deps import get_settings
 from .routers import auth, files, hospitals, logs, results, sms, users
 
 Base.metadata.create_all(bind=engine)
@@ -29,6 +32,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+settings = get_settings().json(exclude={"valid_ddd"}, sort_keys=True, indent=4)
+log(f"As configurações são {settings}", level=logging.INFO)
 
 
 @app.get("/")

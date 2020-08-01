@@ -51,7 +51,7 @@ def read_csv(
         content = content.decode("utf-8")
         content = content.split("\n")
         if type == CSVTypes.results:
-            lines = len(import_results_csv(content, db))
+            lines = len(import_results_csv(content, db, send_sms_=True))
         elif type == CSVTypes.templates_results:
             lines = len(import_templates_results_csv(content, db))
 

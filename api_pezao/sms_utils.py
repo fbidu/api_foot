@@ -3,6 +3,7 @@ Function send_sms: sends SMS
 """
 
 import re
+import logging
 from typing import List
 
 from requests import post
@@ -17,6 +18,12 @@ def send_sms(number, text, msg_id=0, settings=None):
     """
     if not settings:
         settings = config.Settings()
+
+    if not settings.sms_active:
+        log(
+            f"Pedido de envio de SMS para {number} mas o SMS está desabilitado!",
+            logging.WARNING,
+        )
 
     payload = {
         "NumUsu": settings.sms_username,
