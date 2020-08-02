@@ -42,6 +42,12 @@ class Warmup:
         """
         return self._import_csv(filename, type_="templates_results")
 
+    def import_hospitals(self, filename):
+        """
+        Importa CSV de hospitais
+        """
+        return self._import_csv(filename, type_="hospitals")
+
     def create_super_user(self, name, email, password):
         """
         Creates a new user
@@ -89,9 +95,13 @@ def process_option(option_, *args, **kwargs):
     if option_ == "q":
         return "Até mais!"
 
-    options = {"1": warm.import_results, "2": warm.import_templates_results}
+    options = {
+        "1": warm.import_results,
+        "2": warm.import_templates_results,
+        "5": warm.import_hospitals,
+    }
 
-    if option_ in ("1", "2"):
+    if option_ in ("1", "2", "5"):
         filename = input("Digite o caminho completo do arquivo: ")
 
         return options[option_](filename=filename, *args, **kwargs)
@@ -131,10 +141,11 @@ if __name__ == "__main__":
             """
         Digite uma opção:
 
-        [1] Importar resultados
+        [1] Importar Resultados
         [2] Importar Templates Results
         [3] Criar Super Usuário
         [4] Importar PDFs
+        [5] Importar Hospitais
         [q] Sair
         """
         )
