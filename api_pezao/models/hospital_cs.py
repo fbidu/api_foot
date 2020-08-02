@@ -3,7 +3,8 @@ Define modelo SQL para Hospital CS
 """
 import datetime
 import enum
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from ..database import Base

@@ -2,6 +2,7 @@
 Define modelo SQL para log de tentativa de login
 """
 from datetime import datetime
+
 from sqlalchemy import Column, DateTime, Integer, String
 
 from ..database import Base

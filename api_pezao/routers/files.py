@@ -5,19 +5,18 @@ Files router
 from enum import Enum
 from pathlib import Path
 
-from fastapi import Depends, File, UploadFile, APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from .. import config, log, sms_utils
 from ..auth import oauth2_scheme
-from ..crud import get_current_user, read_results, create_patient_user
+from ..crud import create_patient_user, get_current_user, read_results
 from ..csv_input import import_results_csv, import_templates_results_csv
-
+from ..deps import get_db, get_settings
 from ..pdf_input import save_pdf
 from ..schemas.pdf_processed import PDFProcessed
 from ..utils import sha256
-from ..deps import get_db, get_settings
 
 router = APIRouter()
 

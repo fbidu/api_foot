@@ -5,18 +5,16 @@ Testes funcionais para POST de PDF
 from datetime import datetime
 from os import mkdir, remove, rmdir
 from pathlib import Path
+
 from pytest import fixture
 
-
-from api_pezao import config, main
-from api_pezao import deps
-from api_pezao.models.result import Result
+from api_pezao import config, deps, main, sms_utils
 from api_pezao.crud import create_patient_user, find_user
+from api_pezao.models.result import Result
 from api_pezao.schemas import ResultCreate
 from api_pezao.utils import sha256
-from api_pezao import sms_utils
 
-from ..utils import auth_header, post_pdf, check_files_equal, create_demo_user
+from ..utils import auth_header, check_files_equal, create_demo_user, post_pdf
 
 
 def create_demo_result(db, **kwargs):

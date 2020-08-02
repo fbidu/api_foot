@@ -3,14 +3,13 @@ Results router
 """
 from typing import List
 
-from fastapi import Depends, APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 
 from .. import crud, log, schemas
 from ..auth import oauth2_scheme
 from ..deps import get_db
-
 
 router = APIRouter()
 

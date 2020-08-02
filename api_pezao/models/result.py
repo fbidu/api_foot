@@ -2,7 +2,8 @@
 Define modelo SQL para resultados
 """
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String, Boolean
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
 
 from ..database import Base

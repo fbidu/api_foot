@@ -1,17 +1,16 @@
 """
 Module that handles CSV import
 """
-from collections import namedtuple
 import csv
 import logging
+from collections import namedtuple
 
-from pydantic import BaseModel
 import pydantic
+from pydantic import BaseModel
 
 from .log import log
 from .models import Result, TemplatesResult
 from .schemas import ResultCreate, TemplatesResultCreate
-
 
 CSVToPydanticError = namedtuple(
     "CSVToPydanticError", ["csv_record", "validation_error"]

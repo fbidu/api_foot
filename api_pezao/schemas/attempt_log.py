@@ -2,6 +2,7 @@
 Modelos para log de tentativa de login
 """
 from datetime import datetime
+
 from pydantic import BaseModel
 
 

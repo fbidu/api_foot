@@ -2,6 +2,7 @@
 Common dependencies
 """
 from functools import lru_cache
+
 from . import config
 from .database import SessionLocal
 

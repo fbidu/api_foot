@@ -2,14 +2,14 @@
 Function send_sms: sends SMS
 """
 
-import re
 import logging
+import re
 from typing import List
 
 from requests import post
 from sqlalchemy.orm import Session
 
-from . import config, log, crud
+from . import config, crud, log
 
 
 def send_sms(number, text, msg_id=0, settings=None):

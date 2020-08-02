@@ -3,12 +3,11 @@ CRUD para hospitais
 """
 from datetime import datetime
 
-from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..auth import get_password_hash
-
 from .user import create_user
 
 

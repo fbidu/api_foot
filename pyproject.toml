@@ -25,6 +25,7 @@ black = {version = "^18.3-alpha.0", allow-prereleases = true}
 pylint = "^2.4"
 ipython = "^7.13"
 pytest-cov = "^2.10.0"
+isort = {version = "~4", extras = ["pipfile_deprecated_finder"]}
 
 [build-system]
 requires = ["poetry>=0.12"]

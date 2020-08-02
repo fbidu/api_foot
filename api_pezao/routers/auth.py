@@ -1,12 +1,12 @@
 """
 Here be awesome code!
 """
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .. import crud, log, schemas
-from ..auth import verify_password, create_access_token, oauth2_scheme
+from ..auth import create_access_token, oauth2_scheme, verify_password
 from ..deps import get_db
 from ..utils import is_valid_cpf, is_valid_email
 
@@ -38,20 +38,24 @@ def login(
 
     if not user:
         log(
-            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login igual a {form_data.username}",
+            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, "
+            f"CPF ou login igual a {form_data.username}",
             db,
         )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     if not verify_password(form_data.password, user.password):
         log(
-            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário {form_data.username} não coincide com hash que temos no banco para o usuário {form_data.username} => Senha incorreta!",
+            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar "
+            f"com usuário {form_data.username} não coincide com hash que temos"
+            f"no banco para o usuário {form_data.username} => Senha incorreta!",
             db,
         )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     log(
-        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, e token de acesso criado para o usuário {form_data.username}",
+        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, "
+        f"e token de acesso criado para o usuário {form_data.username}",
         db,
     )
     return {
@@ -85,21 +89,25 @@ def login2(
 
     if not user:
         log(
-            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login igual a {form_data.username}",
+            f"[TENTATIVA DE LOGIN] Não existe usuário com e-mail, CPF ou login "
+            f"igual a {form_data.username}",
             db,
         )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     if not verify_password(form_data.password, user.password):
         log(
-            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário {form_data.username} não coincide com hash que temos no banco para o usuário {form_data.username} => Senha incorreta!",
+            f"[TENTATIVA DE LOGIN] Hash da senha fornecida para logar com usuário "
+            f"{form_data.username} não coincide com hash que temos no banco para o "
+            f"usuário {form_data.username} => Senha incorreta!",
             db,
         )
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     token = create_access_token({"sub": username})
     log(
-        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, e token de acesso criado para o usuário {form_data.username}",
+        f"[LOGIN] Sucesso: usuário {form_data.username} existe, senhas coincidem, "
+        f"e token de acesso criado para o usuário {form_data.username}",
         db,
     )
 
@@ -198,7 +206,9 @@ def change_role(
         updated_user = crud.set_staff_role(user, is_staff, db)
 
         log(
-            f"[FLAGS DE USUÁRIO] Usuário staff ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}",
+            f"[FLAGS DE USUÁRIO] Usuário staff ({logged_user.name}, de id = {logged_user.id})"
+            f" alterou flag staff do usuário {updated_user.name}"
+            f"(de id = {updated_user.id}) para {is_staff}",
             db,
             user_id=logged_user.id,
         )
@@ -209,7 +219,9 @@ def change_role(
         updated_user = crud.set_superuser_role(user, is_superuser, db)
 
         log(
-            f"[FLAGS DE USUÁRIO] Usuário superuser ({logged_user.name}, de id = {logged_user.id}) alterou flag staff do usuário {updated_user.name} (de id = {updated_user.id}) para {is_staff}, e flag superuser para {is_superuser}",
+            f"[FLAGS DE USUÁRIO] Usuário superuser ({logged_user.name}, de id = {logged_user.id}) "
+            f"alterou flag staff do usuário {updated_user.name} "
+            f"(de id = {updated_user.id}) para {is_staff}, e flag superuser para {is_superuser}",
             db,
             user_id=logged_user.id,
         )
@@ -217,7 +229,9 @@ def change_role(
         return updated_user
 
     log(
-        f"[FLAGS DE USUÁRIO] Usuário {logged_user.name}, de id = {logged_user.id}, não é staff nem superuser, e tentou alterar flags do usuário {updated_user.name} (de id = {updated_user.id}) para staff={is_staff} e superuser={is_superuser}",
+        f"[FLAGS DE USUÁRIO] Usuário {logged_user.name}, de id = {logged_user.id}, "
+        f"não é staff nem superuser, e tentou alterar flags do usuário {updated_user.name} "
+        f"(de id = {updated_user.id}) para staff={is_staff} e superuser={is_superuser}",
         db,
         user_id=logged_user.id,
     )

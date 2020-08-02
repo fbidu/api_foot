@@ -3,8 +3,8 @@ Warmup functions
 """
 from getpass import getpass
 from pathlib import Path
-import requests
 
+import requests
 
 # pylint: disable=invalid-name
 
