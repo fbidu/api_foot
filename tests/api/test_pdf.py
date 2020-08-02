@@ -5,17 +5,28 @@ Testes funcionais para POST de PDF
 from datetime import datetime
 from os import mkdir, remove, rmdir
 from pathlib import Path
+
 from pytest import fixture
 
-
-from api_pezao import config, main
-from api_pezao import deps
+from api_pezao import config, deps, main, sms_utils
+from api_pezao.crud import create_patient_user, find_user
 from api_pezao.models.result import Result
-from api_pezao.crud import create_patient_user
 from api_pezao.schemas import ResultCreate
 from api_pezao.utils import sha256
 
-from ..utils import auth_header, post_pdf, check_files_equal, create_demo_user
+from ..utils import auth_header, check_files_equal, create_demo_user, post_pdf
+
+
+def create_demo_result(db, **kwargs):
+    """
+    Helper function to create results
+    """
+    result = ResultCreate(**kwargs)
+    db_result = Result(**result.dict())
+    db.add(db_result)
+    db.commit()
+    db.refresh(db_result)
+    return db_result
 
 
 # pylint: disable=redefined-outer-name
@@ -27,10 +38,23 @@ def sample_pdf():
     return Path("tests/demo.pdf").absolute()
 
 
-def test_post_pdf(client, sample_pdf: Path):
+def test_post_pdf(client, db, sample_pdf: Path, mocker):
     """
     Testa se o envio de um arquivo para /pdf retorna o tamanho dele e salva
     """
+    mocker.patch("api_pezao.sms_utils.send_sms")
+    db_result = create_demo_result(
+        db,
+        IDExport=1,
+        DNV=1,
+        CNS=1,
+        CPF="01010101011",
+        PDF_Filename="demo.pdf",
+        ptnPhone1="11000111000",
+        prMotherFirstname="Teste",
+        prMotherSurname="Teste",
+    )
+
     response = post_pdf(sample_pdf, client)
 
     assert response.status_code == 200
@@ -44,6 +68,13 @@ def test_post_pdf(client, sample_pdf: Path):
 
     assert Path("/tmp/demo.pdf").exists()
     assert check_files_equal(sample_pdf, "/tmp/demo.pdf")
+
+    # pylint: disable=no-member
+    sms_utils.send_sms.assert_called()
+
+    db_user = find_user(db, username=db_result.CPF)
+
+    assert db_user
 
 
 def test_post_pdf_obeys_env(client, sample_pdf):
@@ -81,20 +112,16 @@ def test_result_contains_full_pdf_path(client, db, sample_pdf):
     Testa se o usuário logado consegue pegar seus resultados
     """
 
-    result = ResultCreate(
-        IDExport=1, DNV=1, CNS=1, CPF="00000000000", PDF_Filename="demo.pdf"
+    post_pdf(sample_pdf, client)
+
+    db_result = create_demo_result(
+        db, IDExport=1, DNV=1, CNS=1, CPF="00000000000", PDF_Filename="demo.pdf"
     )
-    result2 = ResultCreate(
-        IDExport=2, DNV=2, CNS=2, CPF="00000011000", PDF_Filename="demo1.pdf"
+    create_demo_result(
+        db, IDExport=2, DNV=2, CNS=2, CPF="00000011000", PDF_Filename="demo1.pdf"
     )
-    db_result = Result(**result.dict())
-    db.add(db_result)
-    db.add(Result(**result2.dict()))
-    db.commit()
-    db.refresh(db_result)
 
     assert db_result
-    post_pdf(sample_pdf, client)
 
     _, password = create_patient_user(db, db_result.CPF, "teste")
     auth_headers = auth_header(client, username=db_result.CPF, password=password)
@@ -104,7 +131,6 @@ def test_result_contains_full_pdf_path(client, db, sample_pdf):
 
     data = results.json()
     assert len(data) == 1
-    result = data[0]
 
     result_pdf = client.get("/pdf/demo.pdf", headers=auth_headers)
     assert result_pdf.status_code == 200

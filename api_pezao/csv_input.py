@@ -1,19 +1,16 @@
 """
 Module that handles CSV import
 """
-from collections import namedtuple
 import csv
 import logging
+from collections import namedtuple
 
-from pydantic import BaseModel
 import pydantic
+from pydantic import BaseModel
 
-from .crud import create_patient_user, find_user
 from .log import log
 from .models import Result, TemplatesResult
 from .schemas import ResultCreate, TemplatesResultCreate
-from .sms_utils import send_sms
-
 
 CSVToPydanticError = namedtuple(
     "CSVToPydanticError", ["csv_record", "validation_error"]
@@ -21,7 +18,7 @@ CSVToPydanticError = namedtuple(
 CSVToPydanticResult = namedtuple("CSVToPydanticResult", ["objects", "errors"])
 
 
-def import_results_csv(csv_content, db, create_users=True, send_sms_=False):
+def import_results_csv(csv_content, db):
     """
     Reads a csv file and returns its line length
     """
@@ -62,22 +59,6 @@ def import_results_csv(csv_content, db, create_users=True, send_sms_=False):
         db_result = Result(**result.dict())
         db.add(db_result)
         inserted.append(result)
-
-        db_user = find_user(db, db_result.CPF)
-        if not db_user and create_users:
-            user, password = create_patient_user(
-                db,
-                cpf=db_result.CPF,
-                name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
-            )
-            if send_sms_ and (db_result.ptnPhone1 or db_result.ptnPhone2):
-                message = (
-                    f"{user.name}, o resultado do exame do pézinho está pronto. "
-                    f"Faça login com seu cpf e a senha {password}"
-                )
-                send_sms(
-                    number=(db_result.ptnPhone1 or db_result.ptnPhone2), text=message
-                )
 
     db.commit()
     return inserted

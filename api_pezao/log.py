@@ -2,6 +2,7 @@
 Módulo que oferece funções para log
 """
 import logging
+
 from .database import SessionLocal
 from .models.log import Log
 

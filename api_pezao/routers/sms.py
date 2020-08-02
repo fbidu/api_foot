@@ -3,7 +3,7 @@ SMS router
 """
 from typing import List
 
-from fastapi import Depends, APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
 
 from .. import sms_utils

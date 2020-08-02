@@ -5,19 +5,18 @@ Files router
 from enum import Enum
 from pathlib import Path
 
-from fastapi import Depends, File, UploadFile, APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from .. import config, log
+from .. import config, log, sms_utils
 from ..auth import oauth2_scheme
-from ..crud import get_current_user, read_results
+from ..crud import create_patient_user, get_current_user, read_results
 from ..csv_input import import_results_csv, import_templates_results_csv
-
+from ..deps import get_db, get_settings
 from ..pdf_input import save_pdf
 from ..schemas.pdf_processed import PDFProcessed
 from ..utils import sha256
-from ..deps import get_db, get_settings
 
 router = APIRouter()
 
@@ -54,7 +53,7 @@ def read_csv(
         content = content.decode("utf-8")
         content = content.split("\n")
         if type == CSVTypes.results:
-            lines = len(import_results_csv(content, db, send_sms_=True))
+            lines = len(import_results_csv(content, db))
         elif type == CSVTypes.templates_results:
             lines = len(import_templates_results_csv(content, db))
 
@@ -83,8 +82,37 @@ def read_pdf(
     # Builds the path
     target_path = Path(settings.pdf_storage_path)
     filename = target_path.joinpath(pdf_file.filename)
-
     save_pdf(content, filename)
+
+    db_results = read_results(db, PDF_Filename=pdf_file.filename)
+
+    if db_results:
+        db_result = db_results[0]
+        user, password = create_patient_user(
+            db,
+            cpf=db_result.CPF,
+            name=f"{db_result.prMotherFirstname} {db_result.prMotherSurname}",
+        )
+
+        sms_message = f"{user.name}, o resultado do exame do pézinho está pronto. "
+
+        if password:
+            sms_message += f"Faça login com seu cpf e a senha {password}"
+
+        number = db_result.ptnPhone1 or db_result.ptnPhone2
+
+        if number:
+            sms_utils.send_sms(number, sms_message)
+        else:
+            log(
+                f"[PDF] Arquivo {pdf_file.filename} importado mas sem "
+                "celulares associados. SMS não será enviado."
+            )
+    else:
+        log(
+            f"[PDF] Arquivo {pdf_file.filename} importado mas sem "
+            "resultado associado. SMS não será enviado."
+        )
 
     log("[PDF] PDF foi importado.", db)
 

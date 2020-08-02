@@ -1,16 +1,16 @@
 """
 CRUD = Create Read Update Delete
 """
-from random import choices
 import re
+from random import choices
 from string import ascii_letters, digits
 from typing import List, Tuple
 
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..auth import get_password_hash, SECRET_KEY
+from ..auth import SECRET_KEY, get_password_hash
 from ..models import User
 
 
@@ -123,6 +123,12 @@ def create_patient_user(db: Session, cpf: str, name: str) -> Tuple[User, str]:
     Retorna o objeto criado no banco e uma senha aleatória criada
     para o usuário.
     """
+    db_user = find_user(db, username=cpf)
+
+    # Usuário já existe
+    if db_user:
+        return db_user, None
+
     password = "".join(choices(ascii_letters + digits, k=8))
     user = schemas.UserCreate(cpf=cpf, name=name, password=password)
     db_user = create_user(db, user)

@@ -9,7 +9,7 @@ from api_pezao.crud import find_user
 from api_pezao.models import User
 
 from ..db_utils import create_test_user
-from ..utils import create_demo_user, auth_header
+from ..utils import auth_header, create_demo_user
 
 
 class TestClientPezao:

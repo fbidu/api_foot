@@ -2,6 +2,7 @@
 Define modelos de validação para Logs
 """
 from datetime import datetime
+
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 

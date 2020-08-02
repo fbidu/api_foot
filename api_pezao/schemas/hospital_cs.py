@@ -2,6 +2,7 @@
 Modelos de validação para Hospitais e Centros de Saúde
 """
 from datetime import datetime
+
 from pydantic import BaseModel
 
 

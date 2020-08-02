@@ -1,8 +1,8 @@
 """
 Define modelo de dados para resultados
 """
-from datetime import datetime
 import re
+from datetime import datetime
 
 from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 

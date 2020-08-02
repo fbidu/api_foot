@@ -1,9 +1,14 @@
 """
 Oferece modelos de validação para Usuários
 """
-from datetime import datetime
 import re
-from pydantic import BaseModel, validator, root_validator  # pylint: disable=no-name-in-module
+from datetime import datetime
+
+from pydantic import (
+    BaseModel,  # pylint: disable=no-name-in-module
+    root_validator,
+    validator,
+)
 
 
 class UserBase(BaseModel):
@@ -34,10 +39,15 @@ class UserBase(BaseModel):
             )
         return values
 
-    @validator('cpf')
+    @validator("cpf")
     def cpf_numbers(cls, v):
+        """
+        Dado um CPF, retorna apenas seus números
+        """
         if v:
-            return ''.join(re.findall(r"\d", v))
+            return "".join(re.findall(r"\d", v))
+
+        return v
 
 
 class UserCreate(UserBase):

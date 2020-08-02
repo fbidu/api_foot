@@ -6,10 +6,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import crud, schemas, log
+from .. import crud, log, schemas
 from ..auth import oauth2_scheme
 from ..deps import get_db
-
 
 router = APIRouter()
 
@@ -31,8 +30,8 @@ def read_hospitals(
         hospital_list = crud.read_hospitals(db, code=code, name=name, email=email)
 
         log(
-            "Hospitais foram buscados com os seguintes filtros: code = %s, name = %s, email = %s, pelo usuário %s"
-            % (code, name, email, logged_user.name),
+            f"Hospitais foram buscados com os seguintes filtros: code = {code}, name = {name}, "
+            f"email = {email}, pelo usuário {logged_user.name}",
             db,
             user_id=logged_user.id,
         )

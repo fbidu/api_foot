@@ -11,16 +11,16 @@ from pydantic.error_wrappers import ValidationError
 from api_pezao import csv_input
 from api_pezao.crud.result import read_results
 from api_pezao.crud.user import list_users
-from api_pezao.models import TemplatesResult, TemplateSMS
+from api_pezao.models import TemplateSMS, TemplatesResult
 
 
-def import_test_results(db, create_users=False):
+def import_test_results(db):
     """
     Função auxiliar de importação de CSV
     """
     sample_file = Path("tests/demo.csv").absolute()
     content = open(sample_file)
-    return csv_input.import_results_csv(content, db, create_users)
+    return csv_input.import_results_csv(content, db)
 
 
 def test_import_results_csv(db):
@@ -28,13 +28,13 @@ def test_import_results_csv(db):
     testa se a função de import_csv retorna o total correto de linhas
     """
 
-    imported_objects = import_test_results(db, create_users=True)
+    imported_objects = import_test_results(db)
     assert len(imported_objects) == 40
 
     db_results = read_results(db)
     assert len(db_results) == 40
 
-    assert len(list_users(db)) == 39
+    assert len(list_users(db)) == 0
 
 
 def test_import_templates_results_csv(db):

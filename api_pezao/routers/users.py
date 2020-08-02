@@ -3,14 +3,12 @@ Rotas para usuários
 """
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Header
-
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import crud, config, schemas, log
+from .. import config, crud, log, schemas
 from ..auth import oauth2_scheme
 from ..deps import get_db, get_settings
-
 
 router = APIRouter()
 

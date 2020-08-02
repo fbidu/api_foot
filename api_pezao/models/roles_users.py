@@ -1,7 +1,7 @@
 """
 Define modelo SQL para relação User e Role
 """
-from sqlalchemy import Column, Integer, PrimaryKeyConstraint, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 
 from ..database import Base

@@ -3,8 +3,10 @@ Utilitary function to aid testing
 """
 
 from typing import Any
+
 from requests import Response
 from sqlalchemy.orm.session import Session
+
 from api_pezao.deps import get_settings
 from api_pezao.utils import sha256
 

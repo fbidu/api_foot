@@ -2,11 +2,12 @@
 Here be awesome code!
 """
 import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import log
-from .database import engine, Base
+from .database import Base, engine
 from .deps import get_settings
 from .routers import auth, files, hospitals, logs, results, sms, users
 
