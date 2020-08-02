@@ -21,6 +21,12 @@ CSVToPydanticError = namedtuple(
 CSVToPydanticResult = namedtuple("CSVToPydanticResult", ["objects", "errors"])
 
 
+def chunks(lst, size):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), size):
+        yield lst[i : i + size]
+
+
 def import_results_csv(csv_content, db):
     """
     Reads a csv file and returns its line length
@@ -57,13 +63,12 @@ def import_results_csv(csv_content, db):
 
     results = csv_to_pydantic(csv_reader, ResultCreate, transform)
     inserted = []
-    for result in results.objects:
+    for chunk in chunks(results.objects, 100):
+        objects = [Result(**result.dict()) for result in chunk]
+        db.bulk_save_objects(objects)
+        db.commit()
+        inserted.extend(chunk)
 
-        db_result = Result(**result.dict())
-        db.add(db_result)
-        inserted.append(result)
-
-    db.commit()
     return inserted
 
 
@@ -78,10 +83,14 @@ def import_templates_results_csv(csv_content, db):
     converted = csv_to_pydantic(csv_reader, TemplatesResultCreate, transform)
     inserted = []
 
+    objects = []
+
+    results = set(r.IDExport for r in db.query(Result.IDExport).distinct())
+
     for idx, template_result in enumerate(converted.objects):
-        if db.query(Result).filter(Result.IDExport == template_result.IDExport).first():
+        if template_result.IDExport in results:
             db_template_result = TemplatesResult(**template_result.dict())
-            db.add(db_template_result)
+            objects.append(db_template_result)
             inserted.append(template_result)
         else:
             log(
@@ -90,6 +99,7 @@ def import_templates_results_csv(csv_content, db):
                 level=logging.WARNING,
             )
 
+    db.bulk_save_objects(objects)
     db.commit()
     return inserted
 

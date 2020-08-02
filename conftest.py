@@ -9,11 +9,15 @@ from sqlalchemy.orm import sessionmaker
 from api_pezao import deps, main
 from api_pezao.database import Base
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+POSTGRES_URL = deps.get_settings().postgres_url
+
+if POSTGRES_URL:
+    engine = create_engine(POSTGRES_URL, pool_pre_ping=True)
+else:
+    engine = create_engine(
+        "sqlite:///./test.db", connect_args={"check_same_thread": False}
+    )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

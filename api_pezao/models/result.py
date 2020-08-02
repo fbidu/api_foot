@@ -21,7 +21,7 @@ class Result(Base):
     id = Column(Integer, primary_key=True, index=True)
     IDExport = Column(Integer, unique=True, index=True)
     Barcode = Column(String, nullable=True)
-    LotNumber = Column(Integer, nullable=True)
+    LotNumber = Column(String, nullable=True)
     DataNasc = Column(String, nullable=True)
     HoraNasc = Column(String, nullable=True)
     DataColeta = Column(String, nullable=True)
@@ -50,4 +50,8 @@ class Result(Base):
     sms_sent = Column(Boolean, default=False)
 
     log = relationship("Log", back_populates="result")
-    templates_result = relationship("TemplatesResult", back_populates="result")
+    templates_result = relationship(
+        "TemplatesResult",
+        back_populates="result",
+        primaryjoin="Result.IDExport == foreign(TemplatesResult.IDExport)",
+    )

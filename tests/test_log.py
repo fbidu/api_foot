@@ -1,7 +1,13 @@
+"""
+Teste unitário para log
+"""
 from api_pezao import crud, log
 
 
 def test_log_works(db):
-    log("test!!", db=db)
+    """
+    Teste de log simples
+    """
+    log("test!!", db=db, override_test=True)
 
-    assert len(crud.list_logs(db)) == 1
+    assert len(crud.list_logs(db)) != 0

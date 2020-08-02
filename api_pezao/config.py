@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     sms_password: str = "Pezao$2020"
     sms_sweep_time: str = "0 10 * * *"
     daily_sms_sweep_active: bool = True
-    sms_active = False
+    sms_active: bool = False
+    postgres_url: str = None
     valid_ddd: set = [
         "11",
         "12",
