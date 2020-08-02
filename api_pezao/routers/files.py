@@ -12,7 +12,11 @@ from sqlalchemy.orm import Session
 from .. import config, log, sms_utils
 from ..auth import oauth2_scheme
 from ..crud import create_patient_user, get_current_user, read_results
-from ..csv_input import import_results_csv, import_templates_results_csv
+from ..csv_input import (
+    import_hospitals_csv,
+    import_results_csv,
+    import_templates_results_csv,
+)
 from ..deps import get_db, get_settings
 from ..pdf_input import save_pdf
 from ..schemas.pdf_processed import PDFProcessed
@@ -56,6 +60,10 @@ def read_csv(
             lines = len(import_results_csv(content, db))
         elif type == CSVTypes.templates_results:
             lines = len(import_templates_results_csv(content, db))
+        elif type == CSVTypes.hospitals:
+            lines = len(import_hospitals_csv(content, db))
+        else:
+            raise HTTPException(400)
 
     log("[CSV] CSV foi importado.", db)
 

@@ -28,6 +28,10 @@ pytest-cov = "^2.10.0"
 isort = {version = "~4", extras = ["pipfile_deprecated_finder"]}
 pytest-xdist = "^1.34.0"
 
+[tool.isort]
+profile = "black"
+src_paths = ["api_pezao", "test"]
+
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"

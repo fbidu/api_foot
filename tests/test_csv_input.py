@@ -11,7 +11,7 @@ from pydantic.error_wrappers import ValidationError
 from api_pezao import csv_input
 from api_pezao.crud.result import read_results
 from api_pezao.crud.user import list_users
-from api_pezao.models import TemplateSMS, TemplatesResult
+from api_pezao.models import HospitalCS, TemplateSMS, TemplatesResult
 
 
 def import_test_results(db):
@@ -62,6 +62,19 @@ def test_import_templates_results_csv(db):
     db.refresh(db_template)
 
     assert template_sms_0.template_sms.msg == db_template.msg
+
+
+def test_import_hospitals_csv(db):
+    """
+    testa se a função de importar hospitais funcion
+    """
+
+    sample_file = Path("tests/demo_hospital.csv").absolute()
+    content = open(sample_file)
+    assert len(csv_input.import_hospitals_csv(content, db)) == 2
+
+    db_objects = db.query(HospitalCS).all()
+    assert len(db_objects) == 2
 
 
 def test_csv_to_pydantic():
