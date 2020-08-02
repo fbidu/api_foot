@@ -57,4 +57,5 @@ ENV FASTAPI_ENV=production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 COPY . /app/
 WORKDIR /app
-CMD ["uvicorn", "--reload", "api_pezao.main:app"]
+EXPOSE 8000
+CMD ["uvicorn", "--reload", "--host=0.0.0.0", "--port=8000", "api_pezao.main:app"]
