@@ -5,11 +5,13 @@ from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy.orm.session import Session
 
+from api_pezao.auth import verify_password
 from api_pezao.crud import find_user
+from api_pezao.deps import get_settings
 from api_pezao.models import User
 
 from ..db_utils import create_test_user
-from ..utils import auth_header, create_demo_user
+from ..utils import assert_response_matches_payload, auth_header, create_demo_user
 
 
 class TestClientPezao:
@@ -80,3 +82,32 @@ class TestClientPezao:
         assert not find_user(self.db, deleted_user["email"])
 
         assert self.db.query(User).get(deleted_user["id"])
+
+    def test_create_superuser_with_token(self):
+        """
+        Usando o shared secret, uma pessoa pode criar um superuser
+        """
+        headers = {"authorization": get_settings().upload_secret}
+
+        payload = {
+            "cpf": "12345678900",
+            "name": "A",
+            "email": None,
+            "login": "aaaaaa",
+            "is_superuser": True,
+            "is_staff": False,
+            "password": "a",
+        }
+
+        response = self.client.post("/users/", json=payload, headers=headers)
+
+        assert response.status_code == 201
+
+        password = payload.pop("password")
+        assert_response_matches_payload(response, payload, expected_status=201)
+
+        db_user = find_user(self.db, username=payload["cpf"])
+        assert db_user
+
+        assert verify_password(password, db_user.password)
+        assert db_user.is_superuser

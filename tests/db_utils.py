@@ -23,3 +23,10 @@ def create_test_user(
     user = create_user(db, user)
 
     return user
+
+
+def create_super_user(db, **kwargs):
+    """
+    Cria um super user
+    """
+    return create_test_user(db, is_superuser=True, **kwargs)
