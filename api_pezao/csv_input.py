@@ -1,6 +1,7 @@
 """
 Module that handles CSV import
 """
+
 import csv
 import logging
 from collections import namedtuple
@@ -8,9 +9,10 @@ from collections import namedtuple
 import pydantic
 from pydantic import BaseModel
 
+from .crud import create_hospital
 from .log import log
 from .models import Result, TemplatesResult
-from .schemas import ResultCreate, TemplatesResultCreate
+from .schemas import ResultCreate, TemplatesResultCreate, HospitalCSCreate
 
 CSVToPydanticError = namedtuple(
     "CSVToPydanticError", ["csv_record", "validation_error"]
@@ -89,6 +91,18 @@ def import_templates_results_csv(csv_content, db):
 
     db.commit()
     return inserted
+
+
+def import_hospitals_csv(csv_content, db):
+    """
+    Importa um csv com dados de hospital
+    """
+    csv_reader = csv.DictReader(csv_content, delimiter=",")
+    converted = csv_to_pydantic(csv_reader, HospitalCSCreate)
+
+    for idx, hospital in enumerate(converted.objects):
+        create_hospital(db, hospital)
+    return converted.objects
 
 
 def csv_to_pydantic(
