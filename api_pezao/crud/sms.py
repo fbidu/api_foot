@@ -4,6 +4,7 @@ SMS CRUD
 
 from collections import namedtuple
 from typing import List
+
 from sqlalchemy.orm import Session
 
 from .. import models, sms_utils

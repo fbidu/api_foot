@@ -1,9 +1,13 @@
 """
 Utilitary function to aid testing
 """
+
 from typing import Any
+
 from requests import Response
 from sqlalchemy.orm.session import Session
+
+from api_pezao.deps import get_settings
 from api_pezao.utils import sha256
 
 
@@ -20,15 +24,28 @@ def post_pdf(sample_pdf, client) -> Response:
     Posts a file to the main PDF endpoint
     """
     files = {"pdf_file": open(sample_pdf, "rb")}
-    return client.post("/pdf/", files=files)
+    return client.post(
+        "/pdf/", files=files, headers={"authorization": get_settings().upload_secret}
+    )
 
 
+# pylint:disable=too-many-arguments
 def create_demo_user(
-    client, cpf="00000000000", email="test@test.com", password="secret", super_user=True
+    client,
+    cpf="00000000000",
+    email="test@test.com",
+    password="secret",
+    super_user=True,
+    use_shared_secret=True,
 ) -> Response:
     """
     Creates a user for testing purposes
     """
+
+    headers = {}
+    if use_shared_secret:
+        headers["authorization"] = get_settings().upload_secret
+
     payload = {
         "cpf": cpf,
         "name": "Teste",
@@ -37,7 +54,7 @@ def create_demo_user(
         "is_superuser": super_user,
     }
 
-    response = client.post("/users/", json=payload)
+    response = client.post("/users/", json=payload, headers=headers)
     return response
 
 

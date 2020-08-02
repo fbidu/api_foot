@@ -2,7 +2,8 @@
 Define modelo SQL para User
 """
 import datetime
-from sqlalchemy import Column, DateTime, Integer, String, Boolean
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
 
 from ..database import Base
@@ -16,7 +17,7 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
-    cpf = Column(String, unique=True, nullable=True)
+    cpf = Column(String, unique=True, index=True)
     name = Column(String)
     email = Column(String, unique=True, nullable=True)
     login = Column(String, unique=True, nullable=True)

@@ -7,6 +7,6 @@ from .log import Log
 from .result import Result
 from .role import Role
 from .roles_users import RolesUsers
-from .templates_result import TemplatesResult
 from .template_sms import TemplateSMS
+from .templates_result import TemplatesResult
 from .user import User

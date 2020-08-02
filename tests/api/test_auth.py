@@ -9,7 +9,7 @@ from sqlalchemy.orm.session import Session
 from api_pezao.models import User
 
 from ..db_utils import create_test_user
-from ..utils import log_user_in, auth_header
+from ..utils import auth_header, log_user_in
 
 
 class TestAuth:

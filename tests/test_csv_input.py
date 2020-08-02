@@ -10,10 +10,14 @@ from pydantic.error_wrappers import ValidationError
 
 from api_pezao import csv_input
 from api_pezao.crud.result import read_results
-from api_pezao.models import TemplatesResult, TemplateSMS
+from api_pezao.crud.user import list_users
+from api_pezao.models import TemplateSMS, TemplatesResult
 
 
-def _import_test_results(db):
+def import_test_results(db):
+    """
+    Função auxiliar de importação de CSV
+    """
     sample_file = Path("tests/demo.csv").absolute()
     content = open(sample_file)
     return csv_input.import_results_csv(content, db)
@@ -24,11 +28,13 @@ def test_import_results_csv(db):
     testa se a função de import_csv retorna o total correto de linhas
     """
 
-    imported_objects = _import_test_results(db)
-    assert len(imported_objects) == 159
+    imported_objects = import_test_results(db)
+    assert len(imported_objects) == 40
 
     db_results = read_results(db)
-    assert len(db_results) == 159
+    assert len(db_results) == 40
+
+    assert len(list_users(db)) == 0
 
 
 def test_import_templates_results_csv(db):
@@ -37,14 +43,13 @@ def test_import_templates_results_csv(db):
     """
     sample_file = Path("tests/demo_templates_result.csv").absolute()
     content = open(sample_file)
-
-    assert len(csv_input.import_templates_results_csv(content, db)) == 159
+    results = import_test_results(db)
+    assert len(csv_input.import_templates_results_csv(content, db)) == 40
 
     db_objects = db.query(TemplatesResult).all()
 
-    assert len(db_objects) == 159
+    assert len(db_objects) == 40
 
-    results = _import_test_results(db)
     template_sms_0 = db_objects[0]
 
     assert template_sms_0.template_id == 1

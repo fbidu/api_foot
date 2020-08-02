@@ -2,13 +2,14 @@
 Function send_sms: sends SMS
 """
 
+import logging
 import re
 from typing import List
 
 from requests import post
 from sqlalchemy.orm import Session
 
-from . import config, log, crud
+from . import config, crud, log
 
 
 def send_sms(number, text, msg_id=0, settings=None):
@@ -17,6 +18,13 @@ def send_sms(number, text, msg_id=0, settings=None):
     """
     if not settings:
         settings = config.Settings()
+
+    if not settings.sms_active:
+        log(
+            f"Pedido de envio de SMS para {number} mas o SMS está desabilitado!",
+            level=logging.WARNING,
+        )
+        return False
 
     payload = {
         "NumUsu": settings.sms_username,

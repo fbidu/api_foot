@@ -4,10 +4,9 @@ Módulo que provê funções de autenticação
 from datetime import datetime, timedelta
 from typing import Optional
 
-from jose import jwt
 from fastapi.security import OAuth2PasswordBearer
+from jose import jwt
 from passlib.context import CryptContext
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")

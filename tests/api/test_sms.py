@@ -3,19 +3,21 @@ Testes funcionais para envio de SMS
 """
 from datetime import datetime
 from typing import List
+
 from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy.orm.session import Session
 
 from api_pezao.crud import (
-    create_result,
-    read_results,
-    lists_unsent_sms,
-    sms_sweep,
     confirm_sms,
+    create_result,
+    lists_unsent_sms,
+    read_results,
+    sms_sweep,
 )
-from api_pezao.models import HospitalCS, User, TemplateSMS, TemplatesResult, Result
+from api_pezao.models import HospitalCS, Result, TemplateSMS, TemplatesResult, User
 from api_pezao.schemas import ResultCreate
+
 from ..utils import auth_header, create_demo_hospital, create_demo_user
 
 

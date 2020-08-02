@@ -7,13 +7,14 @@ from sqlalchemy.orm.session import Session
 
 from api_pezao.crud.hospital import read_hospitals
 from api_pezao.models import HospitalCS, User
+
 from ..utils import (
+    assert_json_matches_payload,
+    assert_payload_in_database,
+    assert_response_matches_payload,
     auth_header,
     create_demo_hospital,
     create_demo_user,
-    assert_payload_in_database,
-    assert_response_matches_payload,
-    assert_json_matches_payload,
 )
 
 
@@ -61,6 +62,8 @@ class TestHospital:
             "email3": "testhosp3@test.com",
         }
         response = create_demo_hospital(self.client, **self.payload)
+
+        response.raise_for_status()
 
         id_ = response.json()["id"]
         self.payload["type"] = self.payload.pop("type_")

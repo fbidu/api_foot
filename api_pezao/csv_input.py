@@ -1,15 +1,16 @@
 """
 Module that handles CSV import
 """
-from collections import namedtuple
 import csv
+import logging
+from collections import namedtuple
 
-from pydantic import BaseModel
 import pydantic
+from pydantic import BaseModel
 
+from .log import log
 from .models import Result, TemplatesResult
 from .schemas import ResultCreate, TemplatesResultCreate
-
 
 CSVToPydanticError = namedtuple(
     "CSVToPydanticError", ["csv_record", "validation_error"]
@@ -33,7 +34,7 @@ def import_results_csv(csv_content, db):
         "MotherName": "prMotherFirstname",
         "MotherSurname": "prMotherSurname",
         "MotherSSN_CPF": "CPF",
-        "PatientName": "ptnFirstName",
+        "PatientName": "ptnFirstname",
         "PatientSurname": "ptnSurname",
         "PatientSSN_DNV": "DNV",
         "PatientMedRec2_CNS": "CNS",
@@ -52,13 +53,15 @@ def import_results_csv(csv_content, db):
     }
 
     results = csv_to_pydantic(csv_reader, ResultCreate, transform)
-
+    inserted = []
     for result in results.objects:
+
         db_result = Result(**result.dict())
         db.add(db_result)
+        inserted.append(result)
 
     db.commit()
-    return results.objects
+    return inserted
 
 
 def import_templates_results_csv(csv_content, db):
@@ -70,13 +73,22 @@ def import_templates_results_csv(csv_content, db):
     transform = {"id_reportedPatientsExport": "IDExport", "SMS_Code": "template_id"}
 
     converted = csv_to_pydantic(csv_reader, TemplatesResultCreate, transform)
+    inserted = []
 
-    for template_result in converted.objects:
-        db_template_result = TemplatesResult(**template_result.dict())
-        db.add(db_template_result)
+    for idx, template_result in enumerate(converted.objects):
+        if db.query(Result).filter(Result.IDExport == template_result.IDExport).first():
+            db_template_result = TemplatesResult(**template_result.dict())
+            db.add(db_template_result)
+            inserted.append(template_result)
+        else:
+            log(
+                f"Pulando template #{idx} pois não existe resultado com "
+                f"IDExport={template_result.IDExport}",
+                level=logging.WARNING,
+            )
 
     db.commit()
-    return converted.objects
+    return inserted
 
 
 def csv_to_pydantic(
@@ -94,12 +106,15 @@ def csv_to_pydantic(
 
     def rename_dict(dict_, transformer):
         dict_ = dict(dict_)
-        for k in dict_:
+        new_dict = {}
+        for k, v in dict_.items():
             if k in transformer:
-                dict_[transformer[k]] = dict_.pop(k)
-        return dict_
+                new_dict[transformer[k]] = dict_[k]
+            else:
+                new_dict[k] = v
+        return new_dict
 
-    for record in csv_reader:
+    for idx, record in enumerate(csv_reader):
         if transformer:
             record = rename_dict(record, transformer)
 
@@ -108,6 +123,8 @@ def csv_to_pydantic(
         try:
             object_ = pydantic_schema.parse_obj(record)
         except pydantic.ValidationError as e:
+            error_message = f"Erro de conversão do resultado #{idx}!"
+            log(f"{error_message}\n{e}", level=logging.WARNING)
             errors.append(
                 CSVToPydanticError(csv_record=record, validation_error=e.json())
             )

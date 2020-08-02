@@ -2,7 +2,8 @@
 Define modelo SQL para resultados
 """
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String, Boolean
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
 
 from ..database import Base
@@ -26,11 +27,11 @@ class Result(Base):
     DataColeta = Column(String, nullable=True)
     prMotherFirstname = Column(String, nullable=True)
     prMotherSurname = Column(String, nullable=True)
-    CPF = Column(String, nullable=True)
+    CPF = Column(String, index=True)
     ptnFirstname = Column(String, nullable=True)
     ptnSurname = Column(String, nullable=True)
-    DNV = Column(String, nullable=True)
-    CNS = Column(String, nullable=True)
+    DNV = Column(String, index=True)
+    CNS = Column(String, index=True)
     ptnEmail = Column(String, nullable=True)
     ptnPhone1 = Column(String, nullable=True)
     ptnPhone2 = Column(String, nullable=True)

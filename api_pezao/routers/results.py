@@ -3,13 +3,13 @@ Results router
 """
 from typing import List
 
-from fastapi import Depends, APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 
 from .. import crud, log, schemas
 from ..auth import oauth2_scheme
 from ..deps import get_db
-
 
 router = APIRouter()
 
@@ -44,7 +44,14 @@ def read_results(
     """
 
     logged_user = crud.get_current_user(db, token)
+
+    if not logged_user:
+        raise HTTPException(403)
+
     if not (logged_user.is_superuser or logged_user.is_staff):
+        if not logged_user.cpf:
+            raise HTTPException(403)
+
         cpf = logged_user.cpf
 
     result_list = crud.read_results(
@@ -94,7 +101,8 @@ def create_result_just_for_test(
     created_result = crud.create_result(db=db, result=result)
 
     log(
-        f"[CRIAÇÃO DE RESULTADO] Foi criado um resultado para fins de teste. ID do resultado de teste: {created_result.id}",
+        f"[CRIAÇÃO DE RESULTADO] Foi criado um resultado para fins de teste. "
+        f"ID do resultado de teste: {created_result.id}",
         db,
         results_id=created_result.id,
     )

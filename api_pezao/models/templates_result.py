@@ -1,7 +1,7 @@
 """
 Define relação entre Templates e Resultados
 """
-from sqlalchemy import Column, Integer, PrimaryKeyConstraint, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 
 from ..database import Base

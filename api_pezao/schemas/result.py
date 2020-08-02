@@ -1,8 +1,8 @@
 """
 Define modelo de dados para resultados
 """
-from datetime import datetime
 import re
+from datetime import datetime
 
 from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 
@@ -13,30 +13,30 @@ class ResultBase(BaseModel):
     """
 
     IDExport: int
-    Barcode: str = ""
-    LotNumber: str = ""
-    DataNasc: str = ""
-    HoraNasc: str = ""
-    DataColeta: str = ""
-    prMotherFirstname: str = ""
-    prMotherSurname: str = ""
-    CPF: str = ""
-    ptnFirstname: str = ""
-    ptnSurname: str = ""
-    DNV: str = ""
-    CNS: str = ""
-    ptnEmail: str = ""
-    ptnPhone1: str = ""
-    ptnPhone2: str = ""
-    COD_LocColeta: str = ""
-    LocalColeta: str = ""
-    COD_HospitalNasc: str = ""
-    HospitalNasc: str = ""
-    LocalNasc: str = ""
-    PDF_Filename: str = ""
+    Barcode: str = None
+    LotNumber: str = None
+    DataNasc: str = None
+    HoraNasc: str = None
+    DataColeta: str = None
+    prMotherFirstname: str = None
+    prMotherSurname: str = None
+    CPF: str
+    ptnFirstname: str = None
+    ptnSurname: str = None
+    DNV: str
+    CNS: str = None
+    ptnEmail: str = None
+    ptnPhone1: str = None
+    ptnPhone2: str = None
+    COD_LocColeta: str = None
+    LocalColeta: str = None
+    COD_HospitalNasc: str = None
+    HospitalNasc: str = None
+    LocalNasc: str = None
+    PDF_Filename: str = None
     PDF_ImageDate: datetime = None
     FILE_EXPORT_DATE: datetime = None
-    FILE_EXPORT_NAME: str = ""
+    FILE_EXPORT_NAME: str = None
     sms_sent: bool = False
 
     # pylint: disable=invalid-name,missing-function-docstring,no-self-argument,no-self-use
@@ -70,6 +70,11 @@ class Result(ResultBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+    # pylint: disable=invalid-name,missing-function-docstring,no-self-argument,no-self-use
+    @validator("PDF_Filename")
+    def pdf_file(cls, v):
+        return f"/pdf/{v}"
 
     class Config:
         """

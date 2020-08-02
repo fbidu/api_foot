@@ -292,7 +292,8 @@ good-names=i,
            _,
            db,
            e,
-           f
+           f,
+           v
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
