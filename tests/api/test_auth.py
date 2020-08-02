@@ -1,14 +1,15 @@
 """
 Testes funcionais para autenticação
 """
+from datetime import datetime
 from fastapi.testclient import TestClient
 from jose import jwt
-from pytest import fixture
+from pytest import fixture, approx
 from sqlalchemy.orm.session import Session
 
 from api_pezao.models import User
 
-from ..db_utils import create_test_user
+from ..db_utils import create_test_user, create_super_user
 from ..utils import auth_header, log_user_in
 
 
@@ -17,6 +18,7 @@ class TestAuth:
     Classe que testa vários pontos do mecanismo de autenticação
     """
 
+    root: User
     test_user: User
     client: TestClient
 
@@ -26,6 +28,7 @@ class TestAuth:
         Oferece um usuário de teste
         """
         self.test_user = create_test_user(db, password="secret")
+        self.root = create_super_user(db, cpf="123456789", email="root@root.com")
 
     @fixture(autouse=True)
     def _test_client(self, client: TestClient):
@@ -115,3 +118,23 @@ class TestAuth:
             "/users/me/", headers={"authorization": "Bearer poteitou"}
         )
         assert response.status_code == 401
+
+    def test_superuser_login_has_longer_token(self):
+        """
+        Super users need longer tokens for UX reasons
+        """
+
+        payload = {"username": self.root.email, "password": "secret"}
+
+        response = log_user_in(client=self.client, **payload)
+
+        assert response.status_code == 200
+
+        token = response.json()["access_token"]
+
+        token_exp = jwt.get_unverified_claims(token)["exp"]
+        now = datetime.timestamp(datetime.now())
+
+        assert (token_exp - now) == approx(12 * 60 * 60, abs=10)
+
+        assert token

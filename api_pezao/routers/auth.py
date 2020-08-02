@@ -1,6 +1,7 @@
 """
 Here be awesome code!
 """
+from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -58,10 +59,14 @@ def login(
         f"e token de acesso criado para o usuário {form_data.username}",
         db,
     )
-    return {
-        "access_token": create_access_token({"sub": username}),
-        "token_type": "bearer",
-    }
+
+    superuser_staff = user.is_staff or user.is_superuser
+
+    expires = timedelta(hours=12) if superuser_staff else timedelta(hours=1)
+
+    token = create_access_token({"sub": username}, expires_delta=expires)
+
+    return {"access_token": token, "token_type": "bearer"}
 
 
 @router.post("/token2")
