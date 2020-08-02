@@ -75,6 +75,11 @@ def create_user(
     a new user in the current database
     """
     if authorization != settings.upload_secret:
+        if user.is_superuser or user.is_staff:
+            log(
+                "Tentativa de criação de usuário como superuser ou "
+                "staff mas sem flag de autenticação"
+            )
         user.is_superuser = False
         user.is_staff = False
 
