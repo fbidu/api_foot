@@ -17,4 +17,8 @@ class TemplateSMS(Base):
     id = Column(Integer, primary_key=True, index=True)
     msg = Column(String)
 
-    templates_result = relationship("TemplatesResult", back_populates="template_sms")
+    templates_result = relationship(
+        "TemplatesResult",
+        back_populates="template_sms",
+        primaryjoin="TemplateSMS.id == foreign(TemplatesResult.template_id)",
+    )
