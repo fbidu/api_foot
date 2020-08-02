@@ -51,6 +51,7 @@ class Warmup:
             "email": email,
             "password": password,
             "is_superuser": True,
+            "is_staff": True,
         }
         response = requests.post(
             f"{self.api_url}/users/", headers=self.headers, json=data
