@@ -9,10 +9,13 @@ from .config import Settings
 
 POSTGRES_URL = Settings().postgres_url
 
-SQLALCHEMY_DATABASE_URL = POSTGRES_URL if POSTGRES_URL else "sqlite:///./sql_app.db"
+if POSTGRES_URL:
+    engine = create_engine(POSTGRES_URL, pool_pre_ping=True)
+else:
+    engine = create_engine(
+        "sqlite:///./sql_app.db", connect_args={"check_same_thread": False}
+    )
 
-CONNECT_ARGS = {} if POSTGRES_URL else {"check_same_thread": False}
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=CONNECT_ARGS)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

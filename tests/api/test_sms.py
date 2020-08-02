@@ -29,6 +29,7 @@ class TestSMS:
     test_user: User
     client: TestClient
     db: Session
+    db_results: List[Result]
     payload: dict
     test_hospital: HospitalCS
     results: List[ResultCreate]
@@ -175,6 +176,7 @@ class TestSMS:
                 sms_sent=True,
             ),
         ]
+        self.db_results = []
 
         for result in self.results:
             db_result = create_result(self.db, result)
@@ -184,6 +186,8 @@ class TestSMS:
                 )
             )
             self.db.commit()
+            self.db.refresh(db_result)
+            self.db_results.append(db_result)
 
     def test_results_ok(self):
         """
@@ -205,24 +209,26 @@ class TestSMS:
         all_to_sent = sms_sweep(self.db)
         assert len(all_to_sent) == 3
         assert all_to_sent == [
-            ("19995322524", "hello, world!", 1),
-            ("19995322525", "hello, world!", 1),
-            ("1", None, 2),
+            ("19995322524", "hello, world!", self.db_results[0].id),
+            ("19995322525", "hello, world!", self.db_results[0].id),
+            ("1", None, self.db_results[1].id),
         ]
 
         to_be_sent = sms_sweep(self.db, [self.payload["code"]])
         assert len(to_be_sent) == 2
         assert to_be_sent == [
-            ("19995322524", "hello, world!", 1),
-            ("19995322525", "hello, world!", 1),
+            ("19995322524", "hello, world!", self.db_results[0].id),
+            ("19995322525", "hello, world!", self.db_results[0].id),
         ]
 
     def test_confirm_sms(self):
         """
         Testa se o registro de sms enviado funciona
         """
-        db_result = self.db.query(Result).filter(Result.id == 1).first()
+        db_result = (
+            self.db.query(Result).filter(Result.id == self.db_results[0].id).first()
+        )
         assert not db_result.sms_sent
-        confirm_sms(self.db, 1)
+        confirm_sms(self.db, self.db_results[0].id)
         self.db.refresh(db_result)
         assert db_result.sms_sent
