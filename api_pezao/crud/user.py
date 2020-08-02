@@ -9,7 +9,7 @@ from typing import List, Tuple
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import log, models, schemas
 from ..auth import SECRET_KEY, get_password_hash
 from ..models import User
 
@@ -132,5 +132,7 @@ def create_patient_user(db: Session, cpf: str, name: str) -> Tuple[User, str]:
     password = "".join(choices(ascii_letters + digits, k=8))
     user = schemas.UserCreate(cpf=cpf, name=name, password=password)
     db_user = create_user(db, user)
+
+    log(f"Criado usuário para paciente com cpf {cpf} e senha {password}")
 
     return (db_user, password)
