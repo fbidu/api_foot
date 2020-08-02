@@ -30,5 +30,4 @@ class User(Base):
     deleted = Column(Boolean, default=False)
 
     log = relationship("Log", back_populates="user")
-    roles_users = relationship("RolesUsers", back_populates="user")
     hospital_cs = relationship("HospitalCS", uselist=False, back_populates="user")
