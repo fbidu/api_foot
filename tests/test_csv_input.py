@@ -11,7 +11,7 @@ from pydantic.error_wrappers import ValidationError
 from api_pezao import csv_input
 from api_pezao.crud.result import read_results
 from api_pezao.crud.user import list_users
-from api_pezao.models import TemplateSMS, TemplatesResult, HospitalCS
+from api_pezao.models import HospitalCS, TemplateSMS, TemplatesResult
 
 
 def import_test_results(db):

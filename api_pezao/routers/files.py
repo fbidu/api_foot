@@ -13,9 +13,9 @@ from .. import config, log, sms_utils
 from ..auth import oauth2_scheme
 from ..crud import create_patient_user, get_current_user, read_results
 from ..csv_input import (
+    import_hospitals_csv,
     import_results_csv,
     import_templates_results_csv,
-    import_hospitals_csv,
 )
 from ..deps import get_db, get_settings
 from ..pdf_input import save_pdf

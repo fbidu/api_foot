@@ -8,11 +8,12 @@ from collections import namedtuple
 
 import pydantic
 from pydantic import BaseModel
+from sqlalchemy.exc import SQLAlchemyError
 
 from .crud import create_hospital
 from .log import log
 from .models import Result, TemplatesResult
-from .schemas import ResultCreate, TemplatesResultCreate, HospitalCSCreate
+from .schemas import HospitalCSCreate, ResultCreate, TemplatesResultCreate
 
 CSVToPydanticError = namedtuple(
     "CSVToPydanticError", ["csv_record", "validation_error"]
@@ -101,7 +102,10 @@ def import_hospitals_csv(csv_content, db):
     converted = csv_to_pydantic(csv_reader, HospitalCSCreate)
 
     for idx, hospital in enumerate(converted.objects):
-        create_hospital(db, hospital)
+        try:
+            create_hospital(db, hospital)
+        except SQLAlchemyError:
+            log(f"Falha ao criar hospital #{idx}", db)
     return converted.objects
 
 

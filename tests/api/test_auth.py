@@ -2,14 +2,15 @@
 Testes funcionais para autenticação
 """
 from datetime import datetime
+
 from fastapi.testclient import TestClient
 from jose import jwt
-from pytest import fixture, approx
+from pytest import approx, fixture
 from sqlalchemy.orm.session import Session
 
 from api_pezao.models import User
 
-from ..db_utils import create_test_user, create_super_user
+from ..db_utils import create_super_user, create_test_user
 from ..utils import auth_header, log_user_in
 
 

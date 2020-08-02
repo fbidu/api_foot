@@ -5,7 +5,7 @@ from pathlib import Path
 
 from api_pezao.crud.result import read_results
 from api_pezao.deps import get_settings
-from api_pezao.models import TemplatesResult, HospitalCS
+from api_pezao.models import HospitalCS, TemplatesResult
 
 from ..test_csv_input import import_test_results
 

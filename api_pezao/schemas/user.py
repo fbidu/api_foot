@@ -4,11 +4,8 @@ Oferece modelos de validação para Usuários
 import re
 from datetime import datetime
 
-from pydantic import (
-    BaseModel,  # pylint: disable=no-name-in-module
-    root_validator,
-    validator,
-)
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import root_validator, validator
 
 
 class UserBase(BaseModel):

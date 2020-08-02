@@ -18,6 +18,7 @@ repos:
       - id: black
         language_version: python3
         stages: [commit]
+
   - repo: local
     hooks:
       - id: system
