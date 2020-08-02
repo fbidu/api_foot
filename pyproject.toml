@@ -18,6 +18,7 @@ requests = "^2.24.0"
 ipdb = "^0.13.3"
 pytest-mock = "^3.2.0"
 psycopg2-binary = "^2.8.5"
+alembic = "^1.4.2"
 
 [tool.poetry.dev-dependencies]
 pytest = {version = "^5.3"}

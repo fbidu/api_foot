@@ -18,6 +18,7 @@ repos:
       - id: black
         language_version: python3
         stages: [commit]
+        exclude: ^alembic/
 
   - repo: local
     hooks:
@@ -27,6 +28,7 @@ repos:
         language: system
         files: \.py$
         stages: [commit]
+        exclude: ^alembic/
 
       - id: system
         name: PyTest
