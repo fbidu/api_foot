@@ -77,19 +77,6 @@ def test_import_hospitals_csv(db):
     assert len(db_objects) == 2
 
 
-#
-# template_sms_0 = db_objects[0]
-#
-# assert template_sms_0.template_id == 1
-# assert template_sms_0.IDExport == results[0].IDExport
-# assert template_sms_0.result.IDExport == results[0].IDExport
-#
-# db_template = TemplateSMS(id=1, msg="test")
-# db.add(db_template)
-# db.commit()
-# db.refresh(db_template)
-
-
 def test_csv_to_pydantic():
     """
     Testa se a conversão csv-pydantic funciona
