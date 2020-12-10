@@ -1,4 +1,4 @@
-# Pezão API
+# API
 
 A API principal do projeto
 
